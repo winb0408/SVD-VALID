@@ -24,15 +24,15 @@ class SE3DBlock(nn.Module):
         return x * z.view(b, c, 1, 1, 1)
 
 
-def block(cin, cout, groups):
+def conv_pair(cin, hidden, cout, groups):
     return nn.Sequential(
         nn.ReflectionPad3d(1),
-        nn.Conv3d(cin, cout, 3),
-        SE3DBlock(cout),
-        nn.GroupNorm(groups, cout, eps=1e-5, affine=False),
+        nn.Conv3d(cin, hidden, 3),
+        SE3DBlock(hidden),
+        nn.GroupNorm(groups, hidden, eps=1e-5, affine=False),
         nn.ELU(inplace=True),
         nn.ReflectionPad3d(1),
-        nn.Conv3d(cout, cout, 3),
+        nn.Conv3d(hidden, cout, 3),
         SE3DBlock(cout),
         nn.GroupNorm(groups, cout, eps=1e-5, affine=False),
         nn.ELU(inplace=True),
@@ -40,26 +40,21 @@ def block(cin, cout, groups):
 
 
 class CRN(nn.Module):
-    """Compact Cross-scale Recursive Network used by VALID."""
+    """Channel-faithful port of the VALID v1.0 CRN."""
 
     def __init__(self, in_channels=1, out_channels=1, n_features=16, n_groups=4):
         super().__init__()
         f = n_features
-
         self.conv_in = nn.Conv3d(in_channels, f, 1)
-
-        self.d1 = nn.Sequential(block(f, 8 * f, n_groups), nn.AvgPool3d(8))
-        self.d2 = nn.Sequential(block(f, 4 * f, n_groups), nn.AvgPool3d(4))
-        self.d3 = nn.Sequential(block(f, 2 * f, n_groups), nn.AvgPool3d(2))
-
-        self.u1 = block(12 * f, 4 * f, n_groups)
-        self.u2 = block(6 * f, 2 * f, n_groups)
-        self.uu1 = block(8 * f, 2 * f, n_groups)
-
-        self.b1 = block(3 * f, f, n_groups)
-        self.b2 = block(3 * f, f, n_groups)
-        self.b3 = block(3 * f, f, n_groups)
-
+        self.conv_d1 = nn.Sequential(conv_pair(f, 8*f, 8*f, n_groups), nn.AvgPool3d(8))
+        self.conv_d2 = nn.Sequential(conv_pair(f, 4*f, 4*f, n_groups), nn.AvgPool3d(4))
+        self.conv_d3 = nn.Sequential(conv_pair(f, 2*f, 2*f, n_groups), nn.AvgPool3d(2))
+        self.conv_u1 = conv_pair(12*f, 4*f, 4*f, n_groups)
+        self.conv_u2 = conv_pair(6*f, 2*f, 2*f, n_groups)
+        self.conv_uu1 = conv_pair(8*f, 2*f, 2*f, n_groups)
+        self.conv_b1 = conv_pair(3*f, 2*f, f, n_groups)
+        self.conv_b2 = conv_pair(3*f, 2*f, f, n_groups)
+        self.conv_b3 = conv_pair(3*f, 2*f, f, n_groups)
         self.out = nn.Conv3d(f, out_channels, 1)
 
         for m in self.modules():
@@ -69,30 +64,21 @@ class CRN(nn.Module):
                     nn.init.zeros_(m.bias)
 
     @staticmethod
-    def up(x, ref):
-        if x.shape[2:] != ref.shape[2:]:
-            return F.interpolate(x, size=ref.shape[2:], mode="trilinear", align_corners=False)
-        return x
+    def up(source, target):
+        if source.shape[2:] != target.shape[2:]:
+            return F.interpolate(source, size=target.shape[2:], mode="trilinear", align_corners=False)
+        return source
 
     def forward(self, x):
-        x0 = self.conv_in(x)
-        d1 = self.d1(x0)
-        d2 = self.d2(x0)
-        d3 = self.d3(x0)
-
-        d1u = self.up(d1, d2)
-        d2u = self.up(d2, d3)
-        d3u = self.up(d3, x0)
-
-        u1 = self.u1(torch.cat([d2, d1u], 1))
-        u2 = self.u2(torch.cat([d3, d2u], 1))
-
-        u1u = self.up(u1, u2)
-        u2f = self.up(u2, x0)
-        uff = self.uu1(torch.cat([d3, u1u, u2], 1))
-        uff = self.up(uff, x0)
-
-        y = self.b1(torch.cat([x0, d3u], 1))
-        y = self.b2(torch.cat([y, u2f], 1))
-        y = self.b3(torch.cat([y, uff], 1))
+        x = self.conv_in(x)
+        d1, d2, d3 = self.conv_d1(x), self.conv_d2(x), self.conv_d3(x)
+        d1f, d2f, d3f = self.up(d1, d2), self.up(d2, d3), self.up(d3, x)
+        u1 = self.conv_u1(torch.cat([d2, d1f], dim=1))
+        u2 = self.conv_u2(torch.cat([d3, d2f], dim=1))
+        u1f, u2f = self.up(u1, u2), self.up(u2, x)
+        uf = self.conv_uu1(torch.cat([d3, u1f, u2], dim=1))
+        uf = self.up(uf, x)
+        y = self.conv_b1(torch.cat([x, d3f], dim=1))
+        y = self.conv_b2(torch.cat([y, u2f], dim=1))
+        y = self.conv_b3(torch.cat([y, uf], dim=1))
         return self.out(y)
