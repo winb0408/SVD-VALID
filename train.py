@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
-"""Minimal training entry point for SVD-VALID v0.1."""
+"""Minimal training entry point for SVD-VALID v0.2.
+
+Loss, optimizer, LR schedule and CRN follow VALID v1.0 (the upstream
+DWT typo -- the second DWT applied again to output 1 -- is fixed here).
+
+Two sampling arms share everything else:
+  --mode random : faithful per-block random Tetris (VALID baseline)
+  --mode guided : SVD-guided single-pattern Tetris (our method)
+"""
 
 import argparse
 import json
+import math
 import random
 from pathlib import Path
 
@@ -10,8 +19,13 @@ import numpy as np
 import torch
 from tqdm import trange
 
-from datasets.sampling import guided_tetris_subvolumes, random_tetris_subvolumes
+from datasets.sampling import (
+    TETRIS_PATTERNS,
+    guided_tetris_subvolumes,
+    valid_random_tetris,
+)
 from models.network import NetworkCNR, HessianConstraintLoss3D
+from models.dwt3d import dwt3d_haar, VALID_REG_BANDS
 
 
 def crop3d(arr, shape, rng):
@@ -26,7 +40,18 @@ def crop3d(arr, shape, rng):
 
 
 def tensor(x, device):
-    return torch.from_numpy(np.asarray(x, dtype=np.float32))[None, None].to(device)
+    return torch.from_numpy(np.ascontiguousarray(x, dtype=np.float32))[None, None].to(device)
+
+
+def wavelet_hessian_loss(out1, out2, hessian):
+    """VALID v1.0 loss_reg: Hessian on the low-frequency DWT bands of both outputs."""
+    bands1 = dwt3d_haar(out1)
+    bands2 = dwt3d_haar(out2)
+    stack = torch.cat(
+        [torch.cat([bands1[b], bands2[b]], dim=1) for b in VALID_REG_BANDS],
+        dim=1,
+    )
+    return hessian(stack)
 
 
 def main():
@@ -47,6 +72,9 @@ def main():
     ap.add_argument("--out", default="runs/svd-valid")
     args = ap.parse_args()
 
+    if any(p % 2 for p in args.patch):
+        raise ValueError(f"Patch {args.patch} must be even in every dimension.")
+
     if args.mode == "guided" and (not args.signal_map or not args.noise_map):
         raise ValueError("Guided mode requires --signal-map and --noise-map.")
 
@@ -63,7 +91,12 @@ def main():
 
     model = NetworkCNR(features=args.features, groups=args.groups).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999))
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)
+    # VALID v1.0 schedule: linear warmup over the first 10% epochs, cosine decay.
+    lr_func = lambda epoch: min(
+        (epoch + 1) / (args.epochs * 0.1 + 1e-8),
+        0.5 * (math.cos(epoch / args.epochs * math.pi) + 1),
+    )
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_func)
     mse = torch.nn.MSELoss()
     hessian = HessianConstraintLoss3D()
 
@@ -85,16 +118,16 @@ def main():
                 sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
                 npatch = noise[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
                 _, views, q = guided_tetris_subvolumes(patch, sp, npatch)
+                xa, xb, ya, yb = [tensor(v, device) for v in views]
             else:
-                _, views = random_tetris_subvolumes(patch)
-                q = None
+                subs = valid_random_tetris(patch)
+                xa, xb, ya, yb = [tensor(v, device) for v in subs]
 
-            xa, xb, ya, yb = [tensor(v, device) for v in views]
             ha, hb = model(xa), model(xb)
 
             loss_neighbor = 0.5 * mse(ha, ya) + 0.5 * mse(hb, yb)
             loss_identity = mse(ha, hb)
-            loss_reg = hessian(torch.cat([ha, hb], dim=1))
+            loss_reg = wavelet_hessian_loss(ha, hb, hessian)
             loss = loss_neighbor + loss_identity + args.weight_reg * loss_reg
 
             optimizer.zero_grad(set_to_none=True)
@@ -106,7 +139,7 @@ def main():
         scheduler.step()
         mean_loss = running / args.steps_per_epoch
         history.append({"epoch": epoch + 1, "loss": mean_loss})
-        print(f"epoch={epoch + 1:03d} loss={mean_loss:.6f}")
+        print(f"epoch={epoch + 1:03d} loss={mean_loss:.6f} lr={scheduler.get_last_lr()[0]:.2e}")
 
         torch.save(
             {"model": model.state_dict(), "epoch": epoch + 1, "args": vars(args)},

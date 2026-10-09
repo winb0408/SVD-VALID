@@ -1,0 +1,19 @@
+# data
+data/
+
+# training runs: only the latest correct SA64 / HSA64 comparison figures are kept
+runs/*
+!runs/official_mip/
+runs/official_mip/*
+!runs/official_mip/figure_denoised_B3C3_adaptive.png
+!runs/official_mip/figure_denoised_hessian_ablation.png
+!runs/official_mip/figure_denoised_B4C4_official_clim.png
+
+# python
+__pycache__/
+*.pyc
+
+# large binaries
+*.npy
+*.mat
+*.pt

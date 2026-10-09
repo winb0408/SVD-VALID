@@ -2,6 +2,15 @@
 
 The sampling geometry is adapted from FDU-donglab/VALID v1.0.
 Only the pattern selection policy is new in this repository.
+
+Two samplers are provided:
+
+* :func:`valid_random_tetris` -- a faithful port of the original VALID
+  sampler: every 2x2x2 block independently draws one of the eight Tetris
+  patterns and randomly assigns its four sampled positions to the four
+  subvolume roles. Use this for the baseline arm.
+* :func:`guided_tetris_subvolumes` -- our method: one pattern per patch,
+  selected from SVD-derived signal/noise statistics.
 """
 
 import torch
@@ -45,9 +54,52 @@ def all_phases(volume):
     return [one_phase(volume, i) for i in range(8)]
 
 
+def _space_to_depth(x, block_size=2):
+    """(1,D,H,W) -> (D/2,H/2,W/2,8); last dim orders positions as dz*4+dy*2+dx."""
+    n, d, h, w = x.shape
+    x = x.view(n, d // block_size, block_size, h // block_size, block_size, w // block_size, block_size)
+    x = x.permute(0, 1, 3, 5, 2, 4, 6).contiguous()
+    return x.view(d // block_size, h // block_size, w // block_size, block_size ** 3)
+
+
+def valid_random_tetris(volume, generator=None):
+    """Faithful port of VALID v1.0 random Tetris sampling.
+
+    Each 2x2x2 block draws one of the eight patterns uniformly at random,
+    and the four sampled positions are assigned to the four subvolume
+    roles through a random permutation, exactly as the upstream
+    generate_mask_pair / RandomSampler_0123 combination does.
+
+    Returns four tensors of shape (D/2, H/2, W/2).
+    """
+    x = torch.as_tensor(volume).float()
+    if x.ndim != 3:
+        raise ValueError("volume must have shape [D,H,W].")
+    d, h, w = x.shape
+    if d % 2 or h % 2 or w % 2:
+        raise ValueError("All spatial dimensions must be even.")
+    blocks = _space_to_depth(x[None])            # (nb_d, nb_h, nb_w, 8)
+    nb = blocks.shape[0] * blocks.shape[1] * blocks.shape[2]
+    blocks = blocks.reshape(nb, 8)
+
+    k = torch.randint(0, len(TETRIS_PATTERNS), (nb,), generator=generator)
+    chosen = TETRIS_PATTERNS[k]                  # (nb, 4) positions per block
+    offsets = torch.arange(nb).unsqueeze(1) * 8
+    flat = blocks.reshape(-1)                    # (nb*8,)
+
+    # Random permutation per block: sub i receives pattern slot perm[i].
+    perm = torch.rand(nb, 4, generator=generator).argsort(dim=1)
+
+    subs = []
+    for i in range(4):
+        take = offsets + chosen.gather(1, perm[:, i:i + 1])
+        subs.append(flat.take(take.squeeze(1)).reshape(d // 2, h // 2, w // 2))
+    return subs
+
+
 def corr(a, b, eps=1e-6):
-    a = a.flatten().float()
-    b = b.flatten().float()
+    a = torch.as_tensor(a).flatten().float()
+    b = torch.as_tensor(b).flatten().float()
     a = a - a.mean()
     b = b - b.mean()
     return (a * b).mean() / (a.square().mean().sqrt() * b.square().mean().sqrt() + eps)
@@ -94,6 +146,11 @@ def tetris_from_pattern(volume, pattern_id):
 
 
 def random_tetris_subvolumes(volume):
+    """Single-pattern-per-patch random sampling (kept for ablation only).
+
+    This is NOT the original VALID sampler; use :func:`valid_random_tetris`
+    for the faithful baseline.
+    """
     pattern_id = int(torch.randint(0, len(TETRIS_PATTERNS), ()).item())
     return pattern_id, tetris_from_pattern(volume, pattern_id)
 

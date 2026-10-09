@@ -83,11 +83,15 @@ Do not add new loss terms in v0.1. First test whether random Tetris -> SVD-guide
     ├── models/
     │   ├── __init__.py
     │   ├── model_CRN.py
-    │   └── network.py
+    │   ├── network.py
+    │   └── dwt3d.py
     ├── scripts/
     │   └── prepare_svd.py
+    ├── tests/
+    │   └── test_smoke.py
     ├── docs/
     │   └── datasets.md
     ├── THIRD_PARTY_LICENSES.md
     ├── requirements.txt
-    └── train.py
+    ├── train.py
+    └── infer.py
