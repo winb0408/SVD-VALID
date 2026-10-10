@@ -1,0 +1,162 @@
+{
+  "window": [
+    16,
+    16,
+    16
+  ],
+  "stride": [
+    16,
+    16,
+    16
+  ],
+  "n_units": 32,
+  "agreement": 0.4375,
+  "picks_even": [
+    4,
+    5,
+    5,
+    2,
+    4,
+    7,
+    0,
+    0,
+    4,
+    4,
+    0,
+    0,
+    1,
+    7,
+    7,
+    3,
+    7,
+    2,
+    0,
+    5,
+    7,
+    7,
+    5,
+    2,
+    6,
+    7,
+    2,
+    1,
+    6,
+    1,
+    6,
+    7
+  ],
+  "picks_odd": [
+    5,
+    5,
+    5,
+    2,
+    4,
+    1,
+    0,
+    0,
+    4,
+    3,
+    0,
+    0,
+    1,
+    7,
+    6,
+    3,
+    0,
+    3,
+    2,
+    6,
+    5,
+    3,
+    5,
+    6,
+    7,
+    4,
+    7,
+    7,
+    7,
+    5,
+    6,
+    0
+  ],
+  "raw/select-even_eval-odd": {
+    "n": 32,
+    "rho_noise_guided": 0.44820803362178846,
+    "rho_noise_uniform": 0.44012650439375633,
+    "rho_noise_oracle": 0.39262354470413974,
+    "rho_signal_guided": 0.4482173842235768,
+    "rho_signal_uniform": 0.44044722668859393,
+    "perm_noise_p": 0.1715,
+    "paired_diff_noise_mean": -0.008081529228032123,
+    "paired_diff_noise_ci95": [
+      -0.019165282746048656,
+      0.0029622260857884333
+    ],
+    "perm_signal_p": 0.1881,
+    "paired_diff_signal_mean": 0.0077701575349829015,
+    "paired_diff_signal_ci95": [
+      -0.0033162344712493828,
+      0.01888044075924674
+    ]
+  },
+  "raw/select-odd_eval-even": {
+    "n": 32,
+    "rho_noise_guided": 0.4402219931199074,
+    "rho_noise_uniform": 0.4402406818887509,
+    "rho_noise_oracle": 0.39273291061159754,
+    "rho_signal_guided": 0.44012535298426914,
+    "rho_signal_uniform": 0.4404776686228657,
+    "perm_noise_p": 0.9977,
+    "paired_diff_noise_mean": 1.8688768843531586e-05,
+    "paired_diff_noise_ci95": [
+      -0.009501977870152958,
+      0.010198732754613917
+    ],
+    "perm_signal_p": 0.94985,
+    "paired_diff_signal_mean": -0.0003523156385965443,
+    "paired_diff_signal_ci95": [
+      -0.010607478178499647,
+      0.009207622393279186
+    ]
+  },
+  "detrended/select-even_eval-odd": {
+    "n": 32,
+    "rho_noise_guided": 0.3429683393068818,
+    "rho_noise_uniform": 0.3330850553446351,
+    "rho_noise_oracle": 0.2769475176250142,
+    "rho_signal_guided": 0.3433274535848616,
+    "rho_signal_uniform": 0.33396846233922317,
+    "perm_noise_p": 0.17095,
+    "paired_diff_noise_mean": -0.009883283962246706,
+    "paired_diff_noise_ci95": [
+      -0.023461356009868848,
+      0.003694841067367281
+    ],
+    "perm_signal_p": 0.1979,
+    "paired_diff_signal_mean": 0.009358991245638416,
+    "paired_diff_signal_ci95": [
+      -0.004287882238860114,
+      0.02299498429772586
+    ]
+  },
+  "detrended/select-odd_eval-even": {
+    "n": 32,
+    "rho_noise_guided": 0.3327967245213064,
+    "rho_noise_uniform": 0.3332315539302571,
+    "rho_noise_oracle": 0.27709785813307564,
+    "rho_signal_guided": 0.3331661347337044,
+    "rho_signal_uniform": 0.3340037830098232,
+    "perm_noise_p": 0.9439,
+    "paired_diff_noise_mean": 0.0004348294089507607,
+    "paired_diff_noise_ci95": [
+      -0.011024602323839531,
+      0.012092631368836228
+    ],
+    "perm_signal_p": 0.89295,
+    "paired_diff_signal_mean": -0.000837648276118784,
+    "paired_diff_signal_ci95": [
+      -0.012537742359713033,
+      0.010608072056867928
+    ]
+  }
+}

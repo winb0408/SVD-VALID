@@ -4,9 +4,15 @@
 Loss, optimizer, LR schedule and CRN follow VALID v1.0 (the upstream
 DWT typo -- the second DWT applied again to output 1 -- is fixed here).
 
-Two sampling arms share everything else:
-  --mode random : faithful per-block random Tetris (VALID baseline)
-  --mode guided : SVD-guided single-pattern Tetris (our method)
+Sampling arms share everything else (loss, optimizer, LR schedule, CRN):
+  --mode random       : faithful per-block random Tetris (VALID baseline)
+  --mode patch_random : single random pattern per patch, fixed roles
+                        (control for guided: removes the guidance, keeps the
+                        "one pattern per patch" geometry)
+  --mode guided       : SVD-guided single-pattern Tetris (our method)
+  --mode fixed        : one fixed pattern for every patch, fixed roles
+                        (degeneracy control: if guided keeps picking pattern K,
+                        this isolates "guidance" from "that pattern is good")
 """
 
 import argparse
@@ -23,6 +29,7 @@ from datasets.sampling import (
     TETRIS_PATTERNS,
     guided_tetris_subvolumes,
     random_tetris_subvolumes,
+    tetris_from_pattern,
     valid_random_tetris,
 )
 from models.network import NetworkCNR, HessianConstraintLoss3D
@@ -60,17 +67,23 @@ def main():
     ap.add_argument("--train-volume", required=True)
     ap.add_argument("--signal-map")
     ap.add_argument("--noise-map")
-    ap.add_argument("--mode", choices=["random", "patch_random", "guided"],
+    ap.add_argument("--mode", choices=["random", "patch_random", "guided", "fixed"],
                     default="random",
                     help="random: faithful per-block VALID Tetris; "
                          "patch_random: single random pattern per patch, fixed "
                          "roles (control for guided); guided: SVD-guided "
-                         "pattern per patch.")
+                         "pattern per patch; fixed: one fixed pattern "
+                         "(--pattern) for every patch.")
+    ap.add_argument("--pattern", type=int, default=4,
+                    help="Tetris pattern id used by --mode fixed (0..7).")
     ap.add_argument("--patch", nargs=3, type=int, default=[32, 64, 64])
     ap.add_argument("--epochs", type=int, default=50)
     ap.add_argument("--steps-per-epoch", type=int, default=200)
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--weight-reg", type=float, default=1e-4)
+    ap.add_argument("--weight-identity", type=float, default=1.0,
+                    help="Weight of loss_identity (mse(ha,hb)). VALID v1.0 uses "
+                         "1.0; 0.0 is a diagnostic ablation only.")
     ap.add_argument("--features", type=int, default=16)
     ap.add_argument("--groups", type=int, default=4)
     ap.add_argument("--seed", type=int, default=3407)
@@ -83,6 +96,9 @@ def main():
 
     if args.mode == "guided" and (not args.signal_map or not args.noise_map):
         raise ValueError("Guided mode requires --signal-map and --noise-map.")
+
+    if not 0 <= args.pattern < len(TETRIS_PATTERNS):
+        raise ValueError(f"--pattern must be in [0, {len(TETRIS_PATTERNS) - 1}].")
 
     device = torch.device(
         args.device if args.device.startswith("cuda") and torch.cuda.is_available() else "cpu"
@@ -128,6 +144,9 @@ def main():
             elif args.mode == "patch_random":
                 _, views = random_tetris_subvolumes(patch)
                 xa, xb, ya, yb = [tensor(v, device) for v in views]
+            elif args.mode == "fixed":
+                views = tetris_from_pattern(patch, args.pattern)
+                xa, xb, ya, yb = [tensor(v, device) for v in views]
             else:
                 subs = valid_random_tetris(patch)
                 xa, xb, ya, yb = [tensor(v, device) for v in subs]
@@ -135,9 +154,10 @@ def main():
             ha, hb = model(xa), model(xb)
 
             loss_neighbor = 0.5 * mse(ha, ya) + 0.5 * mse(hb, yb)
-            loss_identity = mse(ha, hb)
             loss_reg = wavelet_hessian_loss(ha, hb, hessian)
-            loss = loss_neighbor + loss_identity + args.weight_reg * loss_reg
+            loss = loss_neighbor + args.weight_reg * loss_reg
+            if args.weight_identity:
+                loss = loss + args.weight_identity * mse(ha, hb)
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()

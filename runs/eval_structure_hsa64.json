@@ -1,0 +1,102 @@
+{
+  "reference": "data/processed/hsa64_blood_remap/power_doppler.npy",
+  "thresholds": {
+    "core": 0.65,
+    "body": [
+      0.2,
+      0.65
+    ],
+    "blob": 0.5,
+    "blob_max_vox": 20,
+    "dark": 0.05
+  },
+  "rows": [
+    {
+      "name": "input",
+      "shape": [
+        37,
+        64,
+        64
+      ],
+      "pseudogt_pearson": 1.0,
+      "vessel_core_keep": 1.0,
+      "n_core_vox": 2781,
+      "bright_top_keep": 1.0,
+      "n_bright_top_vox": 1515,
+      "vessel_body_keep": 1.0,
+      "n_body_vox": 62600,
+      "isolated_blob_keep": 1.0,
+      "n_isolated_vox": 392,
+      "vessel_blob_keep": 1.0,
+      "n_vessel_blob_vox": 8049,
+      "dark_mean": 0.003964241131085831,
+      "dark_p99": 0.04737243935465814,
+      "contrast_span": 0.9960357588689142,
+      "grad_keep": 1.0,
+      "hf_noise_reduction": 0.0,
+      "out_min": 0.0,
+      "out_max": 1.0,
+      "oob_frac": 0.0,
+      "out_mean": 0.20559961121199433,
+      "in_mean": 0.20559961121199433
+    },
+    {
+      "name": "B4",
+      "shape": [
+        37,
+        64,
+        64
+      ],
+      "pseudogt_pearson": 0.8474881323329058,
+      "vessel_core_keep": 0.716022848618258,
+      "n_core_vox": 2781,
+      "bright_top_keep": 0.6965368662283408,
+      "n_bright_top_vox": 1515,
+      "vessel_body_keep": 0.8946645850010262,
+      "n_body_vox": 62600,
+      "isolated_blob_keep": 0.7240480794612172,
+      "n_isolated_vox": 392,
+      "vessel_blob_keep": 0.7761775340959421,
+      "n_vessel_blob_vox": 8049,
+      "dark_mean": 0.07411451192390375,
+      "dark_p99": 0.2851940906047822,
+      "contrast_span": 0.7988341107796479,
+      "grad_keep": 0.8054016597356464,
+      "hf_noise_reduction": 0.45791937508895186,
+      "out_min": -0.15247486531734467,
+      "out_max": 1.0919265747070312,
+      "oob_frac": 0.05359876478040541,
+      "out_mean": 0.21379458039134958,
+      "in_mean": 0.20559961121199433
+    },
+    {
+      "name": "C4",
+      "shape": [
+        37,
+        64,
+        64
+      ],
+      "pseudogt_pearson": 0.8823413518653421,
+      "vessel_core_keep": 0.8224116587017631,
+      "n_core_vox": 2781,
+      "bright_top_keep": 0.8310044335783342,
+      "n_bright_top_vox": 1515,
+      "vessel_body_keep": 0.8619764828835567,
+      "n_body_vox": 62600,
+      "isolated_blob_keep": 0.7152768545487801,
+      "n_isolated_vox": 392,
+      "vessel_blob_keep": 0.8313046738199256,
+      "n_vessel_blob_vox": 8049,
+      "dark_mean": 0.07809790566209798,
+      "dark_p99": 0.3279437088966373,
+      "contrast_span": 0.98879538581129,
+      "grad_keep": 0.866336685510535,
+      "hf_noise_reduction": 0.4398113080822982,
+      "out_min": -0.17226707935333252,
+      "out_max": 1.2184408903121948,
+      "oob_frac": 0.0328930004222973,
+      "out_mean": 0.19796543987189005,
+      "in_mean": 0.20559961121199433
+    }
+  ]
+}

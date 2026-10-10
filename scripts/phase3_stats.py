@@ -86,6 +86,69 @@ def patch_stats(sig_pow, noi_pow):
     return np.array(rs), np.array(rn)
 
 
+def sign_flip_permutation_test(diff, n_perm=20000, seed=0):
+    """Two-sided paired sign-flip permutation test on the paired differences.
+
+    Used instead of a distributional test because the units here are spatial
+    windows: their validity rests on the units being non-overlapping, not on
+    the differences being Gaussian.
+    """
+    d = np.asarray(diff, dtype=np.float64)
+    d = d[np.isfinite(d)]
+    if d.size == 0 or np.allclose(d, d[0]):
+        return float(d.mean()) if d.size else float("nan"), 1.0
+    rng = np.random.default_rng(seed)
+    obs = abs(d.mean())
+    signs = rng.choice([-1.0, 1.0], size=(n_perm, d.size))
+    null = np.abs((signs * d).mean(axis=1))
+    return float(d.mean()), float((null >= obs - 1e-12).mean())
+
+
+def block_bootstrap_ci(diff, n_boot=20000, seed=0, alpha=0.05):
+    """Percentile bootstrap CI for the mean paired difference (resample units)."""
+    d = np.asarray(diff, dtype=np.float64)
+    d = d[np.isfinite(d)]
+    if d.size == 0:
+        return float("nan"), float("nan")
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, d.size, size=(n_boot, d.size))
+    means = d[idx].mean(axis=1)
+    lo, hi = np.percentile(means, [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    return float(lo), float(hi)
+
+
+def summarize_independent(name, rows, seed=0):
+    """Summarize a *non-overlapping* window tiling with a permutation test.
+
+    Overlapping sliding windows are spatially correlated, so a per-window
+    Wilcoxon reports p-values that are far too optimistic. The non-overlapping
+    tiling gives spatially disjoint units, and the paired sign-flip
+    permutation test needs no Gaussian assumption on top of that.
+    """
+    a = np.array(rows, dtype=np.float64)
+    out = dict(
+        n=len(rows),
+        rho_noise_guided=float(a[:, 0].mean()), rho_noise_uniform=float(a[:, 1].mean()),
+        rho_noise_oracle=float(a[:, 2].mean()),
+        rho_signal_guided=float(a[:, 3].mean()), rho_signal_uniform=float(a[:, 4].mean()),
+    )
+    for label, diff in [("noise", a[:, 1] - a[:, 0]),
+                        ("signal", a[:, 3] - a[:, 4])]:
+        mean, p = sign_flip_permutation_test(diff, seed=seed)
+        lo, hi = block_bootstrap_ci(diff, seed=seed)
+        out[f"perm_{label}_p"] = p
+        out[f"paired_diff_{label}_mean"] = mean
+        out[f"paired_diff_{label}_ci95"] = [lo, hi]
+    print(f"[{name}] n={out['n']} (non-overlapping units)")
+    print(f"  rho_noise : guided {out['rho_noise_guided']:+.4f}  "
+          f"uniform {out['rho_noise_uniform']:+.4f}  oracle {out['rho_noise_oracle']:+.4f}")
+    print(f"    diff(uniform-guided) noise  = {out['paired_diff_noise_mean']:+.4f} "
+          f"CI95 {out['paired_diff_noise_ci95']}  perm p={out['perm_noise_p']:.2e}")
+    print(f"    diff(guided-uniform) signal = {out['paired_diff_signal_mean']:+.4f} "
+          f"CI95 {out['paired_diff_signal_ci95']}  perm p={out['perm_signal_p']:.2e}")
+    return out
+
+
 def summarize(name, rows):
     """rows: list of (guided_rn, uniform_rn, oracle_rn, guided_rs, uniform_rs)."""
     from scipy.stats import wilcoxon
@@ -220,12 +283,23 @@ def main():
             rows_train.append((rn[pid], rn.mean(), rn.min(), rs[pid], rs.mean()))
         train_summary = summarize(f"{domain}/train-patch", rows_train)
 
-        print("-- sliding windows --")
+        print("-- sliding windows (overlapping: descriptive only) --")
         rows_map = []
         for sl, pid in zip(map_slices, sel.ravel()):
             rs, rn = patch_stats(sig_v[sl], noi_v[sl])
             rows_map.append((rn[int(pid)], rn.mean(), rn.min(), rs[int(pid)], rs.mean()))
         map_summary = summarize(f"{domain}/sliding-window", rows_map)
+
+        print("-- non-overlapping windows (independent units) --")
+        zs_n, xs_n, ys_n = window_slices(z, x, y, wz, wz)
+        nonoverlap_slices = [(slice(z0, z0 + wz[0]), slice(x0, x0 + wz[1]), slice(y0, y0 + wz[2]))
+                             for z0 in zs_n for x0 in xs_n for y0 in ys_n]
+        rows_non = []
+        for sl in nonoverlap_slices:
+            pid = select_guided_pattern(sig_map[sl], noi_map[sl])[0]
+            rs, rn = patch_stats(sig_v[sl], noi_v[sl])
+            rows_non.append((rn[pid], rn.mean(), rn.min(), rs[pid], rs.mean()))
+        nonoverlap_summary = summarize_independent(f"{domain}/non-overlap", rows_non)
 
         results[domain] = dict(global_stats=global_stats,
                                train_patch=dict(size=tp, guided_choices=choices_train,
@@ -234,7 +308,17 @@ def main():
                                                    stride=args.map_stride,
                                                    starts=[zs, xs, ys],
                                                    summary=map_summary,
-                                                   selection_counts=counts.tolist()))
+                                                   selection_counts=counts.tolist(),
+                                                   unit_note="Overlapping units are spatially "
+                                                             "correlated; these p-values are "
+                                                             "descriptive, not confirmatory."),
+                               non_overlap=dict(window=args.map_window,
+                                                starts=[zs_n, xs_n, ys_n],
+                                                summary=nonoverlap_summary,
+                                                unit_note="Spatially disjoint tiling. Edge "
+                                                          "voxels beyond the last full window are "
+                                                          "dropped, so n is small -- read the CI, "
+                                                          "not just p."))
 
     with open(out / "band_stats.json", "w", encoding="utf-8") as f:
         json.dump(dict(

@@ -223,7 +223,54 @@
         141,
         152,
         167
-      ]
+      ],
+      "unit_note": "Overlapping units are spatially correlated; these p-values are descriptive, not confirmatory."
+    },
+    "non_overlap": {
+      "window": [
+        16,
+        16,
+        16
+      ],
+      "starts": [
+        [
+          0,
+          16
+        ],
+        [
+          0,
+          16,
+          32,
+          48
+        ],
+        [
+          0,
+          16,
+          32,
+          48
+        ]
+      ],
+      "summary": {
+        "n": 32,
+        "rho_noise_guided": 0.7039507906142395,
+        "rho_noise_uniform": 0.7108275535772324,
+        "rho_noise_oracle": 0.6980277081205948,
+        "rho_signal_guided": 0.8752145333252783,
+        "rho_signal_uniform": 0.8697401462694693,
+        "perm_noise_p": 0.0,
+        "paired_diff_noise_mean": 0.006876762962992921,
+        "paired_diff_noise_ci95": [
+          0.0043715833949122046,
+          0.009445082560873013
+        ],
+        "perm_signal_p": 0.0,
+        "paired_diff_signal_mean": 0.005474387055809129,
+        "paired_diff_signal_ci95": [
+          0.0026400426376368795,
+          0.008958025879742834
+        ]
+      },
+      "unit_note": "Spatially disjoint tiling. Edge voxels beyond the last full window are dropped, so n is small -- read the CI, not just p."
     }
   },
   "detrended": {
@@ -428,7 +475,54 @@
         141,
         152,
         167
-      ]
+      ],
+      "unit_note": "Overlapping units are spatially correlated; these p-values are descriptive, not confirmatory."
+    },
+    "non_overlap": {
+      "window": [
+        16,
+        16,
+        16
+      ],
+      "starts": [
+        [
+          0,
+          16
+        ],
+        [
+          0,
+          16,
+          32,
+          48
+        ],
+        [
+          0,
+          16,
+          32,
+          48
+        ]
+      ],
+      "summary": {
+        "n": 32,
+        "rho_noise_guided": 0.3170973077475328,
+        "rho_noise_uniform": 0.3291123230396989,
+        "rho_noise_oracle": 0.2986952526179948,
+        "rho_signal_guided": 0.47575336765480275,
+        "rho_signal_uniform": 0.46363335286138574,
+        "perm_noise_p": 0.00165,
+        "paired_diff_noise_mean": 0.012015015292166031,
+        "paired_diff_noise_ci95": [
+          0.005237334857203183,
+          0.018685645321683444
+        ],
+        "perm_signal_p": 0.0179,
+        "paired_diff_signal_mean": 0.012120014793417077,
+        "paired_diff_signal_ci95": [
+          0.0028367476561171863,
+          0.021610605497705684
+        ]
+      },
+      "unit_note": "Spatially disjoint tiling. Edge voxels beyond the last full window are dropped, so n is small -- read the CI, not just p."
     }
   }
 }
