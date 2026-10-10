@@ -73,12 +73,14 @@ def load_array(path, variable=None):
     raise ValueError(f"Unsupported input: {path}")
 
 
-def normalize_shape(x, emitting_array, frames):
+def normalize_shape(x, emitting_array, frames, frame_start=0, frame_step=1):
     x = np.asarray(x)
     if x.ndim == 5:
         x = x[..., emitting_array]
     if x.ndim != 4:
         raise ValueError(f"Expected [Z,X,Y,T], got {x.shape}")
+    if frame_start or frame_step != 1:
+        x = x[..., frame_start::frame_step]
     if frames > 0:
         x = x[..., :frames]
     return x
@@ -103,6 +105,11 @@ def main():
     ap.add_argument("--variable")
     ap.add_argument("--emitting-array", type=int, default=0)
     ap.add_argument("--frames", type=int, default=-1)
+    ap.add_argument("--frame-start", type=int, default=0,
+                    help="First frame index (after loading, before --frames cap).")
+    ap.add_argument("--frame-step", type=int, default=1,
+                    help="Frame stride; 2 with --frame-start 0/1 selects even/odd "
+                         "frames for temporally disjoint input/reference splits.")
     ap.add_argument("--rank-low", type=int, default=10,
                     help="First retained (blood) singular mode index.")
     ap.add_argument("--rank-high", type=int, default=80,
@@ -129,6 +136,8 @@ def main():
         load_array(args.input, args.variable),
         args.emitting_array,
         args.frames,
+        args.frame_start,
+        args.frame_step,
     )
 
     z, x, y, t = raw.shape
@@ -189,6 +198,8 @@ def main():
         "input": str(Path(args.input)),
         "variable": args.variable,
         "emitting_array": int(args.emitting_array),
+        "frame_start": int(args.frame_start),
+        "frame_step": int(args.frame_step),
         "shape_zyxt": [int(z), int(x), int(y), int(t)],
         "rank_low": int(rank_low),
         "rank_high": int(rank_high),

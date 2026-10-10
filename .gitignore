@@ -9,6 +9,18 @@ runs/official_mip/*
 !runs/official_mip/figure_denoised_hessian_ablation.png
 !runs/official_mip/figure_denoised_B4C4_official_clim.png
 
+# phase 3 statistics: measured sampling-selection results (SA64 + HSA64 replication)
+!runs/phase3/
+runs/phase3/*
+!runs/phase3/figure_phase3_stats.png
+!runs/phase3/figure_phase3_selection.png
+!runs/phase3/band_stats.json
+!runs/phase3_hsa64/
+runs/phase3_hsa64/*
+!runs/phase3_hsa64/figure_phase3_stats.png
+!runs/phase3_hsa64/figure_phase3_selection.png
+!runs/phase3_hsa64/band_stats.json
+
 # python
 __pycache__/
 *.pyc

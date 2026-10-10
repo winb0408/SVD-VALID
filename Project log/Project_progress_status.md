@@ -1,6 +1,14 @@
 # SVD-VALID 项目进度与状态(Project Progress Status)
 
-> 用途:对照 `Project_plan.md` 的验收视图,供直观验收。更新日期:2026-10-07(B3/C3 完成,C3 全面占优,待人工核验)。
+> 用途:对照 `Project_plan.md` 的验收视图,供直观验收。更新日期:2026-10-09(GPT 审查响应,归因控制组实验中)。
+
+> **L19 外部审查响应**:ChatGPT 审查意见大部分成立——补 patch 级随机控制组、CRN 函数级
+> 等价重新实证、remap 裁剪量化 1%、README 更新。
+> **L20 归因三重奏(控制组实验,核心)**:patch 级固定模式本身有害(B3p 全面差于 B3,
+> 含负值暗区填充);**C3 优势全部来自 SVD 指导本身**(净贡献 ≈ +0.14 相关性)——
+> GPT 质疑的混淆变量被控制组实验反向强化。独立参考评估(偶/奇帧拆分)发现 200 帧 PD
+> 参考噪声底仅 0.91,该方案记录为设计缺陷;偶帧组血管核 keep 引导 0.76 > patch 0.64 >
+> 随机 0.55,引导优势跨数据量稳健。详见 Project_log L19/L20。
 > 图例:✅ 已完成 | 🟡 进行中/部分完成 | ⬜ 未开始
 
 ---
@@ -76,11 +84,13 @@
 - [ ] C 组完整训练 + 与 B 组配对比较;
 - [ ] 定量(无参考指标)+ 定性(三正交面快视)评价。
 
-### Phase 3:统计验证 —— ⬜ 0%
+### Phase 3:统计验证 —— ✅ 100%(L21,SA64 主 + HSA64 复验)
 
-- [ ] 逐模式 ρ_signal/ρ_noise 相关性分析;
-- [ ] 2D 采样选择图(论文 Figure 候选);
-- [ ] 随机 vs 引导的 (ρ_signal, ρ_noise) 对比。
+- [x] 逐模式 ρ_signal/ρ_noise 相关性分析(样本级带功率投影,非 RMS 代理);
+- [x] 2D 采样选择图(论文 Figure 候选,`runs/phase3{,_hsa64}/figure_phase3_selection.png`);
+- [x] 随机 vs 引导对比:SA64 滑动窗 ρ_noise 0.6016 vs 0.6103(p=4e−109,oracle 的 47%),
+      ρ_signal 同升 +0.009;HSA64 复现(ρ_noise −0.0088, p=7e−70;ρ_signal +0.018)。
+      详见 L21。
 
 ### Phase 4:全面 3D 验证 —— ⬜ 0%
 
@@ -115,6 +125,15 @@
 | **HSA64 输入/B4/C4 对比(旋转 MIP、自适应色条)** | `/ssd1/wjb/SVD-VALID/runs/official_mip/figure_denoised_B4C4_adaptive.png` |
 | B4 / C4 中面快视 | `runs/{B4_hsa64_random,C4_hsa64_guided}/infer/quicklook.png` |
 
+**Phase 3 统计验证图(L21,当前重点核验)**:
+
+| 内容 | 绝对路径 |
+|---|---|
+| **SA64 逐模式 ρ 条形图 + 引导选择频次(两域)** | `/ssd1/wjb/SVD-VALID/runs/phase3/figure_phase3_stats.png` |
+| **SA64 2D 采样选择图 × 信号 MIP(6 个 z 带)** | `/ssd1/wjb/SVD-VALID/runs/phase3/figure_phase3_selection.png` |
+| HSA64 同名两图(复验) | `/ssd1/wjb/SVD-VALID/runs/phase3_hsa64/figure_phase3_{stats,selection}.png` |
+| 全部数值(含 Wilcoxon p 值) | `runs/phase3{,_hsa64}/band_stats.json` |
+
 ## 六、已确认的技术事实(供后续引用)
 
 1. Dryad MAT 为 v7.3/HDF5,h5py 读取轴序颠倒、复数为复合 dtype——已在 prepare_svd.py 处理。
@@ -127,7 +146,7 @@
 
 | 风险 | 当前状态 |
 |---|---|
-| 引导采样假设不成立 | 未检验;Phase 3 兜底预案就绪 |
+| 引导采样假设不成立 | **已检验并支持**(L21):两序列、两域噪声相关下降 + 信号相关保持,高度显著 |
 | 秩带跨序列不通用 | 未检验;SA64 谱分析完成,HSA/PW 待做 |
 | 结构性零层干扰 | 已识别,暂不加掩码(记录为已知选择) |
 | 无 GT 定量 | 待 Phase 4 补仿真/体模 |
@@ -141,8 +160,14 @@
   梯度保持上全部占优——**创新点 1 实证从单序列扩展为双序列一致**;
 - 已知局限:最亮血管核幅度衰减 −17%(消融证明 Hessian 无贡献,归因半采样混叠,缓解列 v2);
   暗区指标在 HSA64 上方向翻转一处(绝对量级小,已记录);
-- 下一步:Phase 3 统计验证(ρ_signal/ρ_noise + 2D 采样选择图)→ 机理证据;Phase 4 剩余
-  PW 序列与跨采集泛化。
+- **机理证据闭合(L21,Phase 3 完成)**:SVD 引导选择直接降低配对样本噪声相关
+  (SA64 −0.0086,p=4e−109;HSA64 −0.0088,p=7e−70)且信号相关同步升高——归因
+  (B3p 对照)+ 机理(样本级统计)+ 端到端(双序列)三线一致,创新点 1 证据链完整;
+- 已知局限(补充,L21):Tetris 半采样配对噪声相关整体很高(raw ~0.60–0.90,
+  detrended ~0.26–0.63)——血管核衰减 −17% 的根源被定量;选择器收益偏信号侧,
+  patch 尺度噪声侧收益不保证(见 L21 第 4 条);
+- 下一步:Phase 4 剩余 PW 序列与跨采集泛化,或多种子重复(GPT 建议 ≥3 种子)。
 
-> 验收建议:核验 HSA64 对比图 `runs/official_mip/figure_denoised_B4C4_adaptive.png`
-> 与 SA64 三图(第五节);认可后批准 Phase 3 启动。
+> 验收建议:核验 Phase 3 图 `runs/phase3/figure_phase3_stats.png`、
+> `runs/phase3/figure_phase3_selection.png`(及 `runs/phase3_hsa64/` 同名),
+> 加上此前 HSA64 对比图与 SA64 三图(第五节)。

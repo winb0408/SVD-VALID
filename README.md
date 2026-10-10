@@ -51,11 +51,17 @@ Install a CUDA-compatible PyTorch build separately if required.
 
 ### 2. Convert and SVD-filter a public ultrasound acquisition
 
-    python scripts/prepare_svd.py --input /path/to/Data_PW3232.mat --variable Data_PW3232 --emitting-array 0 --frames 400 --rank-low 10 --rank-high 80 --output data/processed/pw3232
+Rank band follows the official Dryad processing code (SA64/HSA64, 400 frames:
+clutter 0-60, blood 60-350, noise 350-400; PW1616 with 800 frames uses
+120/750 — see `Project log/Project_log.md` L9). `--contrast-remap` maps the
+nonzero-voxel dB distribution onto [0,1] so vessel contrast fills the dynamic
+range (L12); structural zeros stay at 0.
+
+    python scripts/prepare_svd.py --input /path/to/Data_SA64.mat --rank-low 60 --rank-high 350 --contrast-remap --output data/processed/sa64
 
 The script writes:
 
-- power_doppler.npy — log-domain training volume source.
+- power_doppler.npy — contrast-remapped training volume in [0,1].
 - signal_map.npy — SVD retained-signal energy map.
 - noise_map.npy — high-rank residual energy map.
 - metadata.json — shape and SVD parameters.

@@ -22,6 +22,7 @@ from tqdm import trange
 from datasets.sampling import (
     TETRIS_PATTERNS,
     guided_tetris_subvolumes,
+    random_tetris_subvolumes,
     valid_random_tetris,
 )
 from models.network import NetworkCNR, HessianConstraintLoss3D
@@ -59,7 +60,12 @@ def main():
     ap.add_argument("--train-volume", required=True)
     ap.add_argument("--signal-map")
     ap.add_argument("--noise-map")
-    ap.add_argument("--mode", choices=["random", "guided"], default="random")
+    ap.add_argument("--mode", choices=["random", "patch_random", "guided"],
+                    default="random",
+                    help="random: faithful per-block VALID Tetris; "
+                         "patch_random: single random pattern per patch, fixed "
+                         "roles (control for guided); guided: SVD-guided "
+                         "pattern per patch.")
     ap.add_argument("--patch", nargs=3, type=int, default=[32, 64, 64])
     ap.add_argument("--epochs", type=int, default=50)
     ap.add_argument("--steps-per-epoch", type=int, default=200)
@@ -118,6 +124,9 @@ def main():
                 sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
                 npatch = noise[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
                 _, views, q = guided_tetris_subvolumes(patch, sp, npatch)
+                xa, xb, ya, yb = [tensor(v, device) for v in views]
+            elif args.mode == "patch_random":
+                _, views = random_tetris_subvolumes(patch)
                 xa, xb, ya, yb = [tensor(v, device) for v in views]
             else:
                 subs = valid_random_tetris(patch)

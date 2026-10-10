@@ -1,0 +1,434 @@
+{
+  "bands": {
+    "signal": [
+      60,
+      350
+    ],
+    "noise": [
+      350,
+      400
+    ]
+  },
+  "measure": "mean Pearson r over the 6 pairs of a pattern's 4 half-res subvolumes, on linear band power",
+  "detrend_size": 9,
+  "selection_counts_sliding": [
+    56,
+    76,
+    102,
+    80,
+    240,
+    141,
+    152,
+    167
+  ],
+  "raw": {
+    "global_stats": [
+      {
+        "pattern": 0,
+        "positions": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "rho_signal": 0.932230413664371,
+        "rho_noise": 0.9041877122528952
+      },
+      {
+        "pattern": 1,
+        "positions": [
+          0,
+          1,
+          3,
+          5
+        ],
+        "rho_signal": 0.9337909438182131,
+        "rho_noise": 0.9060326834880068
+      },
+      {
+        "pattern": 2,
+        "positions": [
+          1,
+          2,
+          3,
+          7
+        ],
+        "rho_signal": 0.9378069312749723,
+        "rho_noise": 0.9072640857721308
+      },
+      {
+        "pattern": 3,
+        "positions": [
+          0,
+          2,
+          3,
+          6
+        ],
+        "rho_signal": 0.9336823231188621,
+        "rho_noise": 0.905943906539601
+      },
+      {
+        "pattern": 4,
+        "positions": [
+          0,
+          4,
+          5,
+          6
+        ],
+        "rho_signal": 0.9356183170714324,
+        "rho_noise": 0.9028922416289333
+      },
+      {
+        "pattern": 5,
+        "positions": [
+          1,
+          4,
+          5,
+          7
+        ],
+        "rho_signal": 0.9337242513262272,
+        "rho_noise": 0.9022162757046118
+      },
+      {
+        "pattern": 6,
+        "positions": [
+          2,
+          4,
+          6,
+          7
+        ],
+        "rho_signal": 0.9322340561012267,
+        "rho_noise": 0.9020832697996618
+      },
+      {
+        "pattern": 7,
+        "positions": [
+          3,
+          5,
+          6,
+          7
+        ],
+        "rho_signal": 0.9333745743780506,
+        "rho_noise": 0.9024191868710356
+      }
+    ],
+    "train_patch": {
+      "size": [
+        32,
+        64,
+        64
+      ],
+      "guided_choices": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "summary": {
+        "n": 6,
+        "rho_noise_guided": 0.8705572916087955,
+        "rho_noise_uniform": 0.8731631545832301,
+        "rho_noise_oracle": 0.8688185980620231,
+        "rho_noise_guided_std": 0.02528508569024364,
+        "rho_noise_uniform_std": 0.024295091262751263,
+        "rho_signal_guided": 0.9136678644852538,
+        "rho_signal_uniform": 0.9123148439582379,
+        "wilcoxon_noise_p": 0.03125,
+        "paired_diff_noise_mean": 0.0026058629744345843,
+        "paired_diff_noise_sem": 0.00042515590301391145,
+        "wilcoxon_signal_p": 0.03125,
+        "paired_diff_signal_mean": 0.001353020527015784,
+        "paired_diff_signal_sem": 0.00016527570113859637,
+        "noise_reduction_vs_uniform": 0.0026058629744346584,
+        "oracle_fraction_captured": 0.5997995334425267
+      }
+    },
+    "sliding_window": {
+      "window": [
+        16,
+        16,
+        16
+      ],
+      "stride": [
+        4,
+        4,
+        4
+      ],
+      "starts": [
+        [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32,
+          36,
+          40,
+          44,
+          48
+        ],
+        [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32,
+          36,
+          40,
+          44,
+          48
+        ]
+      ],
+      "summary": {
+        "n": 1014,
+        "rho_noise_guided": 0.6016139261949297,
+        "rho_noise_uniform": 0.6102536483229063,
+        "rho_noise_oracle": 0.5920066487623252,
+        "rho_noise_guided_std": 0.18134603376282385,
+        "rho_noise_uniform_std": 0.17764843551756904,
+        "rho_signal_guided": 0.8208669095215102,
+        "rho_signal_uniform": 0.8117346423720996,
+        "wilcoxon_noise_p": 4.0734554524651294e-109,
+        "paired_diff_noise_mean": 0.008639722127976583,
+        "paired_diff_noise_sem": 0.00035800803825209885,
+        "wilcoxon_signal_p": 2.9283422645810927e-111,
+        "paired_diff_signal_mean": 0.009132267149410631,
+        "paired_diff_signal_sem": 0.00039471582833041003,
+        "noise_reduction_vs_uniform": 0.00863972212797659,
+        "oracle_fraction_captured": 0.4734872765953781
+      },
+      "selection_counts": [
+        56,
+        76,
+        102,
+        80,
+        240,
+        141,
+        152,
+        167
+      ]
+    }
+  },
+  "detrended": {
+    "global_stats": [
+      {
+        "pattern": 0,
+        "positions": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "rho_signal": 0.6055373011271081,
+        "rho_noise": 0.35699808708974645
+      },
+      {
+        "pattern": 1,
+        "positions": [
+          0,
+          1,
+          3,
+          5
+        ],
+        "rho_signal": 0.6016912045517757,
+        "rho_noise": 0.3541882989276006
+      },
+      {
+        "pattern": 2,
+        "positions": [
+          1,
+          2,
+          3,
+          7
+        ],
+        "rho_signal": 0.6252302675527893,
+        "rho_noise": 0.36062910879591925
+      },
+      {
+        "pattern": 3,
+        "positions": [
+          0,
+          2,
+          3,
+          6
+        ],
+        "rho_signal": 0.6124439834392946,
+        "rho_noise": 0.3634212134179737
+      },
+      {
+        "pattern": 4,
+        "positions": [
+          0,
+          4,
+          5,
+          6
+        ],
+        "rho_signal": 0.6243971887420778,
+        "rho_noise": 0.3539395464620761
+      },
+      {
+        "pattern": 5,
+        "positions": [
+          1,
+          4,
+          5,
+          7
+        ],
+        "rho_signal": 0.6036909271449072,
+        "rho_noise": 0.34260689010297246
+      },
+      {
+        "pattern": 6,
+        "positions": [
+          2,
+          4,
+          6,
+          7
+        ],
+        "rho_signal": 0.6059093215260697,
+        "rho_noise": 0.3497686654929992
+      },
+      {
+        "pattern": 7,
+        "positions": [
+          3,
+          5,
+          6,
+          7
+        ],
+        "rho_signal": 0.6022791078717599,
+        "rho_noise": 0.34062478354041587
+      }
+    ],
+    "train_patch": {
+      "size": [
+        32,
+        64,
+        64
+      ],
+      "guided_choices": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "summary": {
+        "n": 6,
+        "rho_noise_guided": 0.35350360627206806,
+        "rho_noise_uniform": 0.35018799012374396,
+        "rho_noise_oracle": 0.3393284901645905,
+        "rho_noise_guided_std": 0.025398486255232975,
+        "rho_noise_uniform_std": 0.02483744137073116,
+        "rho_signal_guided": 0.6248177770517961,
+        "rho_signal_uniform": 0.6111514796197945,
+        "wilcoxon_noise_p": 0.0625,
+        "paired_diff_noise_mean": -0.003315616148324078,
+        "paired_diff_noise_sem": 0.0011444252091456716,
+        "wilcoxon_signal_p": 0.03125,
+        "paired_diff_signal_mean": 0.013666297432001559,
+        "paired_diff_signal_sem": 0.0002852137682118955,
+        "noise_reduction_vs_uniform": -0.0033156161483240965,
+        "oracle_fraction_captured": -0.3053194125692098
+      }
+    },
+    "sliding_window": {
+      "window": [
+        16,
+        16,
+        16
+      ],
+      "stride": [
+        4,
+        4,
+        4
+      ],
+      "starts": [
+        [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32,
+          36,
+          40,
+          44,
+          48
+        ],
+        [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32,
+          36,
+          40,
+          44,
+          48
+        ]
+      ],
+      "summary": {
+        "n": 1014,
+        "rho_noise_guided": 0.2611803548516792,
+        "rho_noise_uniform": 0.27085542426626147,
+        "rho_noise_oracle": 0.23956193353040825,
+        "rho_noise_guided_std": 0.19092015726179268,
+        "rho_noise_uniform_std": 0.18554416735465246,
+        "rho_signal_guided": 0.44740582198284007,
+        "rho_signal_uniform": 0.4322988837837411,
+        "wilcoxon_noise_p": 3.916944868389547e-53,
+        "paired_diff_noise_mean": 0.00967506941458227,
+        "paired_diff_noise_sem": 0.0005707023202092773,
+        "wilcoxon_signal_p": 2.870587723178161e-69,
+        "paired_diff_signal_mean": 0.015106938199098854,
+        "paired_diff_signal_sem": 0.0008075304736983356,
+        "noise_reduction_vs_uniform": 0.009675069414582294,
+        "oracle_fraction_captured": 0.3091719455732525
+      },
+      "selection_counts": [
+        56,
+        76,
+        102,
+        80,
+        240,
+        141,
+        152,
+        167
+      ]
+    }
+  }
+}
