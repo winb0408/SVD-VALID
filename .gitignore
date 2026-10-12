@@ -32,6 +32,11 @@ runs/phase3_hsa64/*
 !runs/eval_structure_hsa64.json
 !runs/eval_structure_sa64_controls.json
 !runs/eval_structure_sa64_identity.json
+!runs/eval_structure_scan.json
+!runs/eval_structure_sa64_roles.json
+!runs/pattern_scan/
+runs/pattern_scan/*
+!runs/pattern_scan/pattern_scan.json
 !runs/selector_crosscheck/
 runs/selector_crosscheck/*
 !runs/selector_crosscheck/selector_crosscheck.json

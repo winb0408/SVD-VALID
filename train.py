@@ -76,6 +76,12 @@ def main():
                          "(--pattern) for every patch.")
     ap.add_argument("--pattern", type=int, default=4,
                     help="Tetris pattern id used by --mode fixed (0..7).")
+    ap.add_argument("--role-order", nargs=4, type=int, default=None,
+                    metavar=("XA", "XB", "YA", "YB"),
+                    help="Permutation of the pattern's four slots assigning them "
+                         "to the xa / xb / ya / yb roles. Default is 0,1,2,3. "
+                         "The sampled voxel set is unchanged, so this isolates "
+                         "the input->target pairing from the sampling phase.")
     ap.add_argument("--patch", nargs=3, type=int, default=[32, 64, 64])
     ap.add_argument("--epochs", type=int, default=50)
     ap.add_argument("--steps-per-epoch", type=int, default=200)
@@ -99,6 +105,8 @@ def main():
 
     if not 0 <= args.pattern < len(TETRIS_PATTERNS):
         raise ValueError(f"--pattern must be in [0, {len(TETRIS_PATTERNS) - 1}].")
+    if args.role_order is not None and sorted(args.role_order) != [0, 1, 2, 3]:
+        raise ValueError("--role-order must be a permutation of 0,1,2,3.")
 
     device = torch.device(
         args.device if args.device.startswith("cuda") and torch.cuda.is_available() else "cpu"
@@ -146,6 +154,8 @@ def main():
                 xa, xb, ya, yb = [tensor(v, device) for v in views]
             elif args.mode == "fixed":
                 views = tetris_from_pattern(patch, args.pattern)
+                if args.role_order is not None:
+                    views = [views[i] for i in args.role_order]
                 xa, xb, ya, yb = [tensor(v, device) for v in views]
             else:
                 subs = valid_random_tetris(patch)
