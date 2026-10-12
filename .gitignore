@@ -14,6 +14,7 @@ runs/official_mip/*
 !runs/official_mip/figure_remap_hsa64_02_db.png
 !runs/official_mip/figure_ctrl_sa64_01.png
 !runs/official_mip/figure_ctrl_sa64_02_db.png
+!runs/official_mip/figure_scan_overview.png
 
 # phase 3 statistics: measured sampling-selection results (SA64 + HSA64 replication)
 !runs/phase3/
