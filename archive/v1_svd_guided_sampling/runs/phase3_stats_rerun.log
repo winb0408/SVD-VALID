@@ -1,0 +1,140 @@
+loading + SVD ...
+detrending ...
+training-patch choices (z0=0..5): [4, 4, 4, 4, 4, 4]
+sliding-window selection counts: [56, 76, 102, 80, 240, 141, 152, 167]
+
+===== domain: raw =====
+-- whole-volume per-pattern statistics --
+  pattern 0 [0, 1, 2, 4]: rho_signal=+0.9322  rho_noise=+0.9042
+  pattern 1 [0, 1, 3, 5]: rho_signal=+0.9338  rho_noise=+0.9060
+  pattern 2 [1, 2, 3, 7]: rho_signal=+0.9378  rho_noise=+0.9073
+  pattern 3 [0, 2, 3, 6]: rho_signal=+0.9337  rho_noise=+0.9059
+  pattern 4 [0, 4, 5, 6]: rho_signal=+0.9356  rho_noise=+0.9029
+  pattern 5 [1, 4, 5, 7]: rho_signal=+0.9337  rho_noise=+0.9022
+  pattern 6 [2, 4, 6, 7]: rho_signal=+0.9322  rho_noise=+0.9021
+  pattern 7 [3, 5, 6, 7]: rho_signal=+0.9334  rho_noise=+0.9024
+-- training-size patches --
+[raw/train-patch] n=6
+  rho_noise : guided +0.8706  uniform +0.8732  oracle +0.8688  (Wilcoxon p=3.12e-02)
+  rho_signal: guided +0.9137  uniform +0.9123  (Wilcoxon p=3.12e-02)
+[raw/train-patch] n=6
+  rho_noise : guided +0.8706  uniform +0.8732  oracle +0.8688
+  rho_signal: guided +0.9137  uniform +0.9123
+  noise-corr reduction vs uniform: +0.0026 (60.0% of oracle)
+-- sliding windows (overlapping: descriptive only) --
+[raw/sliding-window] n=1014
+  rho_noise : guided +0.6016  uniform +0.6103  oracle +0.5920  (Wilcoxon p=4.07e-109)
+  rho_signal: guided +0.8209  uniform +0.8117  (Wilcoxon p=2.93e-111)
+[raw/sliding-window] n=1014
+  rho_noise : guided +0.6016  uniform +0.6103  oracle +0.5920
+  rho_signal: guided +0.8209  uniform +0.8117
+  noise-corr reduction vs uniform: +0.0086 (47.3% of oracle)
+-- non-overlapping windows (independent units) --
+[raw/non-overlap] n=32 (non-overlapping units)
+  rho_noise : guided +0.7040  uniform +0.7108  oracle +0.6980
+    diff(uniform-guided) noise  = +0.0069 CI95 [0.0043715833949122046, 0.009445082560873013]  perm p=0.00e+00
+    diff(guided-uniform) signal = +0.0055 CI95 [0.0026400426376368795, 0.008958025879742834]  perm p=0.00e+00
+
+===== domain: detrended =====
+-- whole-volume per-pattern statistics --
+  pattern 0 [0, 1, 2, 4]: rho_signal=+0.6055  rho_noise=+0.3570
+  pattern 1 [0, 1, 3, 5]: rho_signal=+0.6017  rho_noise=+0.3542
+  pattern 2 [1, 2, 3, 7]: rho_signal=+0.6252  rho_noise=+0.3606
+  pattern 3 [0, 2, 3, 6]: rho_signal=+0.6124  rho_noise=+0.3634
+  pattern 4 [0, 4, 5, 6]: rho_signal=+0.6244  rho_noise=+0.3539
+  pattern 5 [1, 4, 5, 7]: rho_signal=+0.6037  rho_noise=+0.3426
+  pattern 6 [2, 4, 6, 7]: rho_signal=+0.6059  rho_noise=+0.3498
+  pattern 7 [3, 5, 6, 7]: rho_signal=+0.6023  rho_noise=+0.3406
+-- training-size patches --
+[detrended/train-patch] n=6
+  rho_noise : guided +0.3535  uniform +0.3502  oracle +0.3393  (Wilcoxon p=6.25e-02)
+  rho_signal: guided +0.6248  uniform +0.6112  (Wilcoxon p=3.12e-02)
+[detrended/train-patch] n=6
+  rho_noise : guided +0.3535  uniform +0.3502  oracle +0.3393
+  rho_signal: guided +0.6248  uniform +0.6112
+  noise-corr reduction vs uniform: -0.0033 (-30.5% of oracle)
+-- sliding windows (overlapping: descriptive only) --
+[detrended/sliding-window] n=1014
+  rho_noise : guided +0.2612  uniform +0.2709  oracle +0.2396  (Wilcoxon p=3.92e-53)
+  rho_signal: guided +0.4474  uniform +0.4323  (Wilcoxon p=2.87e-69)
+[detrended/sliding-window] n=1014
+  rho_noise : guided +0.2612  uniform +0.2709  oracle +0.2396
+  rho_signal: guided +0.4474  uniform +0.4323
+  noise-corr reduction vs uniform: +0.0097 (30.9% of oracle)
+-- non-overlapping windows (independent units) --
+[detrended/non-overlap] n=32 (non-overlapping units)
+  rho_noise : guided +0.3171  uniform +0.3291  oracle +0.2987
+    diff(uniform-guided) noise  = +0.0120 CI95 [0.005237334857203183, 0.018685645321683444]  perm p=1.65e-03
+    diff(guided-uniform) signal = +0.0121 CI95 [0.0028367476561171863, 0.021610605497705684]  perm p=1.79e-02
+
+saved figures to runs/phase3/
+loading + SVD ...
+detrending ...
+training-patch choices (z0=0..5): [4, 4, 4, 4, 4, 4]
+sliding-window selection counts: [146, 136, 45, 102, 180, 76, 160, 169]
+
+===== domain: raw =====
+-- whole-volume per-pattern statistics --
+  pattern 0 [0, 1, 2, 4]: rho_signal=+0.7676  rho_noise=+0.8339
+  pattern 1 [0, 1, 3, 5]: rho_signal=+0.7643  rho_noise=+0.8415
+  pattern 2 [1, 2, 3, 7]: rho_signal=+0.7679  rho_noise=+0.8428
+  pattern 3 [0, 2, 3, 6]: rho_signal=+0.7587  rho_noise=+0.8400
+  pattern 4 [0, 4, 5, 6]: rho_signal=+0.7769  rho_noise=+0.8402
+  pattern 5 [1, 4, 5, 7]: rho_signal=+0.7620  rho_noise=+0.8401
+  pattern 6 [2, 4, 6, 7]: rho_signal=+0.7653  rho_noise=+0.8358
+  pattern 7 [3, 5, 6, 7]: rho_signal=+0.7697  rho_noise=+0.8370
+-- training-size patches --
+[raw/train-patch] n=6
+  rho_noise : guided +0.8192  uniform +0.8175  oracle +0.8110  (Wilcoxon p=3.12e-02)
+  rho_signal: guided +0.7701  uniform +0.7626  (Wilcoxon p=3.12e-02)
+[raw/train-patch] n=6
+  rho_noise : guided +0.8192  uniform +0.8175  oracle +0.8110
+  rho_signal: guided +0.7701  uniform +0.7626
+  noise-corr reduction vs uniform: -0.0017 (-26.8% of oracle)
+-- sliding windows (overlapping: descriptive only) --
+[raw/sliding-window] n=1014
+  rho_noise : guided +0.7263  uniform +0.7351  oracle +0.7120  (Wilcoxon p=6.63e-70)
+  rho_signal: guided +0.7887  uniform +0.7709  (Wilcoxon p=1.40e-121)
+[raw/sliding-window] n=1014
+  rho_noise : guided +0.7263  uniform +0.7351  oracle +0.7120
+  rho_signal: guided +0.7887  uniform +0.7709
+  noise-corr reduction vs uniform: +0.0088 (38.1% of oracle)
+-- non-overlapping windows (independent units) --
+[raw/non-overlap] n=32 (non-overlapping units)
+  rho_noise : guided +0.7494  uniform +0.7585  oracle +0.7368
+    diff(uniform-guided) noise  = +0.0091 CI95 [0.0039840282345912, 0.014290660245861573]  perm p=1.25e-03
+    diff(guided-uniform) signal = +0.0152 CI95 [0.008405261256723815, 0.022817839657270272]  perm p=5.00e-05
+
+===== domain: detrended =====
+-- whole-volume per-pattern statistics --
+  pattern 0 [0, 1, 2, 4]: rho_signal=+0.6291  rho_noise=+0.6076
+  pattern 1 [0, 1, 3, 5]: rho_signal=+0.6264  rho_noise=+0.6202
+  pattern 2 [1, 2, 3, 7]: rho_signal=+0.6334  rho_noise=+0.6220
+  pattern 3 [0, 2, 3, 6]: rho_signal=+0.6163  rho_noise=+0.6190
+  pattern 4 [0, 4, 5, 6]: rho_signal=+0.6482  rho_noise=+0.6241
+  pattern 5 [1, 4, 5, 7]: rho_signal=+0.6282  rho_noise=+0.6230
+  pattern 6 [2, 4, 6, 7]: rho_signal=+0.6312  rho_noise=+0.6131
+  pattern 7 [3, 5, 6, 7]: rho_signal=+0.6412  rho_noise=+0.6134
+-- training-size patches --
+[detrended/train-patch] n=6
+  rho_noise : guided +0.6273  uniform +0.6192  oracle +0.6072  (Wilcoxon p=3.12e-02)
+  rho_signal: guided +0.6430  uniform +0.6334  (Wilcoxon p=3.12e-02)
+[detrended/train-patch] n=6
+  rho_noise : guided +0.6273  uniform +0.6192  oracle +0.6072
+  rho_signal: guided +0.6430  uniform +0.6334
+  noise-corr reduction vs uniform: -0.0081 (-67.7% of oracle)
+-- sliding windows (overlapping: descriptive only) --
+[detrended/sliding-window] n=1014
+  rho_noise : guided +0.5292  uniform +0.5406  oracle +0.5036  (Wilcoxon p=1.89e-49)
+  rho_signal: guided +0.6485  uniform +0.6254  (Wilcoxon p=1.72e-92)
+[detrended/sliding-window] n=1014
+  rho_noise : guided +0.5292  uniform +0.5406  oracle +0.5036
+  rho_signal: guided +0.6485  uniform +0.6254
+  noise-corr reduction vs uniform: +0.0115 (31.0% of oracle)
+-- non-overlapping windows (independent units) --
+[detrended/non-overlap] n=32 (non-overlapping units)
+  rho_noise : guided +0.5212  uniform +0.5284  oracle +0.4889
+    diff(uniform-guided) noise  = +0.0072 CI95 [-0.0018762586309298088, 0.015832813298506287]  perm p=1.33e-01
+    diff(guided-uniform) signal = +0.0232 CI95 [0.012871129280026358, 0.03431182164482464]  perm p=1.00e-04
+
+saved figures to runs/phase3_hsa64/

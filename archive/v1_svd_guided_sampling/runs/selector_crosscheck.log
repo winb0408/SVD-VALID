@@ -1,0 +1,23 @@
+loading + SVD (full / even / odd) ...
+window grid: 32 units of [16, 16, 16] at stride [16, 16, 16]
+selector agreement even vs odd: 0.438 (14/32)
+even-side picks: [4, 5, 5, 2, 4, 7, 0, 0, 4, 4, 0, 0, 1, 7, 7, 3, 7, 2, 0, 5, 7, 7, 5, 2, 6, 7, 2, 1, 6, 1, 6, 7]
+odd-side  picks: [5, 5, 5, 2, 4, 1, 0, 0, 4, 3, 0, 0, 1, 7, 6, 3, 0, 3, 2, 6, 5, 3, 5, 6, 7, 4, 7, 7, 7, 5, 6, 0]
+[raw/select-even_eval-odd] n=32 (non-overlapping units)
+  rho_noise : guided +0.4482  uniform +0.4401  oracle +0.3926
+    diff(uniform-guided) noise  = -0.0081 CI95 [-0.019165282746048656, 0.0029622260857884333]  perm p=1.72e-01
+    diff(guided-uniform) signal = +0.0078 CI95 [-0.0033162344712493828, 0.01888044075924674]  perm p=1.88e-01
+[raw/select-odd_eval-even] n=32 (non-overlapping units)
+  rho_noise : guided +0.4402  uniform +0.4402  oracle +0.3927
+    diff(uniform-guided) noise  = +0.0000 CI95 [-0.009501977870152958, 0.010198732754613917]  perm p=9.98e-01
+    diff(guided-uniform) signal = -0.0004 CI95 [-0.010607478178499647, 0.009207622393279186]  perm p=9.50e-01
+[detrended/select-even_eval-odd] n=32 (non-overlapping units)
+  rho_noise : guided +0.3430  uniform +0.3331  oracle +0.2769
+    diff(uniform-guided) noise  = -0.0099 CI95 [-0.023461356009868848, 0.003694841067367281]  perm p=1.71e-01
+    diff(guided-uniform) signal = +0.0094 CI95 [-0.004287882238860114, 0.02299498429772586]  perm p=1.98e-01
+[detrended/select-odd_eval-even] n=32 (non-overlapping units)
+  rho_noise : guided +0.3328  uniform +0.3332  oracle +0.2771
+    diff(uniform-guided) noise  = +0.0004 CI95 [-0.011024602323839531, 0.012092631368836228]  perm p=9.44e-01
+    diff(guided-uniform) signal = -0.0008 CI95 [-0.012537742359713033, 0.010608072056867928]  perm p=8.93e-01
+
+saved runs/selector_crosscheck/selector_crosscheck.json

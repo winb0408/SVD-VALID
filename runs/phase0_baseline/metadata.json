@@ -1,0 +1,359 @@
+{
+  "data_root": "/ssd1/wjb/Data/Dyrad/data",
+  "sequences": [
+    {
+      "sequence": "SA64",
+      "path": "/ssd1/wjb/Data/Dyrad/data/SA64/Data_SA64.mat",
+      "size_bytes": 386292577,
+      "size_mib": 368.4,
+      "sha256": "b3370c9f96b1a95f09b04e9170d26c65d58320f87b383247857b2fa252b9d0d4",
+      "storage": {
+        "Data_SA64": {
+          "stored_shape": [
+            400,
+            64,
+            64,
+            37
+          ],
+          "stored_dtype": "[('real', '<f4'), ('imag', '<f4')]",
+          "compound_fields": [
+            "real",
+            "imag"
+          ],
+          "nbytes": 484966400
+        }
+      },
+      "loaded_shape": [
+        37,
+        64,
+        64,
+        400
+      ],
+      "loaded_dtype": "complex64",
+      "is_complex": true,
+      "axis_order": "[Z, X, Y, T]",
+      "voxels": 151552,
+      "frames": 400,
+      "voxel_size_mm": 0.15,
+      "frame_rate_hz": 46.875,
+      "spatial_axis_lengths": {
+        "Z": 37,
+        "X": 64,
+        "Y": 64
+      },
+      "finite_fraction": 1.0,
+      "abs_min": 0.0,
+      "abs_max": 21100.833984375,
+      "abs_median": 1029.6689453125,
+      "phase_std_rad": 1.6412793397903442,
+      "probe_voxels": [
+        {
+          "voxel": [
+            9,
+            31,
+            31
+          ],
+          "series_length": 400,
+          "abs_mean": 2624.304931640625,
+          "abs_std": 262.34832763671875,
+          "phase_mean_rad": -1.378514289855957,
+          "phase_std_rad": 1.0575610399246216,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            18,
+            15,
+            47
+          ],
+          "series_length": 400,
+          "abs_mean": 2331.365966796875,
+          "abs_std": 186.76956176757812,
+          "phase_mean_rad": 0.27942609786987305,
+          "phase_std_rad": 0.8798559308052063,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            27,
+            31,
+            15
+          ],
+          "series_length": 400,
+          "abs_mean": 500.5282287597656,
+          "abs_std": 99.67418670654297,
+          "phase_mean_rad": -1.6447303295135498,
+          "phase_std_rad": 0.704939603805542,
+          "is_complex": true
+        }
+      ]
+    },
+    {
+      "sequence": "HSA64",
+      "path": "/ssd1/wjb/Data/Dyrad/data/HSA64/Data_HSA64.mat",
+      "size_bytes": 385902984,
+      "size_mib": 368.0,
+      "sha256": "4f5788312892cc85d9770c87ab9c54a6e9f6f3e5e99ba345a7901f70f507ce51",
+      "storage": {
+        "Data_HSA64": {
+          "stored_shape": [
+            400,
+            64,
+            64,
+            37
+          ],
+          "stored_dtype": "[('real', '<f4'), ('imag', '<f4')]",
+          "compound_fields": [
+            "real",
+            "imag"
+          ],
+          "nbytes": 484966400
+        }
+      },
+      "loaded_shape": [
+        37,
+        64,
+        64,
+        400
+      ],
+      "loaded_dtype": "complex64",
+      "is_complex": true,
+      "axis_order": "[Z, X, Y, T]",
+      "voxels": 151552,
+      "frames": 400,
+      "voxel_size_mm": 0.15,
+      "frame_rate_hz": 46.875,
+      "spatial_axis_lengths": {
+        "Z": 37,
+        "X": 64,
+        "Y": 64
+      },
+      "finite_fraction": 1.0,
+      "abs_min": 0.0,
+      "abs_max": 937403.875,
+      "abs_median": 62612.5625,
+      "phase_std_rad": 1.6434054374694824,
+      "probe_voxels": [
+        {
+          "voxel": [
+            9,
+            31,
+            31
+          ],
+          "series_length": 400,
+          "abs_mean": 79001.3671875,
+          "abs_std": 16018.736328125,
+          "phase_mean_rad": -1.8486822843551636,
+          "phase_std_rad": 1.6854376792907715,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            18,
+            15,
+            47
+          ],
+          "series_length": 400,
+          "abs_mean": 185454.515625,
+          "abs_std": 15163.064453125,
+          "phase_mean_rad": -1.126902461051941,
+          "phase_std_rad": 0.37159785628318787,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            27,
+            31,
+            15
+          ],
+          "series_length": 400,
+          "abs_mean": 50970.890625,
+          "abs_std": 9173.060546875,
+          "phase_mean_rad": -0.2423083484172821,
+          "phase_std_rad": 2.819122314453125,
+          "is_complex": true
+        }
+      ]
+    },
+    {
+      "sequence": "PW3232",
+      "path": "/ssd1/wjb/Data/Dyrad/data/PW3232/Data_PW3232.mat",
+      "size_bytes": 775119805,
+      "size_mib": 739.2,
+      "sha256": "29ab2eb35cf0d4f72c65bd68f88d4b68b9ddbf5ae47c13e5fe518b7394c111c2",
+      "storage": {
+        "Data_PW3232": {
+          "stored_shape": [
+            2,
+            400,
+            64,
+            64,
+            37
+          ],
+          "stored_dtype": "[('real', '<f4'), ('imag', '<f4')]",
+          "compound_fields": [
+            "real",
+            "imag"
+          ],
+          "nbytes": 969932800
+        }
+      },
+      "loaded_shape": [
+        37,
+        64,
+        64,
+        400,
+        2
+      ],
+      "loaded_dtype": "complex64",
+      "is_complex": true,
+      "axis_order": "[Z, X, Y, T, EmittingArray]",
+      "emitting_arrays": 2,
+      "voxels": 151552,
+      "frames": 400,
+      "voxel_size_mm": 0.15,
+      "frame_rate_hz": 46.875,
+      "spatial_axis_lengths": {
+        "Z": 37,
+        "X": 64,
+        "Y": 64
+      },
+      "finite_fraction": 1.0,
+      "abs_min": 0.0,
+      "abs_max": 262550.5,
+      "abs_median": 9880.935546875,
+      "phase_std_rad": 1.643924593925476,
+      "probe_voxels": [
+        {
+          "voxel": [
+            9,
+            31,
+            31
+          ],
+          "series_length": 400,
+          "abs_mean": 28004.6484375,
+          "abs_std": 834.5385131835938,
+          "phase_mean_rad": -2.0128445625305176,
+          "phase_std_rad": 0.9925695061683655,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            18,
+            15,
+            47
+          ],
+          "series_length": 400,
+          "abs_mean": 12061.9150390625,
+          "abs_std": 2887.941162109375,
+          "phase_mean_rad": 1.2988195419311523,
+          "phase_std_rad": 2.203155755996704,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            27,
+            31,
+            15
+          ],
+          "series_length": 400,
+          "abs_mean": 6265.9560546875,
+          "abs_std": 1113.0643310546875,
+          "phase_mean_rad": -0.8717901110649109,
+          "phase_std_rad": 0.3992341160774231,
+          "is_complex": true
+        }
+      ]
+    },
+    {
+      "sequence": "PW1616",
+      "path": "/ssd1/wjb/Data/Dyrad/data/PW1616/Data_PW1616.mat",
+      "size_bytes": 1548000660,
+      "size_mib": 1476.3,
+      "sha256": "a511064af29cc20b794b13fd5a72b7db070ae0e863e45f30ccedfcf15a96fd8e",
+      "storage": {
+        "Data_PW1616": {
+          "stored_shape": [
+            2,
+            800,
+            64,
+            64,
+            37
+          ],
+          "stored_dtype": "[('real', '<f4'), ('imag', '<f4')]",
+          "compound_fields": [
+            "real",
+            "imag"
+          ],
+          "nbytes": 1939865600
+        }
+      },
+      "loaded_shape": [
+        37,
+        64,
+        64,
+        800,
+        2
+      ],
+      "loaded_dtype": "complex64",
+      "is_complex": true,
+      "axis_order": "[Z, X, Y, T, EmittingArray]",
+      "emitting_arrays": 2,
+      "voxels": 151552,
+      "frames": 800,
+      "voxel_size_mm": 0.15,
+      "frame_rate_hz": 93.75,
+      "spatial_axis_lengths": {
+        "Z": 37,
+        "X": 64,
+        "Y": 64
+      },
+      "finite_fraction": 1.0,
+      "abs_min": 0.0,
+      "abs_max": 177094.015625,
+      "abs_median": 7820.01171875,
+      "phase_std_rad": 1.6395987272262573,
+      "probe_voxels": [
+        {
+          "voxel": [
+            9,
+            31,
+            31
+          ],
+          "series_length": 800,
+          "abs_mean": 10359.2861328125,
+          "abs_std": 2301.954345703125,
+          "phase_mean_rad": -0.5096446871757507,
+          "phase_std_rad": 0.11946608871221542,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            18,
+            15,
+            47
+          ],
+          "series_length": 800,
+          "abs_mean": 8331.9599609375,
+          "abs_std": 713.4430541992188,
+          "phase_mean_rad": 0.0944746807217598,
+          "phase_std_rad": 0.40721529722213745,
+          "is_complex": true
+        },
+        {
+          "voxel": [
+            27,
+            31,
+            15
+          ],
+          "series_length": 800,
+          "abs_mean": 2927.386962890625,
+          "abs_std": 1591.18310546875,
+          "phase_mean_rad": -0.2748425602912903,
+          "phase_std_rad": 0.5514029264450073,
+          "is_complex": true
+        }
+      ]
+    }
+  ]
+}

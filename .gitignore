@@ -1,52 +1,55 @@
-# data
+# ---------------------------------------------------------------------------
+# Environment / large binaries
+# ---------------------------------------------------------------------------
 data/
-
-# training runs: only the latest correct SA64 / HSA64 comparison figures are kept
-runs/*
-!runs/official_mip/
-runs/official_mip/*
-!runs/official_mip/figure_denoised_B3C3_adaptive.png
-!runs/official_mip/figure_denoised_hessian_ablation.png
-!runs/official_mip/figure_denoised_B4C4_official_clim.png
-!runs/official_mip/figure_remap_sa64_01.png
-!runs/official_mip/figure_remap_sa64_02_db.png
-!runs/official_mip/figure_remap_hsa64_01.png
-!runs/official_mip/figure_remap_hsa64_02_db.png
-!runs/official_mip/figure_ctrl_sa64_01.png
-!runs/official_mip/figure_ctrl_sa64_02_db.png
-!runs/official_mip/figure_scan_overview.png
-
-# phase 3 statistics: measured sampling-selection results (SA64 + HSA64 replication)
-!runs/phase3/
-runs/phase3/*
-!runs/phase3/figure_phase3_stats.png
-!runs/phase3/figure_phase3_selection.png
-!runs/phase3/band_stats.json
-!runs/phase3_hsa64/
-runs/phase3_hsa64/*
-!runs/phase3_hsa64/figure_phase3_stats.png
-!runs/phase3_hsa64/figure_phase3_selection.png
-!runs/phase3_hsa64/band_stats.json
-
-# structure / control measurements and the selector cross-check (Phase 3 review)
-!runs/eval_structure_sa64.json
-!runs/eval_structure_hsa64.json
-!runs/eval_structure_sa64_controls.json
-!runs/eval_structure_sa64_identity.json
-!runs/eval_structure_scan.json
-!runs/eval_structure_sa64_roles.json
-!runs/pattern_scan/
-runs/pattern_scan/*
-!runs/pattern_scan/pattern_scan.json
-!runs/selector_crosscheck/
-runs/selector_crosscheck/*
-!runs/selector_crosscheck/selector_crosscheck.json
-
-# python
+# external consultation notes, deliberately not versioned
+Chatgpt/
 __pycache__/
 *.pyc
-
-# large binaries
 *.npy
 *.mat
 *.pt
+
+# ---------------------------------------------------------------------------
+# Active workspace (CrossFit project). Results are ignored by default; add a
+# whitelist entry here once an artifact backs a documented conclusion.
+# ---------------------------------------------------------------------------
+runs/*
+
+# Phase 0 record: the data audit (sha256, shapes, axis order, env). Small JSON.
+!runs/phase0_baseline/
+runs/phase0_baseline/*
+!runs/phase0_baseline/metadata.json
+
+# ---------------------------------------------------------------------------
+# Archived v1 evidence -- SVD-guided sampling (superseded project line).
+# The whole run tree including weights stays on disk under archive/, but only
+# the artifacts backing documented conclusions are versioned. run -> conclusion
+# map in archive/README.md.
+# ---------------------------------------------------------------------------
+archive/v1_svd_guided_sampling/runs/*
+!archive/v1_svd_guided_sampling/runs/*.log
+!archive/v1_svd_guided_sampling/runs/*.json
+
+# full-sequence reference volumes and the v1 comparison figures
+!archive/v1_svd_guided_sampling/runs/official_mip/
+archive/v1_svd_guided_sampling/runs/official_mip/*
+!archive/v1_svd_guided_sampling/runs/official_mip/*.png
+
+# phase 3 sampling-selection statistics (SA64 + HSA64 replication)
+!archive/v1_svd_guided_sampling/runs/phase3/
+archive/v1_svd_guided_sampling/runs/phase3/*
+!archive/v1_svd_guided_sampling/runs/phase3/*.json
+!archive/v1_svd_guided_sampling/runs/phase3/*.png
+!archive/v1_svd_guided_sampling/runs/phase3_hsa64/
+archive/v1_svd_guided_sampling/runs/phase3_hsa64/*
+!archive/v1_svd_guided_sampling/runs/phase3_hsa64/*.json
+!archive/v1_svd_guided_sampling/runs/phase3_hsa64/*.png
+
+# descriptor scan and the independent selector cross-check
+!archive/v1_svd_guided_sampling/runs/pattern_scan/
+archive/v1_svd_guided_sampling/runs/pattern_scan/*
+!archive/v1_svd_guided_sampling/runs/pattern_scan/*.json
+!archive/v1_svd_guided_sampling/runs/selector_crosscheck/
+archive/v1_svd_guided_sampling/runs/selector_crosscheck/*
+!archive/v1_svd_guided_sampling/runs/selector_crosscheck/*.json
