@@ -24,8 +24,9 @@ data:
       dtype: complex64
       frame_rate_hz: 46.875
   voxel_size_mm: 0.15
-  axis_order: "[Z, X, Y, T]; X/Y assignment unresolvable from the header (both 64), "
-              "affects display orientation only"
+  axis_order: >-
+    [Z, X, Y, T]; X/Y assignment unresolvable from the header (both 64),
+    affects display orientation only
 
 official_pipeline:
   script_reference: main_supplementary_figure_2.m   # MATLAB; ported, no MATLAB on this machine

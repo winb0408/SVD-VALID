@@ -1,0 +1,128 @@
+# Phase 1 config: frame groupings, calibration rank rules, and the observation
+# pairs to construct.  Everything downstream (Phase 2 statistics, Phase 3--4
+# training) is keyed off the manifests this file produces, so it is the single
+# place where the cross-fitting design is fixed.  Pre-registered: do not edit a
+# value here after looking at Phase 2 agreement numbers without recording the
+# change and the reason in the Project log.
+#
+# Discipline note: nothing in Phase 1 may read an A or B frame to decide
+# anything about the projection applied to A and B.  The only A/B quantities
+# Phase 1 computes are (a) the observation volumes themselves and (b) QC
+# statistics that are reported, never fed back.
+
+version: "0.1"
+derived_from: configs/phase0_baseline.yaml
+
+sequences:
+  SA64:
+    frames: 400
+    # Three independent frame groupings: two interleaved widths (different
+    # partition granularity, 3 and 5 groups) and one contiguous.  Grouping
+    # choice is the main lever on whether the two observation groups share the
+    # same slow flow state, so it is varied rather than assumed.
+    splits:
+      - {name: sa64_int3,  strategy: interleaved, n_groups: 3}   # 3 folds,  T_C=133/134, T_A=T_B=133
+      - {name: sa64_int5,  strategy: interleaved, n_groups: 5}   # 10 folds, T_C=240,      T_A=T_B=80
+      - {name: sa64_cont3, strategy: contiguous,  n_groups: 3}   # 3 folds,  T_C=133/134, T_A=T_B=133
+  HSA64:
+    frames: 400
+    # One replication configuration (the plan's minimum for the second
+    # sequence): same partition as sa64_int3, different acquisition.
+    splits:
+      - {name: hsa64_int3, strategy: interleaved, n_groups: 3}
+
+rank_rules:
+  # Rule 1 -- proportional mapping of the official band.
+  #
+  # The official script (main_supplementary_figure_2.m) uses 1-based inclusive
+  # SVDcut1_400 = 60, SVDcut2_400 = 350, i.e. 291 modes, on the full 400-frame
+  # movie.  That band cannot be copied to a calibration group with T_C < 400
+  # modes; the naive rescaling below is the honest "assume the same physical
+  # band, expressed as a fraction of a movie of this length" reading.  It is
+  # kept as a reference, but it is the *least* defensible of the three: it
+  # assumes the clutter/blood boundary scales linearly with the number of
+  # frames, which is an assumption about the data, not a fact.
+  proportional:
+    kind: proportional_mapping
+    cut1_1based: 60
+    cut2_1based: 350
+    reference_frames: 400
+
+  # Rule 2 -- local thresholds on the calibration eigenvalue spectrum.
+  #   lo: first mode where the eigenvalue has fallen to <= clutter_drop of the
+  #       dominant eigenvalue (-20 dB).
+  #   hi: first mode where the eigenvalue has fallen to <= snr_gate times the
+  #       noise floor, the floor being the median of the smallest
+  #       noise_floor_pct% of the spectrum.
+  # Both edges are monotone threshold crossings, so the rule is a function of
+  # the calibration spectrum alone.  `snr_gate` is the single number here most
+  # likely to be wrong; it is pre-registered and any change must be logged.
+  spectral:
+    kind: threshold
+    clutter_drop: 0.01          # -20 dB relative to eval[0]
+    snr_gate: 10.0
+    noise_floor_pct: 5
+
+  # Rule 3 -- global energy budget on the calibration spectrum.
+  #   lo: smallest mode count whose cumulative energy from the top reaches
+  #       clutter_energy_frac (i.e. where the clutter stops owning the movie).
+  #   hi: smallest index from which the remaining tail energy is <=
+  #       discarded_energy_frac of the total (i.e. where the discarded tail
+  #       stops mattering).
+  # This is the rule with an independent check attached: applied to the FULL
+  # 400-frame spectrum it should land near the official 60:350 band, because the
+  # official band is itself an empirical statement about where clutter ends and
+  # the discardable tail begins.  scripts/build_crossfit_pairs.py reports that
+  # comparison for every rule under `rule_validation_full_movie`.
+  cum_energy:
+    kind: cumulative_energy
+    clutter_energy_frac: 0.999
+    discarded_energy_frac: 0.0001
+
+  # Rule 4 -- clutter knee, no upper cut.
+  #   lo: the mode of maximum curvature of log10(eigenvalue), i.e. where the
+  #       steep clutter decay bends into the flat tail.
+  #   hi: T_basis -- keep everything above the clutter.
+  #
+  # Added after measuring the full-movie spectrum, which showed the other two
+  # spectral rules cannot both be right: on SA64 they land at [3,18] and
+  # [25,352], on HSA64 at [3,66] and [9,51].  The reason is visible in the
+  # spectrum itself (see report): beyond roughly mode 40 the eigenvalue decays
+  # by a factor of ~2 across the remaining 360 modes, so there is no eigenvalue
+  # threshold that separates "blood" from "noise" -- the upper edge of the
+  # official 60:350 band sits inside a flat tail and is not identifiable from
+  # the spectrum.  The lower edge (clutter cut) is the edge with real structure,
+  # which is what this rule estimates.  Setting hi = T_basis is the explicit
+  # statement "the upper cut is not something the spectrum can justify".
+  clutter_knee:
+    kind: knee
+    tail_frac: 0.5      # fit the flat-tail line over the last 50% of modes
+    margin_db: 1.0      # knee = first mode within 1 dB of that line
+
+# Independent sanity check on the rules themselves: apply each rule to the
+# spectrum of all 400 frames (no cross-fitting) and compare the resulting band
+# with the official 60:350.  A rule that misses badly there has no business
+# deciding ranks on a 133-frame calibration group.  Reported, never used to
+# silently retune the parameters above.
+rule_validation:
+  reference_band_1based: [60, 350]
+
+# The three observation pairs.  Each is a different answer to "what does the
+# second observation of the same volume look like?", and they exist to separate
+# the two things that could be doing the work in a cross-fit pair (the shared
+# spatial basis vs. the shared frame-to-frame flow state):
+#   P0  no SVD at all          -- D from raw IQ power; the trivial pair, and the
+#                                 one that shows what a *totally* leakage-free
+#                                 pair costs in blood contrast.
+#   P1  shared calibration basis -- P_C = U_{C,R} U_{C,R}^H applied identically
+#                                 to A and B.  The proposal.
+#   P2  per-group own basis     -- each group filters itself with its own rank
+#                                 rule.  No C involved; the leaky reference
+#                                 that says how much of P1's agreement is just
+#                                 "both sides were filtered the same way".
+pair_kinds: [P0, P1, P2]
+
+output:
+  pairs_root: data/processed/crossfit
+  save_volumes: true      # D_A / D_B per fold per rule per kind (~0.6 MB each)
+  save_spectra: true      # calibration eigenvalue spectra, small
