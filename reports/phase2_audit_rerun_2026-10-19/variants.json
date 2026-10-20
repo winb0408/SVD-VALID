@@ -1,0 +1,576 @@
+{
+ "SA64": {
+  "sa64_cont3_c0a1b2": {
+   "proportional": {
+    "as_impl": 0.8396692155084867,
+    "tetris": 0.271579996143677,
+    "v1_complementary": 0.22893128526541515,
+    "v2_same_support": 0.8261717667994142,
+    "v3_full_block": 0.8329035096707105
+   },
+   "clutter_knee": {
+    "as_impl": 0.8385476687302109,
+    "tetris": 0.26940861902770025,
+    "v1_complementary": 0.22959266840365497,
+    "v2_same_support": 0.8239123503420988,
+    "v3_full_block": 0.8311180836302337
+   },
+   "spectral": {
+    "as_impl": 0.8994126741151015,
+    "tetris": 0.49483337905031943,
+    "v1_complementary": 0.4517115083089703,
+    "v2_same_support": 0.9028980990405592,
+    "v3_full_block": 0.9094439320151593
+   },
+   "cum_energy": {
+    "as_impl": 0.9353788169243867,
+    "tetris": 0.35399583415421937,
+    "v1_complementary": 0.33847489345922843,
+    "v2_same_support": 0.9288350760924922,
+    "v3_full_block": 0.933263830944478
+   }
+  },
+  "sa64_cont3_c1a2b0": {
+   "proportional": {
+    "as_impl": 0.40897085491114843,
+    "tetris": 0.25848590086675677,
+    "v1_complementary": 0.15174158302383742,
+    "v2_same_support": 0.39862608265140187,
+    "v3_full_block": 0.42713653738056806
+   },
+   "clutter_knee": {
+    "as_impl": 0.395026987827609,
+    "tetris": 0.2612442254516991,
+    "v1_complementary": 0.14740176996521032,
+    "v2_same_support": 0.3961051571898329,
+    "v3_full_block": 0.41890544146221
+   },
+   "spectral": {
+    "as_impl": 0.6694950234810038,
+    "tetris": 0.4757732373201447,
+    "v1_complementary": 0.3886636481488478,
+    "v2_same_support": 0.688841088667393,
+    "v3_full_block": 0.7135799644227105
+   },
+   "cum_energy": {
+    "as_impl": 0.4008696883571098,
+    "tetris": 0.35473320676082837,
+    "v1_complementary": 0.21103347010887682,
+    "v2_same_support": 0.4349444809033768,
+    "v3_full_block": 0.4559869000021612
+   }
+  },
+  "sa64_cont3_c2a0b1": {
+   "proportional": {
+    "as_impl": 0.48942751572943993,
+    "tetris": 0.23974748208739347,
+    "v1_complementary": 0.15673622291923262,
+    "v2_same_support": 0.4859693939224115,
+    "v3_full_block": 0.4902002792740391
+   },
+   "clutter_knee": {
+    "as_impl": 0.45167861712359075,
+    "tetris": 0.24071519401805624,
+    "v1_complementary": 0.14999191358575725,
+    "v2_same_support": 0.4504429659143015,
+    "v3_full_block": 0.454568809291687
+   },
+   "spectral": {
+    "as_impl": 0.8232890442137185,
+    "tetris": 0.48438723069846923,
+    "v1_complementary": 0.4499087157768115,
+    "v2_same_support": 0.8410317265211905,
+    "v3_full_block": 0.8585373495000974
+   },
+   "cum_energy": {
+    "as_impl": 0.8248122184257931,
+    "tetris": 0.3644564937830854,
+    "v1_complementary": 0.32604381375569624,
+    "v2_same_support": 0.818023553558151,
+    "v3_full_block": 0.829939794864297
+   }
+  },
+  "sa64_int3_c0a1b2": {
+   "proportional": {
+    "as_impl": 0.9610017826748836,
+    "tetris": 0.45286805005105124,
+    "v1_complementary": 0.44596336955544613,
+    "v2_same_support": 0.9642352820832777,
+    "v3_full_block": 0.966169889947103
+   },
+   "clutter_knee": {
+    "as_impl": 0.8849166422064029,
+    "tetris": 0.3615264236137947,
+    "v1_complementary": 0.35122047841026177,
+    "v2_same_support": 0.8883942419435825,
+    "v3_full_block": 0.8937274553735641
+   },
+   "spectral": {
+    "as_impl": 0.9996234563039794,
+    "tetris": 0.5126451863579203,
+    "v1_complementary": 0.5115572237331968,
+    "v2_same_support": 0.9996066157152886,
+    "v3_full_block": 0.9996487464339897
+   },
+   "cum_energy": {
+    "as_impl": 0.9682433709225042,
+    "tetris": 0.4584483225671351,
+    "v1_complementary": 0.454905648713112,
+    "v2_same_support": 0.9695058519254406,
+    "v3_full_block": 0.9726369273608616
+   }
+  },
+  "sa64_int3_c1a2b0": {
+   "proportional": {
+    "as_impl": 0.471835589801366,
+    "tetris": 0.4453532910063995,
+    "v1_complementary": 0.25130670362962804,
+    "v2_same_support": 0.4931994030359882,
+    "v3_full_block": 0.5194650362934565
+   },
+   "clutter_knee": {
+    "as_impl": 0.3938840997153716,
+    "tetris": 0.3822370121551183,
+    "v1_complementary": 0.19918419128235823,
+    "v2_same_support": 0.41570271925430613,
+    "v3_full_block": 0.44268545863157865
+   },
+   "spectral": {
+    "as_impl": 0.9960213142649817,
+    "tetris": 0.5111458385780243,
+    "v1_complementary": 0.5122551456002035,
+    "v2_same_support": 0.9958994622628241,
+    "v3_full_block": 0.9966366892280621
+   },
+   "cum_energy": {
+    "as_impl": 0.4766289552997661,
+    "tetris": 0.4601814271304205,
+    "v1_complementary": 0.2653041772356601,
+    "v2_same_support": 0.5100841382862137,
+    "v3_full_block": 0.5314628786692573
+   }
+  },
+  "sa64_int3_c2a0b1": {
+   "proportional": {
+    "as_impl": 0.5123916387518901,
+    "tetris": 0.30006725574422877,
+    "v1_complementary": 0.21945692266025854,
+    "v2_same_support": 0.518242554895662,
+    "v3_full_block": 0.5296325484638679
+   },
+   "clutter_knee": {
+    "as_impl": 0.4632311733506494,
+    "tetris": 0.2749633030255131,
+    "v1_complementary": 0.1915985450072166,
+    "v2_same_support": 0.47066555615514116,
+    "v3_full_block": 0.48867508754938715
+   },
+   "spectral": {
+    "as_impl": 0.9987710540896906,
+    "tetris": 0.5108590617767071,
+    "v1_complementary": 0.5108715949045411,
+    "v2_same_support": 0.9988091100703391,
+    "v3_full_block": 0.9989613884835429
+   },
+   "cum_energy": {
+    "as_impl": 0.5364773713249762,
+    "tetris": 0.3228149990116313,
+    "v1_complementary": 0.254499921187538,
+    "v2_same_support": 0.5522853695703155,
+    "v3_full_block": 0.5583616642488768
+   }
+  },
+  "sa64_int5_c0_1_2a3b4": {
+   "proportional": {
+    "as_impl": 0.7673985289960358,
+    "tetris": 0.38606651616810067,
+    "v1_complementary": 0.3516006171377253,
+    "v2_same_support": 0.7754880864647575,
+    "v3_full_block": 0.7910471579635293
+   },
+   "clutter_knee": {
+    "as_impl": 0.7006441696781901,
+    "tetris": 0.3775211770387882,
+    "v1_complementary": 0.32601798477591004,
+    "v2_same_support": 0.7089580104717155,
+    "v3_full_block": 0.7289811196184279
+   },
+   "spectral": {
+    "as_impl": 0.9993615553708033,
+    "tetris": 0.5133519305947153,
+    "v1_complementary": 0.5122285601558164,
+    "v2_same_support": 0.9993906430281911,
+    "v3_full_block": 0.9994573291785738
+   },
+   "cum_energy": {
+    "as_impl": 0.917984999925759,
+    "tetris": 0.47777818286904805,
+    "v1_complementary": 0.4640951758984592,
+    "v2_same_support": 0.9259374243261811,
+    "v3_full_block": 0.9333264482847469
+   }
+  },
+  "sa64_int5_c0_1_3a2b4": {
+   "proportional": {
+    "as_impl": 0.7214464393021375,
+    "tetris": 0.40457523964688963,
+    "v1_complementary": 0.34717023299551375,
+    "v2_same_support": 0.7432035743893084,
+    "v3_full_block": 0.7556048425777822
+   },
+   "clutter_knee": {
+    "as_impl": 0.652743595272987,
+    "tetris": 0.3817981012746833,
+    "v1_complementary": 0.32451740224358255,
+    "v2_same_support": 0.6767674781197542,
+    "v3_full_block": 0.6962331177906703
+   },
+   "spectral": {
+    "as_impl": 0.9984486432155073,
+    "tetris": 0.5134234450013934,
+    "v1_complementary": 0.5121659625972729,
+    "v2_same_support": 0.9985222685691143,
+    "v3_full_block": 0.9986560627615118
+   },
+   "cum_energy": {
+    "as_impl": 0.8499287012915431,
+    "tetris": 0.48598721070261436,
+    "v1_complementary": 0.45639788479789184,
+    "v2_same_support": 0.8701476031161214,
+    "v3_full_block": 0.8790024077141096
+   }
+  },
+  "sa64_int5_c0_1_4a2b3": {
+   "proportional": {
+    "as_impl": 0.788470947323497,
+    "tetris": 0.389589861103492,
+    "v1_complementary": 0.3449427008823156,
+    "v2_same_support": 0.7923403126147135,
+    "v3_full_block": 0.8071757965826155
+   },
+   "clutter_knee": {
+    "as_impl": 0.7097577829223038,
+    "tetris": 0.3787884124588148,
+    "v1_complementary": 0.3311120819972768,
+    "v2_same_support": 0.7217898212159792,
+    "v3_full_block": 0.7407260506334535
+   },
+   "spectral": {
+    "as_impl": 0.9994057374035048,
+    "tetris": 0.5133199529761021,
+    "v1_complementary": 0.513189385030738,
+    "v2_same_support": 0.9994502238243197,
+    "v3_full_block": 0.9995001054978206
+   },
+   "cum_energy": {
+    "as_impl": 0.8970132431504124,
+    "tetris": 0.4956838873482259,
+    "v1_complementary": 0.4784651500153328,
+    "v2_same_support": 0.9105795863627505,
+    "v3_full_block": 0.9214956062503133
+   }
+  },
+  "sa64_int5_c0_2_3a1b4": {
+   "proportional": {
+    "as_impl": 0.6870202736618778,
+    "tetris": 0.3915278570846707,
+    "v1_complementary": 0.3394285370730856,
+    "v2_same_support": 0.7170596444286786,
+    "v3_full_block": 0.727691181877713
+   },
+   "clutter_knee": {
+    "as_impl": 0.6211676341325284,
+    "tetris": 0.38418511154621754,
+    "v1_complementary": 0.31587165849350024,
+    "v2_same_support": 0.6536096645626673,
+    "v3_full_block": 0.6728388109391558
+   },
+   "spectral": {
+    "as_impl": 0.9976678021002381,
+    "tetris": 0.5133400313981259,
+    "v1_complementary": 0.5107910334096942,
+    "v2_same_support": 0.9977172777800815,
+    "v3_full_block": 0.9979093291308145
+   },
+   "cum_energy": {
+    "as_impl": 0.8318128161636642,
+    "tetris": 0.4703845289032448,
+    "v1_complementary": 0.44877470933108204,
+    "v2_same_support": 0.8504197016316779,
+    "v3_full_block": 0.8624590047599817
+   }
+  },
+  "sa64_int5_c0_2_4a1b3": {
+   "proportional": {
+    "as_impl": 0.7026597784030739,
+    "tetris": 0.3867464820475601,
+    "v1_complementary": 0.34634297726161206,
+    "v2_same_support": 0.728204568397512,
+    "v3_full_block": 0.7424511794485892
+   },
+   "clutter_knee": {
+    "as_impl": 0.6184163499609462,
+    "tetris": 0.37623887258732547,
+    "v1_complementary": 0.31253695867691184,
+    "v2_same_support": 0.640974673192551,
+    "v3_full_block": 0.6643261542374472
+   },
+   "spectral": {
+    "as_impl": 0.9983968343887085,
+    "tetris": 0.5132017278568278,
+    "v1_complementary": 0.511755454294274,
+    "v2_same_support": 0.998413437181429,
+    "v3_full_block": 0.9985683820508966
+   },
+   "cum_energy": {
+    "as_impl": 0.86148366675015,
+    "tetris": 0.4769986186296996,
+    "v1_complementary": 0.45705659913043134,
+    "v2_same_support": 0.8722088840811583,
+    "v3_full_block": 0.8849079772953848
+   }
+  },
+  "sa64_int5_c0_3_4a1b2": {
+   "proportional": {
+    "as_impl": 0.7879642632363529,
+    "tetris": 0.3871131434175745,
+    "v1_complementary": 0.35826462545612053,
+    "v2_same_support": 0.7924824327750364,
+    "v3_full_block": 0.8107835121075052
+   },
+   "clutter_knee": {
+    "as_impl": 0.6905518670373668,
+    "tetris": 0.3832763864863836,
+    "v1_complementary": 0.33395617551072765,
+    "v2_same_support": 0.7013966707803833,
+    "v3_full_block": 0.7259710774066427
+   },
+   "spectral": {
+    "as_impl": 0.9991667378873985,
+    "tetris": 0.512994046170493,
+    "v1_complementary": 0.5115139679498658,
+    "v2_same_support": 0.9991350910676423,
+    "v3_full_block": 0.9992316771985768
+   },
+   "cum_energy": {
+    "as_impl": 0.9132811493748031,
+    "tetris": 0.4738560222695359,
+    "v1_complementary": 0.4661037669585587,
+    "v2_same_support": 0.92266067381901,
+    "v3_full_block": 0.9288239247355922
+   }
+  },
+  "sa64_int5_c1_2_3a0b4": {
+   "proportional": {
+    "as_impl": 0.20135288336749985,
+    "tetris": 0.2488366080618805,
+    "v1_complementary": 0.1347360087193321,
+    "v2_same_support": 0.23129622293620394,
+    "v3_full_block": 0.2518695887629323
+   },
+   "clutter_knee": {
+    "as_impl": 0.18223169853533708,
+    "tetris": 0.24567975150721985,
+    "v1_complementary": 0.11499887166801347,
+    "v2_same_support": 0.2137340423665727,
+    "v3_full_block": 0.23293984253008476
+   },
+   "spectral": {
+    "as_impl": 0.9875299048590277,
+    "tetris": 0.515965347943295,
+    "v1_complementary": 0.5070124971728971,
+    "v2_same_support": 0.9877819853383649,
+    "v3_full_block": 0.9895541602135459
+   },
+   "cum_energy": {
+    "as_impl": 0.3504630690800551,
+    "tetris": 0.32417216704441315,
+    "v1_complementary": 0.21183970307908517,
+    "v2_same_support": 0.3900067985285821,
+    "v3_full_block": 0.40635381002324433
+   }
+  },
+  "sa64_int5_c1_2_4a0b3": {
+   "proportional": {
+    "as_impl": 0.2024980915748703,
+    "tetris": 0.26794243190128,
+    "v1_complementary": 0.1427222394962765,
+    "v2_same_support": 0.24129794847661273,
+    "v3_full_block": 0.2576841898685808
+   },
+   "clutter_knee": {
+    "as_impl": 0.172753608030607,
+    "tetris": 0.2574501772809345,
+    "v1_complementary": 0.12472242548358463,
+    "v2_same_support": 0.20030247287040057,
+    "v3_full_block": 0.22440510760316004
+   },
+   "spectral": {
+    "as_impl": 0.9885963690052869,
+    "tetris": 0.5161409134835035,
+    "v1_complementary": 0.5086206483289633,
+    "v2_same_support": 0.9887950356376943,
+    "v3_full_block": 0.9906171600644412
+   },
+   "cum_energy": {
+    "as_impl": 0.35614222896287334,
+    "tetris": 0.32717231473623454,
+    "v1_complementary": 0.22472695959376784,
+    "v2_same_support": 0.39335776894799324,
+    "v3_full_block": 0.4121309325174086
+   }
+  },
+  "sa64_int5_c1_3_4a0b2": {
+   "proportional": {
+    "as_impl": 0.2318994500014862,
+    "tetris": 0.26154577170328563,
+    "v1_complementary": 0.14121315512657867,
+    "v2_same_support": 0.25769752061160744,
+    "v3_full_block": 0.28071474326762896
+   },
+   "clutter_knee": {
+    "as_impl": 0.19874350761709417,
+    "tetris": 0.2538196209910392,
+    "v1_complementary": 0.13215074531537585,
+    "v2_same_support": 0.2292746981976994,
+    "v3_full_block": 0.2517719993553453
+   },
+   "spectral": {
+    "as_impl": 0.990273029510407,
+    "tetris": 0.5154249928309934,
+    "v1_complementary": 0.5084103736269918,
+    "v2_same_support": 0.9901933347171885,
+    "v3_full_block": 0.9917177280325256
+   },
+   "cum_energy": {
+    "as_impl": 0.3784014548944234,
+    "tetris": 0.32374056440506827,
+    "v1_complementary": 0.2208264598475342,
+    "v2_same_support": 0.4033088051876084,
+    "v3_full_block": 0.4291951078810588
+   }
+  },
+  "sa64_int5_c2_3_4a0b1": {
+   "proportional": {
+    "as_impl": 0.5290999696619398,
+    "tetris": 0.26508233248097435,
+    "v1_complementary": 0.19318060122953742,
+    "v2_same_support": 0.5230780013316548,
+    "v3_full_block": 0.5325524404938285
+   },
+   "clutter_knee": {
+    "as_impl": 0.3977514947834388,
+    "tetris": 0.25638837661161046,
+    "v1_complementary": 0.1657157133355734,
+    "v2_same_support": 0.4111421732757628,
+    "v3_full_block": 0.42508015844800195
+   },
+   "spectral": {
+    "as_impl": 0.9948538040112337,
+    "tetris": 0.513372161957132,
+    "v1_complementary": 0.5105362086731147,
+    "v2_same_support": 0.9950334138922968,
+    "v3_full_block": 0.9957342192800611
+   },
+   "cum_energy": {
+    "as_impl": 0.6418440897934938,
+    "tetris": 0.3139844389174309,
+    "v1_complementary": 0.26786644322222125,
+    "v2_same_support": 0.6340990138467042,
+    "v3_full_block": 0.644412748094795
+   }
+  }
+ },
+ "HSA64": {
+  "hsa64_int3_c0a1b2": {
+   "proportional": {
+    "as_impl": 0.9736667837188729,
+    "tetris": 0.5992884653306341,
+    "v1_complementary": 0.5955594116995525,
+    "v2_same_support": 0.9794243080281524,
+    "v3_full_block": 0.9823187864276363
+   },
+   "clutter_knee": {
+    "as_impl": 0.9526227147050167,
+    "tetris": 0.6283807980510451,
+    "v1_complementary": 0.6213784203109813,
+    "v2_same_support": 0.9650390909104937,
+    "v3_full_block": 0.9697627902162747
+   },
+   "spectral": {
+    "as_impl": 0.9980848808243179,
+    "tetris": 0.4747081404842321,
+    "v1_complementary": 0.4729444632275827,
+    "v2_same_support": 0.9980090501537492,
+    "v3_full_block": 0.9979865573320513
+   },
+   "cum_energy": {
+    "as_impl": 0.9911741639767755,
+    "tetris": 0.5295642249668358,
+    "v1_complementary": 0.5273450055517792,
+    "v2_same_support": 0.9926487300198428,
+    "v3_full_block": 0.9930898332498649
+   }
+  },
+  "hsa64_int3_c1a2b0": {
+   "proportional": {
+    "as_impl": 0.9741949127242202,
+    "tetris": 0.6090398659582976,
+    "v1_complementary": 0.6027931768118571,
+    "v2_same_support": 0.9789902938224097,
+    "v3_full_block": 0.9824308208166934
+   },
+   "clutter_knee": {
+    "as_impl": 0.9480725105779363,
+    "tetris": 0.6240974960342899,
+    "v1_complementary": 0.6174808986600344,
+    "v2_same_support": 0.9605361968386997,
+    "v3_full_block": 0.9668434450971424
+   },
+   "spectral": {
+    "as_impl": 0.998239448530254,
+    "tetris": 0.47219468782934737,
+    "v1_complementary": 0.4726236997399767,
+    "v2_same_support": 0.9981534717592261,
+    "v3_full_block": 0.9982702722854148
+   },
+   "cum_energy": {
+    "as_impl": 0.9927878490785776,
+    "tetris": 0.5319984920401853,
+    "v1_complementary": 0.5330468021840821,
+    "v2_same_support": 0.9937464454787986,
+    "v3_full_block": 0.9942457947764937
+   }
+  },
+  "hsa64_int3_c2a0b1": {
+   "proportional": {
+    "as_impl": 0.9688828624295234,
+    "tetris": 0.6015801518098003,
+    "v1_complementary": 0.5950721439823252,
+    "v2_same_support": 0.9746982407760579,
+    "v3_full_block": 0.9785154191168051
+   },
+   "clutter_knee": {
+    "as_impl": 0.9541875630493075,
+    "tetris": 0.6244189630354058,
+    "v1_complementary": 0.6152313256571965,
+    "v2_same_support": 0.9645857263230497,
+    "v3_full_block": 0.9695419888755665
+   },
+   "spectral": {
+    "as_impl": 0.9979385019156428,
+    "tetris": 0.47419271552357045,
+    "v1_complementary": 0.47353299372480495,
+    "v2_same_support": 0.9977769174485296,
+    "v3_full_block": 0.997715787712322
+   },
+   "cum_energy": {
+    "as_impl": 0.9938064079370519,
+    "tetris": 0.5321550103112868,
+    "v1_complementary": 0.5300191161813793,
+    "v2_same_support": 0.9944654033295083,
+    "v3_full_block": 0.995087617716874
+   }
+  }
+ }
+}

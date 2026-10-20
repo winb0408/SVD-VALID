@@ -1,0 +1,3094 @@
+{
+ "frame0": 0,
+ "variants": {
+  "as_impl": "C, A, B as manifested",
+  "variant_a": "frame 0 dropped from the arm that holds it; C unchanged",
+  "variant_b": "frame 0 dropped from C as well; rank rule re-derived on the shorter calibration spectrum"
+ },
+ "convention": "projected_power_map sums over frames; arm volumes are means; everything below divides the sum by the frame count, so the two never mix.",
+ "sequences": {
+  "SA64": {
+   "shape3d": [
+    37,
+    64,
+    64
+   ],
+   "cropped_shape3d": [
+    36,
+    64,
+    64
+   ],
+   "folds": [
+    {
+     "fold_id": "sa64_int3_c0a1b2",
+     "split": "sa64_int3",
+     "frame0_role": "C",
+     "T_C": 134,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.9610018449421783,
+        "tetris_mean_r": 0.45719479695958964,
+        "n_units": 1881,
+        "relative_reduction": 1.1019527154135986,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9610018449421783,
+        "tetris_mean_r": 0.45719479695958964,
+        "n_units": 1881,
+        "relative_reduction": 1.1019527154135986,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9270875003032011,
+        "tetris_mean_r": 0.43730817290439583,
+        "n_units": 1881,
+        "relative_reduction": 1.1199866770061044,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "rank_change": 0
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.8849135698442526,
+        "tetris_mean_r": 0.37316118946604615,
+        "n_units": 1881,
+        "relative_reduction": 1.371397655555953,
+        "band_0based_half_open": [
+         31,
+         134
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8849135698442526,
+        "tetris_mean_r": 0.37316118946604615,
+        "n_units": 1881,
+        "relative_reduction": 1.371397655555953,
+        "band_0based_half_open": [
+         31,
+         134
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8653450196404021,
+        "tetris_mean_r": 0.3708258849534555,
+        "n_units": 1881,
+        "relative_reduction": 1.333561530498381,
+        "band_0based_half_open": [
+         30,
+         133
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.9682425337692169,
+        "tetris_mean_r": 0.4643237836757434,
+        "n_units": 1881,
+        "relative_reduction": 1.0852744739980429,
+        "band_0based_half_open": [
+         18,
+         120
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9682425337692169,
+        "tetris_mean_r": 0.4643237836757434,
+        "n_units": 1881,
+        "relative_reduction": 1.0852744739980429,
+        "band_0based_half_open": [
+         18,
+         120
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9479221075824941,
+        "tetris_mean_r": 0.45706841276043153,
+        "n_units": 1881,
+        "relative_reduction": 1.073917341733565,
+        "band_0based_half_open": [
+         18,
+         119
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9996234560737214,
+        "tetris_mean_r": 0.5123869844172022,
+        "n_units": 1881,
+        "relative_reduction": 0.9509150046243082,
+        "band_0based_half_open": [
+         2,
+         13
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9996234560737214,
+        "tetris_mean_r": 0.5123869844172022,
+        "n_units": 1881,
+        "relative_reduction": 0.9509150046243082,
+        "band_0based_half_open": [
+         2,
+         13
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9996459715559544,
+        "tetris_mean_r": 0.5120692101604144,
+        "n_units": 1881,
+        "relative_reduction": 0.9521696515258128,
+        "band_0based_half_open": [
+         2,
+         13
+        ],
+        "rank_change": 0
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int3_c1a2b0",
+     "split": "sa64_int3",
+     "frame0_role": "B",
+     "T_C": 133,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.47183736624356826,
+        "tetris_mean_r": 0.34834854134745324,
+        "n_units": 1881,
+        "relative_reduction": 0.3544978957524716,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9526474181734053,
+        "tetris_mean_r": 0.44488810584534805,
+        "n_units": 1881,
+        "relative_reduction": 1.1413191444245185,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.6554526794538068
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9526474181734053,
+        "tetris_mean_r": 0.44488810584534805,
+        "n_units": 1881,
+        "relative_reduction": 1.1413191444245185,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.6554526794538068,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.3938868321338961,
+        "tetris_mean_r": 0.31227700609264214,
+        "n_units": 1881,
+        "relative_reduction": 0.2613379289829717,
+        "band_0based_half_open": [
+         29,
+         133
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9065273564312889,
+        "tetris_mean_r": 0.38885896992469343,
+        "n_units": 1881,
+        "relative_reduction": 1.331249698590847,
+        "band_0based_half_open": [
+         29,
+         133
+        ],
+        "frame0_share_of_arm": 0.5067054987416675
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9065273564312889,
+        "tetris_mean_r": 0.38885896992469343,
+        "n_units": 1881,
+        "relative_reduction": 1.331249698590847,
+        "band_0based_half_open": [
+         29,
+         133
+        ],
+        "frame0_share_of_arm": 0.5067054987416675,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.4766292603876135,
+        "tetris_mean_r": 0.3641607583335591,
+        "n_units": 1881,
+        "relative_reduction": 0.3088430026582848,
+        "band_0based_half_open": [
+         18,
+         119
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9681109974497207,
+        "tetris_mean_r": 0.4618938180711587,
+        "n_units": 1881,
+        "relative_reduction": 1.095960066087256,
+        "band_0based_half_open": [
+         18,
+         119
+        ],
+        "frame0_share_of_arm": 0.6714240035154966
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9681109974497207,
+        "tetris_mean_r": 0.4618938180711587,
+        "n_units": 1881,
+        "relative_reduction": 1.095960066087256,
+        "band_0based_half_open": [
+         18,
+         119
+        ],
+        "frame0_share_of_arm": 0.6714240035154966,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9960213082466253,
+        "tetris_mean_r": 0.5126073863515328,
+        "n_units": 1881,
+        "relative_reduction": 0.9430490756986084,
+        "band_0based_half_open": [
+         2,
+         13
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9994844894226914,
+        "tetris_mean_r": 0.5113438836570378,
+        "n_units": 1881,
+        "relative_reduction": 0.95462294820965,
+        "band_0based_half_open": [
+         2,
+         13
+        ],
+        "frame0_share_of_arm": 0.06410165010524274
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9994844894226914,
+        "tetris_mean_r": 0.5113438836570378,
+        "n_units": 1881,
+        "relative_reduction": 0.95462294820965,
+        "band_0based_half_open": [
+         2,
+         13
+        ],
+        "frame0_share_of_arm": 0.06410165010524274,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int3_c2a0b1",
+     "split": "sa64_int3",
+     "frame0_role": "A",
+     "T_C": 133,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.5123985885619995,
+        "tetris_mean_r": 0.31996188217974836,
+        "n_units": 1881,
+        "relative_reduction": 0.6014363494528512,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9308025962447524,
+        "tetris_mean_r": 0.4217789122527427,
+        "n_units": 1881,
+        "relative_reduction": 1.2068495346846246,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.7353208263731459
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9308025962447524,
+        "tetris_mean_r": 0.4217789122527427,
+        "n_units": 1881,
+        "relative_reduction": 1.2068495346846246,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.7353208263731459,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.46323587368809943,
+        "tetris_mean_r": 0.292963047247408,
+        "n_units": 1881,
+        "relative_reduction": 0.5812092277183872,
+        "band_0based_half_open": [
+         29,
+         133
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8805524603240164,
+        "tetris_mean_r": 0.3671426385571556,
+        "n_units": 1881,
+        "relative_reduction": 1.3983933432099436,
+        "band_0based_half_open": [
+         29,
+         133
+        ],
+        "frame0_share_of_arm": 0.6375166986088242
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8805524603240164,
+        "tetris_mean_r": 0.3671426385571556,
+        "n_units": 1881,
+        "relative_reduction": 1.3983933432099436,
+        "band_0based_half_open": [
+         29,
+         133
+        ],
+        "frame0_share_of_arm": 0.6375166986088242,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.5364808889017483,
+        "tetris_mean_r": 0.34687241023650733,
+        "n_units": 1881,
+        "relative_reduction": 0.5466231186734066,
+        "band_0based_half_open": [
+         17,
+         119
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9400839041671896,
+        "tetris_mean_r": 0.46097321168901195,
+        "n_units": 1881,
+        "relative_reduction": 1.039346062480962,
+        "band_0based_half_open": [
+         17,
+         119
+        ],
+        "frame0_share_of_arm": 0.7009428885057686
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9400839041671896,
+        "tetris_mean_r": 0.46097321168901195,
+        "n_units": 1881,
+        "relative_reduction": 1.039346062480962,
+        "band_0based_half_open": [
+         17,
+         119
+        ],
+        "frame0_share_of_arm": 0.7009428885057686,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9987710543467991,
+        "tetris_mean_r": 0.5112905518910025,
+        "n_units": 1881,
+        "relative_reduction": 0.953431469939852,
+        "band_0based_half_open": [
+         2,
+         12
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9995613145960693,
+        "tetris_mean_r": 0.511474423543275,
+        "n_units": 1881,
+        "relative_reduction": 0.9542742874052981,
+        "band_0based_half_open": [
+         2,
+         12
+        ],
+        "frame0_share_of_arm": 0.043510331113903504
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9995613145960693,
+        "tetris_mean_r": 0.511474423543275,
+        "n_units": 1881,
+        "relative_reduction": 0.9542742874052981,
+        "band_0based_half_open": [
+         2,
+         12
+        ],
+        "frame0_share_of_arm": 0.043510331113903504,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c2_3_4a0b1",
+     "split": "sa64_int5",
+     "frame0_role": "A",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.5291029569406724,
+        "tetris_mean_r": 0.2736705650258146,
+        "n_units": 1881,
+        "relative_reduction": 0.9333571986112704,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7173172951787068,
+        "tetris_mean_r": 0.39151781646271533,
+        "n_units": 1881,
+        "relative_reduction": 0.8321447071285905,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.8077752021398572
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7173172951787068,
+        "tetris_mean_r": 0.39151781646271533,
+        "n_units": 1881,
+        "relative_reduction": 0.8321447071285905,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.8077752021398572,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.3977632114300021,
+        "tetris_mean_r": 0.2721002396027164,
+        "n_units": 1881,
+        "relative_reduction": 0.46182602415478063,
+        "band_0based_half_open": [
+         38,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6515847354633768,
+        "tetris_mean_r": 0.39562424695291837,
+        "n_units": 1881,
+        "relative_reduction": 0.6469787695821365,
+        "band_0based_half_open": [
+         38,
+         240
+        ],
+        "frame0_share_of_arm": 0.7213415137876648
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6515847354633768,
+        "tetris_mean_r": 0.39562424695291837,
+        "n_units": 1881,
+        "relative_reduction": 0.6469787695821365,
+        "band_0based_half_open": [
+         38,
+         240
+        ],
+        "frame0_share_of_arm": 0.7213415137876648,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.6418464012111339,
+        "tetris_mean_r": 0.3275413892868848,
+        "n_units": 1881,
+        "relative_reduction": 0.9595886877336216,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8067049278178835,
+        "tetris_mean_r": 0.4745762310602546,
+        "n_units": 1881,
+        "relative_reduction": 0.6998426701978258,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8558074582250225
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8067049278178835,
+        "tetris_mean_r": 0.4745762310602546,
+        "n_units": 1881,
+        "relative_reduction": 0.6998426701978258,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8558074582250225,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9948538028410546,
+        "tetris_mean_r": 0.5131975643246738,
+        "n_units": 1881,
+        "relative_reduction": 0.9385396034570064,
+        "band_0based_half_open": [
+         2,
+         14
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9988945036075731,
+        "tetris_mean_r": 0.5120122985525942,
+        "n_units": 1881,
+        "relative_reduction": 0.9509189650938943,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "frame0_share_of_arm": 0.09054544129510443
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9988945036075731,
+        "tetris_mean_r": 0.5120122985525942,
+        "n_units": 1881,
+        "relative_reduction": 0.9509189650938943,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "frame0_share_of_arm": 0.09054544129510443,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c1_3_4a0b2",
+     "split": "sa64_int5",
+     "frame0_role": "A",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.23192327398488094,
+        "tetris_mean_r": 0.2803496969275701,
+        "n_units": 1881,
+        "relative_reduction": -0.17273577775687915,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.727226895574802,
+        "tetris_mean_r": 0.4064827475141978,
+        "n_units": 1881,
+        "relative_reduction": 0.789071984043803,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.7044648169062417
+       },
+       "variant_b": {
+        "p1_mean_r": 0.727226895574802,
+        "tetris_mean_r": 0.4064827475141978,
+        "n_units": 1881,
+        "relative_reduction": 0.789071984043803,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.7044648169062417,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.19874203260549736,
+        "tetris_mean_r": 0.27045690717517673,
+        "n_units": 1881,
+        "relative_reduction": -0.2651619266030768,
+        "band_0based_half_open": [
+         37,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6703722214784418,
+        "tetris_mean_r": 0.3992654382107188,
+        "n_units": 1881,
+        "relative_reduction": 0.6790139023369259,
+        "band_0based_half_open": [
+         37,
+         240
+        ],
+        "frame0_share_of_arm": 0.7147173537888207
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6703722214784418,
+        "tetris_mean_r": 0.3992654382107188,
+        "n_units": 1881,
+        "relative_reduction": 0.6790139023369259,
+        "band_0based_half_open": [
+         37,
+         240
+        ],
+        "frame0_share_of_arm": 0.7147173537888207,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.3784029176414944,
+        "tetris_mean_r": 0.33942563076093,
+        "n_units": 1881,
+        "relative_reduction": 0.11483306900891506,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8682951561371887,
+        "tetris_mean_r": 0.49641242444691497,
+        "n_units": 1881,
+        "relative_reduction": 0.7491406608217194,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8211448394406249
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8682951561371887,
+        "tetris_mean_r": 0.49641242444691497,
+        "n_units": 1881,
+        "relative_reduction": 0.7491406608217194,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8211448394406249,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9902730219495077,
+        "tetris_mean_r": 0.5149150269644044,
+        "n_units": 1881,
+        "relative_reduction": 0.9231775537558052,
+        "band_0based_half_open": [
+         2,
+         14
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9983514547794753,
+        "tetris_mean_r": 0.512393230442259,
+        "n_units": 1881,
+        "relative_reduction": 0.9484087522346342,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "frame0_share_of_arm": 0.10440250219273307
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9983514547794753,
+        "tetris_mean_r": 0.512393230442259,
+        "n_units": 1881,
+        "relative_reduction": 0.9484087522346342,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "frame0_share_of_arm": 0.10440250219273307,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c1_2_4a0b3",
+     "split": "sa64_int5",
+     "frame0_role": "A",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.202497390165164,
+        "tetris_mean_r": 0.2819425954536401,
+        "n_units": 1881,
+        "relative_reduction": -0.2817779454737952,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7183961154080519,
+        "tetris_mean_r": 0.4103137014022578,
+        "n_units": 1881,
+        "relative_reduction": 0.7508460306173408,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.7658399155507704
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7183961154080519,
+        "tetris_mean_r": 0.4103137014022578,
+        "n_units": 1881,
+        "relative_reduction": 0.7508460306173408,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.7658399155507704,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.17275376175447163,
+        "tetris_mean_r": 0.2714435118894977,
+        "n_units": 1881,
+        "relative_reduction": -0.36357380380195575,
+        "band_0based_half_open": [
+         37,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6559547882544301,
+        "tetris_mean_r": 0.41324459979354145,
+        "n_units": 1881,
+        "relative_reduction": 0.587328155243039,
+        "band_0based_half_open": [
+         37,
+         240
+        ],
+        "frame0_share_of_arm": 0.7691466346198865
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6559547882544301,
+        "tetris_mean_r": 0.41324459979354145,
+        "n_units": 1881,
+        "relative_reduction": 0.587328155243039,
+        "band_0based_half_open": [
+         37,
+         240
+        ],
+        "frame0_share_of_arm": 0.7691466346198865,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.3561394077280744,
+        "tetris_mean_r": 0.3451967227114149,
+        "n_units": 1881,
+        "relative_reduction": 0.03169985198789856,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8471106656009961,
+        "tetris_mean_r": 0.5006569229074243,
+        "n_units": 1881,
+        "relative_reduction": 0.6919983063085181,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8056567659037565
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8471106656009961,
+        "tetris_mean_r": 0.5006569229074243,
+        "n_units": 1881,
+        "relative_reduction": 0.6919983063085181,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8056567659037565,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9885963646364943,
+        "tetris_mean_r": 0.5154374331399132,
+        "n_units": 1881,
+        "relative_reduction": 0.9179754924166406,
+        "band_0based_half_open": [
+         2,
+         15
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9981390239442752,
+        "tetris_mean_r": 0.5126154511184444,
+        "n_units": 1881,
+        "relative_reduction": 0.9471497040647068,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "frame0_share_of_arm": 0.10523785363589144
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9981390239442752,
+        "tetris_mean_r": 0.5126154511184444,
+        "n_units": 1881,
+        "relative_reduction": 0.9471497040647068,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "frame0_share_of_arm": 0.10523785363589144,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c1_2_3a0b4",
+     "split": "sa64_int5",
+     "frame0_role": "A",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.20135594738256568,
+        "tetris_mean_r": 0.2633139621300872,
+        "n_units": 1881,
+        "relative_reduction": -0.23530090940225898,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.716909612853189,
+        "tetris_mean_r": 0.4070086810472193,
+        "n_units": 1881,
+        "relative_reduction": 0.7614111104672393,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.7612004115400003
+       },
+       "variant_b": {
+        "p1_mean_r": 0.716909612853189,
+        "tetris_mean_r": 0.4070086810472193,
+        "n_units": 1881,
+        "relative_reduction": 0.7614111104672393,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "frame0_share_of_arm": 0.7612004115400003,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.18222462859578276,
+        "tetris_mean_r": 0.25919244919112483,
+        "n_units": 1881,
+        "relative_reduction": -0.2969524028787856,
+        "band_0based_half_open": [
+         37,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6820406283557242,
+        "tetris_mean_r": 0.40625601000970923,
+        "n_units": 1881,
+        "relative_reduction": 0.6788444024235455,
+        "band_0based_half_open": [
+         37,
+         240
+        ],
+        "frame0_share_of_arm": 0.7549872343814534
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6820406283557242,
+        "tetris_mean_r": 0.40625601000970923,
+        "n_units": 1881,
+        "relative_reduction": 0.6788444024235455,
+        "band_0based_half_open": [
+         37,
+         240
+        ],
+        "frame0_share_of_arm": 0.7549872343814534,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.3504624075802462,
+        "tetris_mean_r": 0.33899754870991144,
+        "n_units": 1881,
+        "relative_reduction": 0.033819887235071226,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.870202205365406,
+        "tetris_mean_r": 0.4810940197149514,
+        "n_units": 1881,
+        "relative_reduction": 0.8087986333336705,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8279614809777774
+       },
+       "variant_b": {
+        "p1_mean_r": 0.870202205365406,
+        "tetris_mean_r": 0.4810940197149514,
+        "n_units": 1881,
+        "relative_reduction": 0.8087986333336705,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "frame0_share_of_arm": 0.8279614809777774,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9875299027878081,
+        "tetris_mean_r": 0.5146686581224725,
+        "n_units": 1881,
+        "relative_reduction": 0.9187682933527529,
+        "band_0based_half_open": [
+         2,
+         14
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9982200350527716,
+        "tetris_mean_r": 0.5119359099949571,
+        "n_units": 1881,
+        "relative_reduction": 0.9498925853093695,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "frame0_share_of_arm": 0.10479436109108864
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9982200350527716,
+        "tetris_mean_r": 0.5119359099949571,
+        "n_units": 1881,
+        "relative_reduction": 0.9498925853093695,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "frame0_share_of_arm": 0.10479436109108864,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c0_3_4a1b2",
+     "split": "sa64_int5",
+     "frame0_role": "C",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.7879749700269238,
+        "tetris_mean_r": 0.4041724509373369,
+        "n_units": 1881,
+        "relative_reduction": 0.9496008899159035,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7879749700269238,
+        "tetris_mean_r": 0.4041724509373369,
+        "n_units": 1881,
+        "relative_reduction": 0.9496008899159035,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7557368854163413,
+        "tetris_mean_r": 0.39226318002780464,
+        "n_units": 1881,
+        "relative_reduction": 0.9266067372491416,
+        "band_0based_half_open": [
+         35,
+         209
+        ],
+        "rank_change": -1
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.6905531160528575,
+        "tetris_mean_r": 0.39835940612228243,
+        "n_units": 1881,
+        "relative_reduction": 0.7334926838425947,
+        "band_0based_half_open": [
+         39,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6905531160528575,
+        "tetris_mean_r": 0.39835940612228243,
+        "n_units": 1881,
+        "relative_reduction": 0.7334926838425947,
+        "band_0based_half_open": [
+         39,
+         240
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6774403714633276,
+        "tetris_mean_r": 0.39119263477437943,
+        "n_units": 1881,
+        "relative_reduction": 0.7317308948161606,
+        "band_0based_half_open": [
+         38,
+         239
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.9132811481379861,
+        "tetris_mean_r": 0.4880960850230841,
+        "n_units": 1881,
+        "relative_reduction": 0.8711093494937441,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9132811481379861,
+        "tetris_mean_r": 0.4880960850230841,
+        "n_units": 1881,
+        "relative_reduction": 0.8711093494937441,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8683891967110241,
+        "tetris_mean_r": 0.46365874213549585,
+        "n_units": 1881,
+        "relative_reduction": 0.8729059064247151,
+        "band_0based_half_open": [
+         21,
+         212
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9991667379291788,
+        "tetris_mean_r": 0.5130987799197784,
+        "n_units": 1881,
+        "relative_reduction": 0.9473184833637606,
+        "band_0based_half_open": [
+         2,
+         15
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9991667379291788,
+        "tetris_mean_r": 0.5130987799197784,
+        "n_units": 1881,
+        "relative_reduction": 0.9473184833637606,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9992456278626313,
+        "tetris_mean_r": 0.5126347018620636,
+        "n_units": 1881,
+        "relative_reduction": 0.9492352434063306,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "rank_change": -1
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c0_2_4a1b3",
+     "split": "sa64_int5",
+     "frame0_role": "C",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.7026636065717419,
+        "tetris_mean_r": 0.4075674325606289,
+        "n_units": 1881,
+        "relative_reduction": 0.7240425766040939,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7026636065717419,
+        "tetris_mean_r": 0.4075674325606289,
+        "n_units": 1881,
+        "relative_reduction": 0.7240425766040939,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6794405514354922,
+        "tetris_mean_r": 0.40454630090374977,
+        "n_units": 1881,
+        "relative_reduction": 0.6795124560962076,
+        "band_0based_half_open": [
+         35,
+         209
+        ],
+        "rank_change": -1
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.6184275106955587,
+        "tetris_mean_r": 0.40018334135802064,
+        "n_units": 1881,
+        "relative_reduction": 0.5453604555275272,
+        "band_0based_half_open": [
+         39,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6184275106955587,
+        "tetris_mean_r": 0.40018334135802064,
+        "n_units": 1881,
+        "relative_reduction": 0.5453604555275272,
+        "band_0based_half_open": [
+         39,
+         240
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6080399750172124,
+        "tetris_mean_r": 0.3988982692114411,
+        "n_units": 1881,
+        "relative_reduction": 0.5242983536108378,
+        "band_0based_half_open": [
+         38,
+         239
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.8614860740782531,
+        "tetris_mean_r": 0.49308802588382505,
+        "n_units": 1881,
+        "relative_reduction": 0.7471243040917508,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8614860740782531,
+        "tetris_mean_r": 0.49308802588382505,
+        "n_units": 1881,
+        "relative_reduction": 0.7471243040917508,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8088737150803169,
+        "tetris_mean_r": 0.4842105426333257,
+        "n_units": 1881,
+        "relative_reduction": 0.670500007458215,
+        "band_0based_half_open": [
+         21,
+         212
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9983968344327739,
+        "tetris_mean_r": 0.5132188010754531,
+        "n_units": 1881,
+        "relative_reduction": 0.9453629374851958,
+        "band_0based_half_open": [
+         2,
+         15
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9983968344327739,
+        "tetris_mean_r": 0.5132188010754531,
+        "n_units": 1881,
+        "relative_reduction": 0.9453629374851958,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9985010967088715,
+        "tetris_mean_r": 0.512875847865044,
+        "n_units": 1881,
+        "relative_reduction": 0.9468670651295962,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "rank_change": -1
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c0_2_3a1b4",
+     "split": "sa64_int5",
+     "frame0_role": "C",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.6870310093659662,
+        "tetris_mean_r": 0.40186880071534287,
+        "n_units": 1881,
+        "relative_reduction": 0.7095903144086402,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6870310093659662,
+        "tetris_mean_r": 0.40186880071534287,
+        "n_units": 1881,
+        "relative_reduction": 0.7095903144086402,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6550187031549219,
+        "tetris_mean_r": 0.3988786969908554,
+        "n_units": 1881,
+        "relative_reduction": 0.6421501275861288,
+        "band_0based_half_open": [
+         35,
+         209
+        ],
+        "rank_change": -1
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.6211898084262623,
+        "tetris_mean_r": 0.40287960164889314,
+        "n_units": 1881,
+        "relative_reduction": 0.5418745597540205,
+        "band_0based_half_open": [
+         38,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6211898084262623,
+        "tetris_mean_r": 0.40287960164889314,
+        "n_units": 1881,
+        "relative_reduction": 0.5418745597540205,
+        "band_0based_half_open": [
+         38,
+         240
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6096151012771881,
+        "tetris_mean_r": 0.4054583787716921,
+        "n_units": 1881,
+        "relative_reduction": 0.503520788308715,
+        "band_0based_half_open": [
+         37,
+         239
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.8318198403814372,
+        "tetris_mean_r": 0.48913977448777884,
+        "n_units": 1881,
+        "relative_reduction": 0.7005769797651575,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8318198403814372,
+        "tetris_mean_r": 0.48913977448777884,
+        "n_units": 1881,
+        "relative_reduction": 0.7005769797651575,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7546469878767458,
+        "tetris_mean_r": 0.4660301079057477,
+        "n_units": 1881,
+        "relative_reduction": 0.6193095147178117,
+        "band_0based_half_open": [
+         21,
+         212
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9976678019899171,
+        "tetris_mean_r": 0.5127686665350091,
+        "n_units": 1881,
+        "relative_reduction": 0.9456489194856093,
+        "band_0based_half_open": [
+         2,
+         15
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9976678019899171,
+        "tetris_mean_r": 0.5127686665350091,
+        "n_units": 1881,
+        "relative_reduction": 0.9456489194856093,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9977691798977348,
+        "tetris_mean_r": 0.5123842614400445,
+        "n_units": 1881,
+        "relative_reduction": 0.9473064553027585,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "rank_change": -1
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c0_1_4a2b3",
+     "split": "sa64_int5",
+     "frame0_role": "C",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.7884723683331694,
+        "tetris_mean_r": 0.39995915347983857,
+        "n_units": 1881,
+        "relative_reduction": 0.971382231093044,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7884723683331694,
+        "tetris_mean_r": 0.39995915347983857,
+        "n_units": 1881,
+        "relative_reduction": 0.971382231093044,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7717537166517349,
+        "tetris_mean_r": 0.39910567273583875,
+        "n_units": 1881,
+        "relative_reduction": 0.9337077104452622,
+        "band_0based_half_open": [
+         35,
+         209
+        ],
+        "rank_change": -1
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.709767173286151,
+        "tetris_mean_r": 0.3953949584657869,
+        "n_units": 1881,
+        "relative_reduction": 0.7950840244402518,
+        "band_0based_half_open": [
+         38,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.709767173286151,
+        "tetris_mean_r": 0.3953949584657869,
+        "n_units": 1881,
+        "relative_reduction": 0.7950840244402518,
+        "band_0based_half_open": [
+         38,
+         240
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7129986799017926,
+        "tetris_mean_r": 0.3957738172824563,
+        "n_units": 1881,
+        "relative_reduction": 0.8015306944697124,
+        "band_0based_half_open": [
+         37,
+         239
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.8970121517777367,
+        "tetris_mean_r": 0.5029626899649385,
+        "n_units": 1881,
+        "relative_reduction": 0.7834566453433501,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8970121517777367,
+        "tetris_mean_r": 0.5029626899649385,
+        "n_units": 1881,
+        "relative_reduction": 0.7834566453433501,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8866122196084287,
+        "tetris_mean_r": 0.49341555701167855,
+        "n_units": 1881,
+        "relative_reduction": 0.7968874450941636,
+        "band_0based_half_open": [
+         21,
+         212
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9994057375377133,
+        "tetris_mean_r": 0.5131816637076476,
+        "n_units": 1881,
+        "relative_reduction": 0.9474696939036792,
+        "band_0based_half_open": [
+         2,
+         15
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9994057375377133,
+        "tetris_mean_r": 0.5131816637076476,
+        "n_units": 1881,
+        "relative_reduction": 0.9474696939036792,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9994013288669757,
+        "tetris_mean_r": 0.5131020505590699,
+        "n_units": 1881,
+        "relative_reduction": 0.947763272000258,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "rank_change": -1
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c0_1_3a2b4",
+     "split": "sa64_int5",
+     "frame0_role": "C",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.7214441440049472,
+        "tetris_mean_r": 0.4117869071281592,
+        "n_units": 1881,
+        "relative_reduction": 0.7519841731646274,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7214441440049472,
+        "tetris_mean_r": 0.4117869071281592,
+        "n_units": 1881,
+        "relative_reduction": 0.7519841731646274,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.701077936809401,
+        "tetris_mean_r": 0.4099862255743523,
+        "n_units": 1881,
+        "relative_reduction": 0.710003636895987,
+        "band_0based_half_open": [
+         35,
+         209
+        ],
+        "rank_change": -1
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.65275401314493,
+        "tetris_mean_r": 0.4029006938003654,
+        "n_units": 1881,
+        "relative_reduction": 0.6201362350305736,
+        "band_0based_half_open": [
+         38,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.65275401314493,
+        "tetris_mean_r": 0.4029006938003654,
+        "n_units": 1881,
+        "relative_reduction": 0.6201362350305736,
+        "band_0based_half_open": [
+         38,
+         240
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6532218947423342,
+        "tetris_mean_r": 0.40463356528639655,
+        "n_units": 1881,
+        "relative_reduction": 0.6143541979271756,
+        "band_0based_half_open": [
+         37,
+         239
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.8499302208757604,
+        "tetris_mean_r": 0.4924323112374389,
+        "n_units": 1881,
+        "relative_reduction": 0.7259838590606714,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8499302208757604,
+        "tetris_mean_r": 0.4924323112374389,
+        "n_units": 1881,
+        "relative_reduction": 0.7259838590606714,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8296451916223279,
+        "tetris_mean_r": 0.48135717134444206,
+        "n_units": 1881,
+        "relative_reduction": 0.7235542358392814,
+        "band_0based_half_open": [
+         21,
+         212
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9984486432022527,
+        "tetris_mean_r": 0.5126911723811624,
+        "n_units": 1881,
+        "relative_reduction": 0.9474660321632219,
+        "band_0based_half_open": [
+         2,
+         15
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9984486432022527,
+        "tetris_mean_r": 0.5126911723811624,
+        "n_units": 1881,
+        "relative_reduction": 0.9474660321632219,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9984248863598705,
+        "tetris_mean_r": 0.5125696905921686,
+        "n_units": 1881,
+        "relative_reduction": 0.9478812436341999,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "rank_change": -1
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_int5_c0_1_2a3b4",
+     "split": "sa64_int5",
+     "frame0_role": "C",
+     "T_C": 240,
+     "T_A": 80,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.7673972392727703,
+        "tetris_mean_r": 0.39908706725415516,
+        "n_units": 1881,
+        "relative_reduction": 0.9228817524774862,
+        "band_0based_half_open": [
+         35,
+         210
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7673972392727703,
+        "tetris_mean_r": 0.39908706725415516,
+        "n_units": 1881,
+        "relative_reduction": 0.9228817524774862,
+        "band_0based_half_open": [
+         35,
+         210
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7684244714565178,
+        "tetris_mean_r": 0.39504321137891263,
+        "n_units": 1881,
+        "relative_reduction": 0.9451656156153257,
+        "band_0based_half_open": [
+         35,
+         209
+        ],
+        "rank_change": -1
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.7006351589936216,
+        "tetris_mean_r": 0.3952387503460491,
+        "n_units": 1881,
+        "relative_reduction": 0.7726884278937335,
+        "band_0based_half_open": [
+         39,
+         240
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.7006351589936216,
+        "tetris_mean_r": 0.3952387503460491,
+        "n_units": 1881,
+        "relative_reduction": 0.7726884278937335,
+        "band_0based_half_open": [
+         39,
+         240
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.7005798215708733,
+        "tetris_mean_r": 0.3991431293545546,
+        "n_units": 1881,
+        "relative_reduction": 0.7552095227187431,
+        "band_0based_half_open": [
+         38,
+         239
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.9179802951679717,
+        "tetris_mean_r": 0.4861643465016184,
+        "n_units": 1881,
+        "relative_reduction": 0.888209824051579,
+        "band_0based_half_open": [
+         21,
+         213
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9179802951679717,
+        "tetris_mean_r": 0.4861643465016184,
+        "n_units": 1881,
+        "relative_reduction": 0.888209824051579,
+        "band_0based_half_open": [
+         21,
+         213
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9130873643267454,
+        "tetris_mean_r": 0.4845944117334832,
+        "n_units": 1881,
+        "relative_reduction": 0.8842300740952918,
+        "band_0based_half_open": [
+         21,
+         212
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9993615554062534,
+        "tetris_mean_r": 0.5127118629181802,
+        "n_units": 1881,
+        "relative_reduction": 0.9491679980217934,
+        "band_0based_half_open": [
+         2,
+         15
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9993615554062534,
+        "tetris_mean_r": 0.5127118629181802,
+        "n_units": 1881,
+        "relative_reduction": 0.9491679980217934,
+        "band_0based_half_open": [
+         2,
+         15
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9993570661051228,
+        "tetris_mean_r": 0.5126039547854001,
+        "n_units": 1881,
+        "relative_reduction": 0.9495695590633907,
+        "band_0based_half_open": [
+         2,
+         14
+        ],
+        "rank_change": -1
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_cont3_c0a1b2",
+     "split": "sa64_cont3",
+     "frame0_role": "C",
+     "T_C": 133,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.8396252893680883,
+        "tetris_mean_r": 0.25735753162840314,
+        "n_units": 1881,
+        "relative_reduction": 2.2624857879831466,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8396252893680883,
+        "tetris_mean_r": 0.25735753162840314,
+        "n_units": 1881,
+        "relative_reduction": 2.2624857879831466,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8451883110328283,
+        "tetris_mean_r": 0.2573867807904458,
+        "n_units": 1881,
+        "relative_reduction": 2.283728513318434,
+        "band_0based_half_open": [
+         19,
+         115
+        ],
+        "rank_change": -1
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.8385004764958799,
+        "tetris_mean_r": 0.2570340315461839,
+        "n_units": 1881,
+        "relative_reduction": 2.262215790850318,
+        "band_0based_half_open": [
+         20,
+         133
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8385004764958799,
+        "tetris_mean_r": 0.2570340315461839,
+        "n_units": 1881,
+        "relative_reduction": 2.262215790850318,
+        "band_0based_half_open": [
+         20,
+         133
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.864687035058022,
+        "tetris_mean_r": 0.25560268508698325,
+        "n_units": 1881,
+        "relative_reduction": 2.3829340828863494,
+        "band_0based_half_open": [
+         20,
+         132
+        ],
+        "rank_change": -1
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.9353708713171158,
+        "tetris_mean_r": 0.3525199319672889,
+        "n_units": 1881,
+        "relative_reduction": 1.6533843521900795,
+        "band_0based_half_open": [
+         11,
+         118
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9353708713171158,
+        "tetris_mean_r": 0.3525199319672889,
+        "n_units": 1881,
+        "relative_reduction": 1.6533843521900795,
+        "band_0based_half_open": [
+         11,
+         118
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9125411043108942,
+        "tetris_mean_r": 0.35925018874810033,
+        "n_units": 1881,
+        "relative_reduction": 1.5401270003249778,
+        "band_0based_half_open": [
+         10,
+         117
+        ],
+        "rank_change": 0
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.8994129347912493,
+        "tetris_mean_r": 0.4745080123519543,
+        "n_units": 1881,
+        "relative_reduction": 0.8954641678929808,
+        "band_0based_half_open": [
+         2,
+         9
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8994129347912493,
+        "tetris_mean_r": 0.4745080123519543,
+        "n_units": 1881,
+        "relative_reduction": 0.8954641678929808,
+        "band_0based_half_open": [
+         2,
+         9
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9111623722449862,
+        "tetris_mean_r": 0.47567527341749805,
+        "n_units": 1881,
+        "relative_reduction": 0.915513425153935,
+        "band_0based_half_open": [
+         2,
+         8
+        ],
+        "rank_change": -1
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_cont3_c1a2b0",
+     "split": "sa64_cont3",
+     "frame0_role": "B",
+     "T_C": 134,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.4089510916708331,
+        "tetris_mean_r": 0.2688705916020028,
+        "n_units": 1881,
+        "relative_reduction": 0.520995990056753,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.36627217379592536,
+        "tetris_mean_r": 0.2691856724446389,
+        "n_units": 1881,
+        "relative_reduction": 0.3606674176585434,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.17215730820498143
+       },
+       "variant_b": {
+        "p1_mean_r": 0.36627217379592536,
+        "tetris_mean_r": 0.2691856724446389,
+        "n_units": 1881,
+        "relative_reduction": 0.3606674176585434,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.17215730820498143,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.39501368114215696,
+        "tetris_mean_r": 0.27331671341727193,
+        "n_units": 1881,
+        "relative_reduction": 0.4452598825857041,
+        "band_0based_half_open": [
+         18,
+         134
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.35843847811052787,
+        "tetris_mean_r": 0.2735020131035505,
+        "n_units": 1881,
+        "relative_reduction": 0.31055151676276554,
+        "band_0based_half_open": [
+         18,
+         134
+        ],
+        "frame0_share_of_arm": 0.16376640299675213
+       },
+       "variant_b": {
+        "p1_mean_r": 0.35843847811052787,
+        "tetris_mean_r": 0.2735020131035505,
+        "n_units": 1881,
+        "relative_reduction": 0.31055151676276554,
+        "band_0based_half_open": [
+         18,
+         134
+        ],
+        "frame0_share_of_arm": 0.16376640299675213,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.4008718590937301,
+        "tetris_mean_r": 0.37711114640742166,
+        "n_units": 1881,
+        "relative_reduction": 0.06300718743709029,
+        "band_0based_half_open": [
+         11,
+         119
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.39719395914801003,
+        "tetris_mean_r": 0.3762084966309476,
+        "n_units": 1881,
+        "relative_reduction": 0.05578146879986271,
+        "band_0based_half_open": [
+         11,
+         119
+        ],
+        "frame0_share_of_arm": 0.08095653930180428
+       },
+       "variant_b": {
+        "p1_mean_r": 0.39719395914801003,
+        "tetris_mean_r": 0.3762084966309476,
+        "n_units": 1881,
+        "relative_reduction": 0.05578146879986271,
+        "band_0based_half_open": [
+         11,
+         119
+        ],
+        "frame0_share_of_arm": 0.08095653930180428,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.6694952255621957,
+        "tetris_mean_r": 0.5052479084815278,
+        "n_units": 1881,
+        "relative_reduction": 0.32508262641659774,
+        "band_0based_half_open": [
+         2,
+         8
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.6716467028466276,
+        "tetris_mean_r": 0.5046041123334559,
+        "n_units": 1881,
+        "relative_reduction": 0.33103691870585766,
+        "band_0based_half_open": [
+         2,
+         8
+        ],
+        "frame0_share_of_arm": 0.028219881335162813
+       },
+       "variant_b": {
+        "p1_mean_r": 0.6716467028466276,
+        "tetris_mean_r": 0.5046041123334559,
+        "n_units": 1881,
+        "relative_reduction": 0.33103691870585766,
+        "band_0based_half_open": [
+         2,
+         8
+        ],
+        "frame0_share_of_arm": 0.028219881335162813,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "sa64_cont3_c2a0b1",
+     "split": "sa64_cont3",
+     "frame0_role": "A",
+     "T_C": 133,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.48940295095781183,
+        "tetris_mean_r": 0.25212691247871766,
+        "n_units": 1881,
+        "relative_reduction": 0.941097624788956,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.4911800062770049,
+        "tetris_mean_r": 0.2513018442312876,
+        "n_units": 1881,
+        "relative_reduction": 0.9545419882591216,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.03320483890989747
+       },
+       "variant_b": {
+        "p1_mean_r": 0.4911800062770049,
+        "tetris_mean_r": 0.2513018442312876,
+        "n_units": 1881,
+        "relative_reduction": 0.9545419882591216,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.03320483890989747,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.45164644655845365,
+        "tetris_mean_r": 0.25400277843624447,
+        "n_units": 1881,
+        "relative_reduction": 0.778116166047445,
+        "band_0based_half_open": [
+         21,
+         133
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.4536687778366834,
+        "tetris_mean_r": 0.2535934763180371,
+        "n_units": 1881,
+        "relative_reduction": 0.7889607588632428,
+        "band_0based_half_open": [
+         21,
+         133
+        ],
+        "frame0_share_of_arm": 0.03558775701416137
+       },
+       "variant_b": {
+        "p1_mean_r": 0.4536687778366834,
+        "tetris_mean_r": 0.2535934763180371,
+        "n_units": 1881,
+        "relative_reduction": 0.7889607588632428,
+        "band_0based_half_open": [
+         21,
+         133
+        ],
+        "frame0_share_of_arm": 0.03558775701416137,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.8248111330975914,
+        "tetris_mean_r": 0.3697158634292742,
+        "n_units": 1881,
+        "relative_reduction": 1.2309324935292527,
+        "band_0based_half_open": [
+         13,
+         119
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8267046823031357,
+        "tetris_mean_r": 0.3693378073721719,
+        "n_units": 1881,
+        "relative_reduction": 1.238342963546343,
+        "band_0based_half_open": [
+         13,
+         119
+        ],
+        "frame0_share_of_arm": 0.017009612437477385
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8267046823031357,
+        "tetris_mean_r": 0.3693378073721719,
+        "n_units": 1881,
+        "relative_reduction": 1.238342963546343,
+        "band_0based_half_open": [
+         13,
+         119
+        ],
+        "frame0_share_of_arm": 0.017009612437477385,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.8232894245015415,
+        "tetris_mean_r": 0.5002171736125288,
+        "n_units": 1881,
+        "relative_reduction": 0.6458639725537819,
+        "band_0based_half_open": [
+         2,
+         9
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.8247485110371475,
+        "tetris_mean_r": 0.5001432612035654,
+        "n_units": 1881,
+        "relative_reduction": 0.6490245395937927,
+        "band_0based_half_open": [
+         2,
+         9
+        ],
+        "frame0_share_of_arm": 0.01512158775239933
+       },
+       "variant_b": {
+        "p1_mean_r": 0.8247485110371475,
+        "tetris_mean_r": 0.5001432612035654,
+        "n_units": 1881,
+        "relative_reduction": 0.6490245395937927,
+        "band_0based_half_open": [
+         2,
+         9
+        ],
+        "frame0_share_of_arm": 0.01512158775239933,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    }
+   ],
+   "aggregate": {
+    "proportional": {
+     "as_impl": {
+      "n_folds": 16,
+      "p1_mean_r": 0.58144250236208,
+      "tetris_mean_r": 0.33922368048803053,
+      "relative_reduction_mean": 0.6909681791931193,
+      "relative_reduction_min": -0.2817779454737952,
+      "relative_reduction_max": 2.2624857879831466,
+      "n_folds_negative": 3,
+      "n_folds_passing_10pct": 3
+     },
+     "variant_a": {
+      "n_folds": 16,
+      "p1_mean_r": 0.7422726615869764,
+      "tetris_mean_r": 0.38384197636649137,
+      "relative_reduction_mean": 0.9494232723965201,
+      "relative_reduction_min": 0.3606674176585434,
+      "relative_reduction_max": 2.2624857879831466,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 16,
+      "p1_mean_r": 0.7327800118603922,
+      "tetris_mean_r": 0.38106223265667266,
+      "relative_reduction_mean": 0.9398570869685233,
+      "relative_reduction_min": 0.3606674176585434,
+      "relative_reduction_max": 2.283728513318434,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    },
+    "clutter_knee": {
+     "as_impl": {
+      "n_folds": 16,
+      "p1_mean_r": 0.5232504559279921,
+      "tetris_mean_r": 0.3269315391128569,
+      "relative_reduction_mean": 0.5777694330687777,
+      "relative_reduction_min": -0.36357380380195575,
+      "relative_reduction_max": 2.262215790850318,
+      "n_folds_negative": 3,
+      "n_folds_passing_10pct": 3
+     },
+     "variant_a": {
+      "n_folds": 16,
+      "p1_mean_r": 0.6859925170746253,
+      "tetris_mean_r": 0.370164960351497,
+      "relative_reduction_mean": 0.8789731487442136,
+      "relative_reduction_min": 0.31055151676276554,
+      "relative_reduction_max": 2.262215790850318,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 16,
+      "p1_mean_r": 0.6844417090578526,
+      "tetris_mean_r": 0.3699384848494802,
+      "relative_reduction_mean": 0.8792787882655326,
+      "relative_reduction_min": 0.31055151676276554,
+      "relative_reduction_max": 2.3829340828863494,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    },
+    "cum_energy": {
+     "as_impl": {
+      "n_folds": 16,
+      "p1_mean_r": 0.6962979631966943,
+      "tetris_mean_r": 0.41110927616360127,
+      "relative_reduction_mean": 0.6715291928911198,
+      "relative_reduction_min": 0.03169985198789856,
+      "relative_reduction_max": 1.6533843521900795,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_a": {
+      "n_folds": 16,
+      "p1_mean_r": 0.856220602093438,
+      "tetris_mean_r": 0.4618674925396595,
+      "relative_reduction_mean": 0.8646456637231583,
+      "relative_reduction_min": 0.05578146879986271,
+      "relative_reduction_max": 1.6533843521900795,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 16,
+      "p1_mean_r": 0.8403827740692816,
+      "tetris_mean_r": 0.4569211291353462,
+      "relative_reduction_mean": 0.8475401473290112,
+      "relative_reduction_min": 0.05578146879986271,
+      "relative_reduction_max": 1.5401270003249778,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    },
+    "spectral": {
+     "as_impl": {
+      "n_folds": 16,
+      "p1_mean_r": 0.9587696128896928,
+      "tetris_mean_r": 0.5095092278871527,
+      "relative_reduction_mean": 0.8809188327832247,
+      "relative_reduction_min": 0.32508262641659774,
+      "relative_reduction_max": 0.953431469939852,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_a": {
+      "n_folds": 16,
+      "p1_mean_r": 0.9612831085406057,
+      "tetris_mean_r": 0.5088180321344985,
+      "relative_reduction_mean": 0.8883838710973595,
+      "relative_reduction_min": 0.33103691870585766,
+      "relative_reduction_max": 0.95462294820965,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 16,
+      "p1_mean_r": 0.9620345978055487,
+      "tetris_mean_r": 0.5087773475954558,
+      "relative_reduction_mean": 0.8901021634895928,
+      "relative_reduction_min": 0.33103691870585766,
+      "relative_reduction_max": 0.95462294820965,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    }
+   }
+  },
+  "HSA64": {
+   "shape3d": [
+    37,
+    64,
+    64
+   ],
+   "cropped_shape3d": [
+    36,
+    64,
+    64
+   ],
+   "folds": [
+    {
+     "fold_id": "hsa64_int3_c0a1b2",
+     "split": "hsa64_int3",
+     "frame0_role": "C",
+     "T_C": 134,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.9736679315632975,
+        "tetris_mean_r": 0.6029178041832899,
+        "n_units": 1881,
+        "relative_reduction": 0.6149264871722012,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9736679315632975,
+        "tetris_mean_r": 0.6029178041832899,
+        "n_units": 1881,
+        "relative_reduction": 0.6149264871722012,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9729590646842817,
+        "tetris_mean_r": 0.6019091357748041,
+        "n_units": 1881,
+        "relative_reduction": 0.6164550541866186,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "rank_change": 0
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.9526352861353896,
+        "tetris_mean_r": 0.6345981149632951,
+        "n_units": 1881,
+        "relative_reduction": 0.5011631198912239,
+        "band_0based_half_open": [
+         54,
+         134
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9526352861353896,
+        "tetris_mean_r": 0.6345981149632951,
+        "n_units": 1881,
+        "relative_reduction": 0.5011631198912239,
+        "band_0based_half_open": [
+         54,
+         134
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.952973382723974,
+        "tetris_mean_r": 0.6353092626304867,
+        "n_units": 1881,
+        "relative_reduction": 0.5000149356837719,
+        "band_0based_half_open": [
+         53,
+         133
+        ],
+        "rank_change": 0
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.9911741524127332,
+        "tetris_mean_r": 0.5309204997194319,
+        "n_units": 1881,
+        "relative_reduction": 0.8668974977167487,
+        "band_0based_half_open": [
+         8,
+         41
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9911741524127332,
+        "tetris_mean_r": 0.5309204997194319,
+        "n_units": 1881,
+        "relative_reduction": 0.8668974977167487,
+        "band_0based_half_open": [
+         8,
+         41
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9913147573304664,
+        "tetris_mean_r": 0.5309276893518932,
+        "n_units": 1881,
+        "relative_reduction": 0.867137045612691,
+        "band_0based_half_open": [
+         8,
+         40
+        ],
+        "rank_change": -1
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9980848837161427,
+        "tetris_mean_r": 0.47391347049522586,
+        "n_units": 1881,
+        "relative_reduction": 1.1060487744169263,
+        "band_0based_half_open": [
+         2,
+         30
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9980848837161427,
+        "tetris_mean_r": 0.47391347049522586,
+        "n_units": 1881,
+        "relative_reduction": 1.1060487744169263,
+        "band_0based_half_open": [
+         2,
+         30
+        ],
+        "note": "frame 0 not in A/B"
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9980950061177594,
+        "tetris_mean_r": 0.4739934670228434,
+        "n_units": 1881,
+        "relative_reduction": 1.1057146892483598,
+        "band_0based_half_open": [
+         2,
+         30
+        ],
+        "rank_change": 0
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "hsa64_int3_c1a2b0",
+     "split": "hsa64_int3",
+     "frame0_role": "B",
+     "T_C": 133,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.9741951227648538,
+        "tetris_mean_r": 0.6081862708626218,
+        "n_units": 1881,
+        "relative_reduction": 0.6018038706843922,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9757514677765126,
+        "tetris_mean_r": 0.6089974008528642,
+        "n_units": 1881,
+        "relative_reduction": 0.6022259970404329,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.024180777568250073
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9757514677765126,
+        "tetris_mean_r": 0.6089974008528642,
+        "n_units": 1881,
+        "relative_reduction": 0.6022259970404329,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.024180777568250073,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.9480777668323016,
+        "tetris_mean_r": 0.6313771733406814,
+        "n_units": 1881,
+        "relative_reduction": 0.501602856207051,
+        "band_0based_half_open": [
+         53,
+         133
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9510122489834832,
+        "tetris_mean_r": 0.632332653316833,
+        "n_units": 1881,
+        "relative_reduction": 0.5039745994375756,
+        "band_0based_half_open": [
+         53,
+         133
+        ],
+        "frame0_share_of_arm": 0.02805054259800109
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9510122489834832,
+        "tetris_mean_r": 0.632332653316833,
+        "n_units": 1881,
+        "relative_reduction": 0.5039745994375756,
+        "band_0based_half_open": [
+         53,
+         133
+        ],
+        "frame0_share_of_arm": 0.02805054259800109,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.9927879322746821,
+        "tetris_mean_r": 0.5339440591033019,
+        "n_units": 1881,
+        "relative_reduction": 0.8593482132603106,
+        "band_0based_half_open": [
+         8,
+         41
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9929127932835244,
+        "tetris_mean_r": 0.5338208737548282,
+        "n_units": 1881,
+        "relative_reduction": 0.8600111799666094,
+        "band_0based_half_open": [
+         8,
+         41
+        ],
+        "frame0_share_of_arm": 0.010764385199736866
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9929127932835244,
+        "tetris_mean_r": 0.5338208737548282,
+        "n_units": 1881,
+        "relative_reduction": 0.8600111799666094,
+        "band_0based_half_open": [
+         8,
+         41
+        ],
+        "frame0_share_of_arm": 0.010764385199736866,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.998239449623238,
+        "tetris_mean_r": 0.47305642953786375,
+        "n_units": 1881,
+        "relative_reduction": 1.1101910624033453,
+        "band_0based_half_open": [
+         2,
+         29
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9981400429522304,
+        "tetris_mean_r": 0.4731256137766921,
+        "n_units": 1881,
+        "relative_reduction": 1.1096723869685419,
+        "band_0based_half_open": [
+         2,
+         29
+        ],
+        "frame0_share_of_arm": 0.008205691782751878
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9981400429522304,
+        "tetris_mean_r": 0.4731256137766921,
+        "n_units": 1881,
+        "relative_reduction": 1.1096723869685419,
+        "band_0based_half_open": [
+         2,
+         29
+        ],
+        "frame0_share_of_arm": 0.008205691782751878,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    },
+    {
+     "fold_id": "hsa64_int3_c2a0b1",
+     "split": "hsa64_int3",
+     "frame0_role": "A",
+     "T_C": 133,
+     "T_A": 133,
+     "rules": {
+      "proportional": {
+       "as_impl": {
+        "p1_mean_r": 0.9688855162184856,
+        "tetris_mean_r": 0.6046415278417568,
+        "n_units": 1881,
+        "relative_reduction": 0.6024131185247609,
+        "band_0based_half_open": [
+         20,
+         117
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9716591835956786,
+        "tetris_mean_r": 0.6059236789152921,
+        "n_units": 1881,
+        "relative_reduction": 0.6035999539333339,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.026555761494902512
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9716591835956786,
+        "tetris_mean_r": 0.6059236789152921,
+        "n_units": 1881,
+        "relative_reduction": 0.6035999539333339,
+        "band_0based_half_open": [
+         20,
+         117
+        ],
+        "frame0_share_of_arm": 0.026555761494902512,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "clutter_knee": {
+       "as_impl": {
+        "p1_mean_r": 0.9541895126069998,
+        "tetris_mean_r": 0.6298987262952104,
+        "n_units": 1881,
+        "relative_reduction": 0.5148300397734195,
+        "band_0based_half_open": [
+         54,
+         133
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9570446276191064,
+        "tetris_mean_r": 0.6303662808466693,
+        "n_units": 1881,
+        "relative_reduction": 0.5182357570485253,
+        "band_0based_half_open": [
+         54,
+         133
+        ],
+        "frame0_share_of_arm": 0.02035067122982761
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9570446276191064,
+        "tetris_mean_r": 0.6303662808466693,
+        "n_units": 1881,
+        "relative_reduction": 0.5182357570485253,
+        "band_0based_half_open": [
+         54,
+         133
+        ],
+        "frame0_share_of_arm": 0.02035067122982761,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "cum_energy": {
+       "as_impl": {
+        "p1_mean_r": 0.9938063442113108,
+        "tetris_mean_r": 0.5333312797370192,
+        "n_units": 1881,
+        "relative_reduction": 0.8633940703821977,
+        "band_0based_half_open": [
+         8,
+         40
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9937951688985639,
+        "tetris_mean_r": 0.5332198278524414,
+        "n_units": 1881,
+        "relative_reduction": 0.8637625928148683,
+        "band_0based_half_open": [
+         8,
+         40
+        ],
+        "frame0_share_of_arm": 0.010342589308102777
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9937951688985639,
+        "tetris_mean_r": 0.5332198278524414,
+        "n_units": 1881,
+        "relative_reduction": 0.8637625928148683,
+        "band_0based_half_open": [
+         8,
+         40
+        ],
+        "frame0_share_of_arm": 0.010342589308102777,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      },
+      "spectral": {
+       "as_impl": {
+        "p1_mean_r": 0.9979384879636286,
+        "tetris_mean_r": 0.4743899432824273,
+        "n_units": 1881,
+        "relative_reduction": 1.1036248809547542,
+        "band_0based_half_open": [
+         2,
+         29
+        ]
+       },
+       "variant_a": {
+        "p1_mean_r": 0.9979102268238413,
+        "tetris_mean_r": 0.4744509948046849,
+        "n_units": 1881,
+        "relative_reduction": 1.1032946242101285,
+        "band_0based_half_open": [
+         2,
+         29
+        ],
+        "frame0_share_of_arm": 0.008305537795089397
+       },
+       "variant_b": {
+        "p1_mean_r": 0.9979102268238413,
+        "tetris_mean_r": 0.4744509948046849,
+        "n_units": 1881,
+        "relative_reduction": 1.1032946242101285,
+        "band_0based_half_open": [
+         2,
+         29
+        ],
+        "frame0_share_of_arm": 0.008305537795089397,
+        "note": "frame 0 not in C; same as variant A"
+       }
+      }
+     }
+    }
+   ],
+   "aggregate": {
+    "proportional": {
+     "as_impl": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9722495235155456,
+      "tetris_mean_r": 0.6052485342958894,
+      "relative_reduction_mean": 0.6063811587937847,
+      "relative_reduction_min": 0.6018038706843922,
+      "relative_reduction_max": 0.6149264871722012,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_a": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9736928609784962,
+      "tetris_mean_r": 0.6059462946504821,
+      "relative_reduction_mean": 0.6069174793819893,
+      "relative_reduction_min": 0.6022259970404329,
+      "relative_reduction_max": 0.6149264871722012,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9734565720188243,
+      "tetris_mean_r": 0.6056100718476535,
+      "relative_reduction_mean": 0.6074270017201285,
+      "relative_reduction_min": 0.6022259970404329,
+      "relative_reduction_max": 0.6164550541866186,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    },
+    "clutter_knee": {
+     "as_impl": {
+      "n_folds": 3,
+      "p1_mean_r": 0.951634188524897,
+      "tetris_mean_r": 0.6319580048663956,
+      "relative_reduction_mean": 0.5058653386238982,
+      "relative_reduction_min": 0.5011631198912239,
+      "relative_reduction_max": 0.5148300397734195,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_a": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9535640542459931,
+      "tetris_mean_r": 0.6324323497089325,
+      "relative_reduction_mean": 0.5077911587924416,
+      "relative_reduction_min": 0.5011631198912239,
+      "relative_reduction_max": 0.5182357570485253,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9536767531088546,
+      "tetris_mean_r": 0.6326693989313297,
+      "relative_reduction_mean": 0.507408430723291,
+      "relative_reduction_min": 0.5000149356837719,
+      "relative_reduction_max": 0.5182357570485253,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    },
+    "cum_energy": {
+     "as_impl": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9925894762995754,
+      "tetris_mean_r": 0.5327319461865844,
+      "relative_reduction_mean": 0.8632132604530858,
+      "relative_reduction_min": 0.8593482132603106,
+      "relative_reduction_max": 0.8668974977167487,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_a": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9926273715316073,
+      "tetris_mean_r": 0.5326537337755671,
+      "relative_reduction_mean": 0.8635570901660755,
+      "relative_reduction_min": 0.8600111799666094,
+      "relative_reduction_max": 0.8668974977167487,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9926742398375182,
+      "tetris_mean_r": 0.5326561303197209,
+      "relative_reduction_mean": 0.8636369394647229,
+      "relative_reduction_min": 0.8600111799666094,
+      "relative_reduction_max": 0.867137045612691,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    },
+    "spectral": {
+     "as_impl": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9980876071010031,
+      "tetris_mean_r": 0.4737866144385056,
+      "relative_reduction_mean": 1.1066215725916753,
+      "relative_reduction_min": 1.1036248809547542,
+      "relative_reduction_max": 1.1101910624033453,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_a": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9980450511640715,
+      "tetris_mean_r": 0.4738300263588677,
+      "relative_reduction_mean": 1.106338595198532,
+      "relative_reduction_min": 1.1032946242101285,
+      "relative_reduction_max": 1.1096723869685419,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     },
+     "variant_b": {
+      "n_folds": 3,
+      "p1_mean_r": 0.9980484252979437,
+      "tetris_mean_r": 0.4738566918680735,
+      "relative_reduction_mean": 1.1062272334756769,
+      "relative_reduction_min": 1.1032946242101285,
+      "relative_reduction_max": 1.1096723869685419,
+      "n_folds_negative": 0,
+      "n_folds_passing_10pct": 0
+     }
+    }
+   }
+  }
+ }
+}

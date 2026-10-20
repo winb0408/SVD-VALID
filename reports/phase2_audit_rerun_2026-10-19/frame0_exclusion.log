@@ -1,0 +1,57 @@
+
+=== SA64 ===
+  [iq] SA64 (37, 64, 64, 400) (3.3s)
+loaded IQ (151552, 400) + gram (400, 400) (4.1s)
+  sa64_int3_c0a1b2           f0=C proportional: +1.102->+1.120 clutter_knee: +1.371->+1.334 cum_energy: +1.085->+1.074 spectral: +0.951->+0.952
+  sa64_int3_c1a2b0           f0=B proportional: +0.354->+1.141 clutter_knee: +0.261->+1.331 cum_energy: +0.309->+1.096 spectral: +0.943->+0.955
+  sa64_int3_c2a0b1           f0=A proportional: +0.601->+1.207 clutter_knee: +0.581->+1.398 cum_energy: +0.547->+1.039 spectral: +0.953->+0.954
+  sa64_int5_c2_3_4a0b1       f0=A proportional: +0.933->+0.832 clutter_knee: +0.462->+0.647 cum_energy: +0.960->+0.700 spectral: +0.939->+0.951
+  sa64_int5_c1_3_4a0b2       f0=A proportional: -0.173->+0.789 clutter_knee: -0.265->+0.679 cum_energy: +0.115->+0.749 spectral: +0.923->+0.948
+  sa64_int5_c1_2_4a0b3       f0=A proportional: -0.282->+0.751 clutter_knee: -0.364->+0.587 cum_energy: +0.032->+0.692 spectral: +0.918->+0.947
+  sa64_int5_c1_2_3a0b4       f0=A proportional: -0.235->+0.761 clutter_knee: -0.297->+0.679 cum_energy: +0.034->+0.809 spectral: +0.919->+0.950
+  sa64_int5_c0_3_4a1b2       f0=C proportional: +0.950->+0.927 clutter_knee: +0.733->+0.732 cum_energy: +0.871->+0.873 spectral: +0.947->+0.949
+  sa64_int5_c0_2_4a1b3       f0=C proportional: +0.724->+0.680 clutter_knee: +0.545->+0.524 cum_energy: +0.747->+0.671 spectral: +0.945->+0.947
+  sa64_int5_c0_2_3a1b4       f0=C proportional: +0.710->+0.642 clutter_knee: +0.542->+0.504 cum_energy: +0.701->+0.619 spectral: +0.946->+0.947
+  sa64_int5_c0_1_4a2b3       f0=C proportional: +0.971->+0.934 clutter_knee: +0.795->+0.802 cum_energy: +0.783->+0.797 spectral: +0.947->+0.948
+  sa64_int5_c0_1_3a2b4       f0=C proportional: +0.752->+0.710 clutter_knee: +0.620->+0.614 cum_energy: +0.726->+0.724 spectral: +0.947->+0.948
+  sa64_int5_c0_1_2a3b4       f0=C proportional: +0.923->+0.945 clutter_knee: +0.773->+0.755 cum_energy: +0.888->+0.884 spectral: +0.949->+0.950
+  sa64_cont3_c0a1b2          f0=C proportional: +2.262->+2.284 clutter_knee: +2.262->+2.383 cum_energy: +1.653->+1.540 spectral: +0.895->+0.916
+  sa64_cont3_c1a2b0          f0=B proportional: +0.521->+0.361 clutter_knee: +0.445->+0.311 cum_energy: +0.063->+0.056 spectral: +0.325->+0.331
+  sa64_cont3_c2a0b1          f0=A proportional: +0.941->+0.955 clutter_knee: +0.778->+0.789 cum_energy: +1.231->+1.238 spectral: +0.646->+0.649
+
+-- SA64 aggregate over 16 folds
+   proportional  as_impl    P1 0.581 TET 0.339 rel +0.691 [-0.282,+2.262] neg 3/16
+   proportional  variant_a  P1 0.742 TET 0.384 rel +0.949 [+0.361,+2.262] neg 0/16
+   proportional  variant_b  P1 0.733 TET 0.381 rel +0.940 [+0.361,+2.284] neg 0/16
+   clutter_knee  as_impl    P1 0.523 TET 0.327 rel +0.578 [-0.364,+2.262] neg 3/16
+   clutter_knee  variant_a  P1 0.686 TET 0.370 rel +0.879 [+0.311,+2.262] neg 0/16
+   clutter_knee  variant_b  P1 0.684 TET 0.370 rel +0.879 [+0.311,+2.383] neg 0/16
+   cum_energy    as_impl    P1 0.696 TET 0.411 rel +0.672 [+0.032,+1.653] neg 0/16
+   cum_energy    variant_a  P1 0.856 TET 0.462 rel +0.865 [+0.056,+1.653] neg 0/16
+   cum_energy    variant_b  P1 0.840 TET 0.457 rel +0.848 [+0.056,+1.540] neg 0/16
+   spectral      as_impl    P1 0.959 TET 0.510 rel +0.881 [+0.325,+0.953] neg 0/16
+   spectral      variant_a  P1 0.961 TET 0.509 rel +0.888 [+0.331,+0.955] neg 0/16
+   spectral      variant_b  P1 0.962 TET 0.509 rel +0.890 [+0.331,+0.955] neg 0/16
+
+=== HSA64 ===
+  [iq] HSA64 (37, 64, 64, 400) (3.2s)
+loaded IQ (151552, 400) + gram (400, 400) (4.1s)
+  hsa64_int3_c0a1b2          f0=C proportional: +0.615->+0.616 clutter_knee: +0.501->+0.500 cum_energy: +0.867->+0.867 spectral: +1.106->+1.106
+  hsa64_int3_c1a2b0          f0=B proportional: +0.602->+0.602 clutter_knee: +0.502->+0.504 cum_energy: +0.859->+0.860 spectral: +1.110->+1.110
+  hsa64_int3_c2a0b1          f0=A proportional: +0.602->+0.604 clutter_knee: +0.515->+0.518 cum_energy: +0.863->+0.864 spectral: +1.104->+1.103
+
+-- HSA64 aggregate over 3 folds
+   proportional  as_impl    P1 0.972 TET 0.605 rel +0.606 [+0.602,+0.615] neg 0/3
+   proportional  variant_a  P1 0.974 TET 0.606 rel +0.607 [+0.602,+0.615] neg 0/3
+   proportional  variant_b  P1 0.973 TET 0.606 rel +0.607 [+0.602,+0.616] neg 0/3
+   clutter_knee  as_impl    P1 0.952 TET 0.632 rel +0.506 [+0.501,+0.515] neg 0/3
+   clutter_knee  variant_a  P1 0.954 TET 0.632 rel +0.508 [+0.501,+0.518] neg 0/3
+   clutter_knee  variant_b  P1 0.954 TET 0.633 rel +0.507 [+0.500,+0.518] neg 0/3
+   cum_energy    as_impl    P1 0.993 TET 0.533 rel +0.863 [+0.859,+0.867] neg 0/3
+   cum_energy    variant_a  P1 0.993 TET 0.533 rel +0.864 [+0.860,+0.867] neg 0/3
+   cum_energy    variant_b  P1 0.993 TET 0.533 rel +0.864 [+0.860,+0.867] neg 0/3
+   spectral      as_impl    P1 0.998 TET 0.474 rel +1.107 [+1.104,+1.110] neg 0/3
+   spectral      variant_a  P1 0.998 TET 0.474 rel +1.106 [+1.103,+1.110] neg 0/3
+   spectral      variant_b  P1 0.998 TET 0.474 rel +1.106 [+1.103,+1.110] neg 0/3
+
+wrote reports/phase2_audit_rerun_2026-10-19/frame0_exclusion.json

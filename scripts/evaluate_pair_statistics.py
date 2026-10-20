@@ -719,7 +719,8 @@ def analyse_fold(seq, fold, rule_names, cfg, base, iq4d, valid, ref_power,
             lo, hi = block_bootstrap_ci(diff, n_boot=N_BOOT, seed=7)
             rel = float(np.mean(va[:n]) - np.mean(vb[:n])) / max(abs(np.mean(vb[:n])), 1e-12)
             r["gate_noise_vs_tetris"] = {
-                "unit": "non-overlapping 2x2x2 spatial blocks",
+                "unit": f"non-overlapping {BOOT_BLOCK}x{BOOT_BLOCK}x{BOOT_BLOCK} "
+                        f"spatial blocks",
                 "n_units": int(n),
                 "p1_mean_r": float(np.mean(va[:n])),
                 "tetris_mean_r": float(np.mean(vb[:n])),

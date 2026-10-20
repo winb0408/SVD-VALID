@@ -1,0 +1,43 @@
+
+=== SA64 ===
+  [iq] SA64 (37, 64, 64, 400) (3.3s)
+loaded IQ (151552, 400) + gram (400, 400) (4.1s)
+  sa64_int3_c0a1b2           f0=C proportional: as -0.025 f0free -0.039 clutter_knee: as -0.059 f0free -0.069
+  sa64_int3_c1a2b0           f0=B proportional: as -0.279 f0free -0.035 clutter_knee: as -0.362 f0free -0.054
+  sa64_int3_c2a0b1           f0=A proportional: as -0.314 f0free -0.043 clutter_knee: as -0.346 f0free -0.069
+  sa64_int5_c2_3_4a0b1       f0=A proportional: as -0.294 f0free -0.164 clutter_knee: as -0.391 f0free -0.195
+  sa64_int5_c1_3_4a0b2       f0=A proportional: as -0.496 f0free -0.143 clutter_knee: as -0.511 f0free -0.187
+  sa64_int5_c1_2_4a0b3       f0=A proportional: as -0.494 f0free -0.162 clutter_knee: as -0.541 f0free -0.218
+  sa64_int5_c1_2_3a0b4       f0=A proportional: as -0.488 f0free -0.151 clutter_knee: as -0.556 f0free -0.182
+  sa64_int5_c0_3_4a1b2       f0=C proportional: as -0.114 f0free -0.138 clutter_knee: as -0.162 f0free -0.163
+  sa64_int5_c0_2_4a1b3       f0=C proportional: as -0.150 f0free -0.164 clutter_knee: as -0.219 f0free -0.226
+  sa64_int5_c0_2_3a1b4       f0=C proportional: as -0.155 f0free -0.181 clutter_knee: as -0.216 f0free -0.226
+  sa64_int5_c0_1_4a2b3       f0=C proportional: as -0.138 f0free -0.148 clutter_knee: as -0.163 f0free -0.158
+  sa64_int5_c0_1_3a2b4       f0=C proportional: as -0.157 f0free -0.165 clutter_knee: as -0.194 f0free -0.196
+  sa64_int5_c0_1_2a3b4       f0=C proportional: as -0.119 f0free -0.120 clutter_knee: as -0.175 f0free -0.177
+  sa64_cont3_c0a1b2          f0=C proportional: as -0.110 f0free -0.106 clutter_knee: as -0.107 f0free -0.090
+  sa64_cont3_c1a2b0          f0=B proportional: as -0.436 f0free -0.465 clutter_knee: as -0.461 f0free -0.490
+  sa64_cont3_c2a0b1          f0=A proportional: as -0.378 f0free -0.380 clutter_knee: as -0.410 f0free -0.410
+
+-- SA64 aggregate
+   proportional as_impl  MAT 0.260 TET 0.339 rel -0.259 ci [-0.0922,-0.0671] excl0 16/16 pass10 15/16
+   proportional f0_free  MAT 0.324 TET 0.381 rel -0.163 ci [-0.0660,-0.0484] excl0 16/16 pass10 13/16
+   clutter_knee as_impl  MAT 0.234 TET 0.327 rel -0.304 ci [-0.1061,-0.0789] excl0 16/16 pass10 15/16
+   clutter_knee f0_free  MAT 0.301 TET 0.370 rel -0.194 ci [-0.0790,-0.0593] excl0 16/16 pass10 12/16
+   consistency vs saved arms: max rel diff 0.0008391108761636293
+
+=== HSA64 ===
+  [iq] HSA64 (37, 64, 64, 400) (3.2s)
+loaded IQ (151552, 400) + gram (400, 400) (4.0s)
+  hsa64_int3_c0a1b2          f0=C proportional: as -0.012 f0free -0.013 clutter_knee: as -0.021 f0free -0.021
+  hsa64_int3_c1a2b0          f0=B proportional: as -0.009 f0free -0.008 clutter_knee: as -0.022 f0free -0.022
+  hsa64_int3_c2a0b1          f0=A proportional: as -0.016 f0free -0.014 clutter_knee: as -0.023 f0free -0.022
+
+-- HSA64 aggregate
+   proportional as_impl  MAT 0.598 TET 0.605 rel -0.012 ci [-0.0100,-0.0049] excl0 3/3 pass10 0/3
+   proportional f0_free  MAT 0.598 TET 0.606 rel -0.012 ci [-0.0096,-0.0047] excl0 3/3 pass10 0/3
+   clutter_knee as_impl  MAT 0.618 TET 0.632 rel -0.022 ci [-0.0172,-0.0107] excl0 3/3 pass10 0/3
+   clutter_knee f0_free  MAT 0.619 TET 0.633 rel -0.021 ci [-0.0168,-0.0105] excl0 3/3 pass10 0/3
+   consistency vs saved arms: max rel diff 0.0007180575099737975
+
+wrote reports/phase2_audit_rerun_2026-10-19/matched_ci.json
