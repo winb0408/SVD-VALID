@@ -1,0 +1,41 @@
+
+=== SA64 ===
+  [iq] SA64 (37, 64, 64, 400) (3.2s)
+loaded IQ (151552, 400) + gram (400, 400) (4.0s)
+  sa64_int3_c0a1b2           f0=C proportional: as -0.025 f0free -0.039 clutter_knee: as -0.059 f0free -0.069
+  sa64_int3_c1a2b0           f0=B proportional: as -0.279 f0free -0.035 clutter_knee: as -0.362 f0free -0.054
+  sa64_int3_c2a0b1           f0=A proportional: as -0.314 f0free -0.043 clutter_knee: as -0.346 f0free -0.069
+  sa64_int5_c2_3_4a0b1       f0=A proportional: as -0.294 f0free -0.164 clutter_knee: as -0.391 f0free -0.195
+  sa64_int5_c1_3_4a0b2       f0=A proportional: as -0.496 f0free -0.143 clutter_knee: as -0.511 f0free -0.187
+  sa64_int5_c1_2_4a0b3       f0=A proportional: as -0.494 f0free -0.162 clutter_knee: as -0.541 f0free -0.218
+  sa64_int5_c1_2_3a0b4       f0=A proportional: as -0.488 f0free -0.151 clutter_knee: as -0.556 f0free -0.182
+  sa64_int5_c0_3_4a1b2       f0=C proportional: as -0.114 f0free -0.138 clutter_knee: as -0.162 f0free -0.163
+  sa64_int5_c0_2_4a1b3       f0=C proportional: as -0.150 f0free -0.164 clutter_knee: as -0.219 f0free -0.226
+  sa64_int5_c0_2_3a1b4       f0=C proportional: as -0.155 f0free -0.181 clutter_knee: as -0.216 f0free -0.226
+  sa64_int5_c0_1_4a2b3       f0=C proportional: as -0.138 f0free -0.148 clutter_knee: as -0.163 f0free -0.158
+  sa64_int5_c0_1_3a2b4       f0=C proportional: as -0.157 f0free -0.165 clutter_knee: as -0.194 f0free -0.196
+  sa64_int5_c0_1_2a3b4       f0=C proportional: as -0.119 f0free -0.120 clutter_knee: as -0.175 f0free -0.177
+  sa64_cont3_c0a1b2          f0=C proportional: as -0.110 f0free -0.106 clutter_knee: as -0.107 f0free -0.090
+  sa64_cont3_c1a2b0          f0=B proportional: as -0.436 f0free -0.465 clutter_knee: as -0.461 f0free -0.490
+  sa64_cont3_c2a0b1          f0=A proportional: as -0.378 f0free -0.380 clutter_knee: as -0.410 f0free -0.410
+
+-- SA64 aggregate over 16 folds
+   proportional  as_impl  P1 0.581 TET 0.339 MAT 0.260 relM -0.259 [-0.496,-0.025] pass10 15/16  f0=A:-0.411(n=6) f0=B:-0.357(n=2) f0=C:-0.121(n=8)
+   proportional  f0_free  P1 0.733 TET 0.381 MAT 0.324 relM -0.163 [-0.465,-0.035] pass10 13/16  f0=A:-0.174(n=6) f0=B:-0.250(n=2) f0=C:-0.133(n=8)
+   clutter_knee  as_impl  P1 0.523 TET 0.327 MAT 0.234 relM -0.304 [-0.556,-0.059] pass10 15/16  f0=A:-0.459(n=6) f0=B:-0.411(n=2) f0=C:-0.162(n=8)
+   clutter_knee  f0_free  P1 0.684 TET 0.370 MAT 0.301 relM -0.194 [-0.490,-0.054] pass10 12/16  f0=A:-0.210(n=6) f0=B:-0.272(n=2) f0=C:-0.163(n=8)
+
+=== HSA64 ===
+  [iq] HSA64 (37, 64, 64, 400) (3.2s)
+loaded IQ (151552, 400) + gram (400, 400) (4.1s)
+  hsa64_int3_c0a1b2          f0=C proportional: as -0.012 f0free -0.013 clutter_knee: as -0.021 f0free -0.021
+  hsa64_int3_c1a2b0          f0=B proportional: as -0.009 f0free -0.008 clutter_knee: as -0.022 f0free -0.022
+  hsa64_int3_c2a0b1          f0=A proportional: as -0.016 f0free -0.014 clutter_knee: as -0.023 f0free -0.022
+
+-- HSA64 aggregate over 3 folds
+   proportional  as_impl  P1 0.972 TET 0.605 MAT 0.598 relM -0.012 [-0.016,-0.009] pass10 0/3  f0=A:-0.016(n=1) f0=B:-0.009(n=1) f0=C:-0.012(n=1)
+   proportional  f0_free  P1 0.973 TET 0.606 MAT 0.598 relM -0.012 [-0.014,-0.008] pass10 0/3  f0=A:-0.014(n=1) f0=B:-0.008(n=1) f0=C:-0.013(n=1)
+   clutter_knee  as_impl  P1 0.952 TET 0.632 MAT 0.618 relM -0.022 [-0.023,-0.021] pass10 0/3  f0=A:-0.023(n=1) f0=B:-0.022(n=1) f0=C:-0.021(n=1)
+   clutter_knee  f0_free  P1 0.954 TET 0.633 MAT 0.619 relM -0.021 [-0.022,-0.021] pass10 0/3  f0=A:-0.022(n=1) f0=B:-0.022(n=1) f0=C:-0.021(n=1)
+
+wrote reports/phase2_audit_rerun_2026-10-19/frame0_matched.json

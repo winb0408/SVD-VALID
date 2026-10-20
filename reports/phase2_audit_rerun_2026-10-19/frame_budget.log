@@ -1,0 +1,6 @@
+== frame budget
+  [iq] HSA64 (37, 64, 64, 400) (3.8s)
+HSA64 proportional: P1_native 0.974  A_u_B 0.603  A_only 0.599  B_only 0.603
+HSA64 clutter_knee: P1_native 0.953  A_u_B 0.635  A_only 0.628  B_only 0.633
+  wrote reports/phase2_audit_rerun_2026-10-19/frame_budget.json
+done -> reports/phase2_audit_rerun_2026-10-19

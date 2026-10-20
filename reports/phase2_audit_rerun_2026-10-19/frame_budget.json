@@ -1,0 +1,22 @@
+{
+ "note": "Tetris control built from A-only vs A u B frames",
+ "sequences": {
+  "HSA64": {
+   "fold": "hsa64_int3_c0a1b2",
+   "rules": {
+    "proportional": {
+     "P1_native": 0.9736679315632975,
+     "A_u_B": 0.6029178041832899,
+     "A_only": 0.599282216494881,
+     "B_only": 0.6030778040023163
+    },
+    "clutter_knee": {
+     "P1_native": 0.9526352861353897,
+     "A_u_B": 0.6345981149632951,
+     "A_only": 0.628406957696071,
+     "B_only": 0.6327595478015163
+    }
+   }
+  }
+ }
+}

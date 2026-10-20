@@ -1,0 +1,54 @@
+
+=== SA64 ===
+  [iq] SA64 (37, 64, 64, 400) (3.2s)
+  sa64_int3_c0a1b2           proportional  TET 0.457 CF 0.446 (-0.025) rand 0.436±0.005 (-0.045) CF pct 100
+  sa64_int3_c0a1b2           clutter_knee  TET 0.373 CF 0.351 (-0.059) rand 0.335±0.006 (-0.102) CF pct 100
+  sa64_int3_c1a2b0           proportional  TET 0.348 CF 0.251 (-0.279) rand 0.254±0.007 (-0.270) CF pct 30
+  sa64_int3_c1a2b0           clutter_knee  TET 0.312 CF 0.199 (-0.362) rand 0.201±0.004 (-0.357) CF pct 35
+  sa64_int3_c2a0b1           proportional  TET 0.320 CF 0.219 (-0.314) rand 0.204±0.019 (-0.363) CF pct 65
+  sa64_int3_c2a0b1           clutter_knee  TET 0.293 CF 0.192 (-0.346) rand 0.182±0.013 (-0.379) CF pct 72
+  sa64_int5_c2_3_4a0b1       proportional  TET 0.274 CF 0.193 (-0.294) rand 0.169±0.025 (-0.383) CF pct 72
+  sa64_int5_c2_3_4a0b1       clutter_knee  TET 0.272 CF 0.166 (-0.391) rand 0.156±0.016 (-0.426) CF pct 65
+  sa64_int5_c1_3_4a0b2       proportional  TET 0.280 CF 0.141 (-0.496) rand 0.146±0.005 (-0.479) CF pct 12
+  sa64_int5_c1_3_4a0b2       clutter_knee  TET 0.270 CF 0.132 (-0.511) rand 0.130±0.004 (-0.518) CF pct 68
+  sa64_int5_c1_2_4a0b3       proportional  TET 0.282 CF 0.143 (-0.494) rand 0.137±0.007 (-0.516) CF pct 75
+  sa64_int5_c1_2_4a0b3       clutter_knee  TET 0.271 CF 0.125 (-0.541) rand 0.126±0.004 (-0.536) CF pct 38
+  sa64_int5_c1_2_3a0b4       proportional  TET 0.263 CF 0.135 (-0.488) rand 0.133±0.005 (-0.495) CF pct 68
+  sa64_int5_c1_2_3a0b4       clutter_knee  TET 0.259 CF 0.115 (-0.556) rand 0.122±0.006 (-0.527) CF pct 10
+  sa64_int5_c0_3_4a1b2       proportional  TET 0.404 CF 0.358 (-0.114) rand 0.333±0.010 (-0.177) CF pct 100
+  sa64_int5_c0_3_4a1b2       clutter_knee  TET 0.398 CF 0.334 (-0.162) rand 0.305±0.008 (-0.234) CF pct 100
+  sa64_int5_c0_2_4a1b3       proportional  TET 0.408 CF 0.346 (-0.150) rand 0.335±0.007 (-0.178) CF pct 98
+  sa64_int5_c0_2_4a1b3       clutter_knee  TET 0.400 CF 0.313 (-0.219) rand 0.306±0.006 (-0.235) CF pct 85
+  sa64_int5_c0_2_3a1b4       proportional  TET 0.402 CF 0.339 (-0.155) rand 0.323±0.005 (-0.195) CF pct 100
+  sa64_int5_c0_2_3a1b4       clutter_knee  TET 0.403 CF 0.316 (-0.216) rand 0.308±0.006 (-0.237) CF pct 92
+  sa64_int5_c0_1_4a2b3       proportional  TET 0.400 CF 0.345 (-0.138) rand 0.330±0.007 (-0.175) CF pct 100
+  sa64_int5_c0_1_4a2b3       clutter_knee  TET 0.395 CF 0.331 (-0.163) rand 0.311±0.005 (-0.214) CF pct 100
+  sa64_int5_c0_1_3a2b4       proportional  TET 0.412 CF 0.347 (-0.157) rand 0.338±0.006 (-0.180) CF pct 98
+  sa64_int5_c0_1_3a2b4       clutter_knee  TET 0.403 CF 0.325 (-0.194) rand 0.312±0.006 (-0.226) CF pct 100
+  sa64_int5_c0_1_2a3b4       proportional  TET 0.399 CF 0.352 (-0.119) rand 0.323±0.011 (-0.190) CF pct 100
+  sa64_int5_c0_1_2a3b4       clutter_knee  TET 0.395 CF 0.326 (-0.175) rand 0.302±0.011 (-0.235) CF pct 98
+  sa64_cont3_c0a1b2          proportional  TET 0.257 CF 0.229 (-0.110) rand 0.256±0.001 (-0.004) CF pct 0
+  sa64_cont3_c0a1b2          clutter_knee  TET 0.257 CF 0.230 (-0.107) rand 0.256±0.001 (-0.004) CF pct 0
+  sa64_cont3_c1a2b0          proportional  TET 0.269 CF 0.152 (-0.436) rand 0.264±0.002 (-0.016) CF pct 0
+  sa64_cont3_c1a2b0          clutter_knee  TET 0.273 CF 0.147 (-0.461) rand 0.269±0.002 (-0.015) CF pct 0
+  sa64_cont3_c2a0b1          proportional  TET 0.252 CF 0.157 (-0.378) rand 0.250±0.001 (-0.007) CF pct 0
+  sa64_cont3_c2a0b1          clutter_knee  TET 0.254 CF 0.150 (-0.410) rand 0.252±0.001 (-0.007) CF pct 0
+
+-- SA64 aggregate
+   proportional  CF -0.259  random -0.230 (p95 -0.198)  CF percentile 64  below-random-p05 3/16
+   clutter_knee  CF -0.304  random -0.266 (p95 -0.237)  CF percentile 60  below-random-p05 3/16
+
+=== HSA64 ===
+  [iq] HSA64 (37, 64, 64, 400) (3.1s)
+  hsa64_int3_c0a1b2          proportional  TET 0.603 CF 0.596 (-0.012) rand 0.585±0.002 (-0.030) CF pct 100
+  hsa64_int3_c0a1b2          clutter_knee  TET 0.635 CF 0.621 (-0.021) rand 0.600±0.002 (-0.054) CF pct 100
+  hsa64_int3_c1a2b0          proportional  TET 0.608 CF 0.603 (-0.009) rand 0.589±0.003 (-0.032) CF pct 100
+  hsa64_int3_c1a2b0          clutter_knee  TET 0.631 CF 0.617 (-0.022) rand 0.595±0.004 (-0.058) CF pct 100
+  hsa64_int3_c2a0b1          proportional  TET 0.605 CF 0.595 (-0.016) rand 0.583±0.004 (-0.036) CF pct 100
+  hsa64_int3_c2a0b1          clutter_knee  TET 0.630 CF 0.615 (-0.023) rand 0.594±0.004 (-0.058) CF pct 100
+
+-- HSA64 aggregate
+   proportional  CF -0.012  random -0.033 (p95 -0.024)  CF percentile 100  below-random-p05 0/3
+   clutter_knee  CF -0.022  random -0.057 (p95 -0.049)  CF percentile 100  below-random-p05 0/3
+
+wrote reports/phase2_audit_rerun_2026-10-19/random_split_null.json

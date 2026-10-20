@@ -1,0 +1,14 @@
+
+=== SA64 ===
+  [iq] SA64 (37, 64, 64, 400) (3.1s)
+  (151552, 400)  valid 0.815  blocks 308 (5.0s)
+  sa64_int3_c0a1b2                 proportional   N=[67, 67, 66, 66] V_S 1.28e+05 nf=[0.144, 0.079, -0.084, -0.071] rho_mean -0.081 rho_max +1.087 CI[1.029 4.218] fail
+    calibration (additive injection):
+Traceback (most recent call last):
+  File "/ssd1/wjb/SVD-VALID/scripts/gate_noise_independence.py", line 343, in <module>
+    main()
+  File "/ssd1/wjb/SVD-VALID/scripts/gate_noise_independence.py", line 327, in main
+    cal = calibrate(x2d, gram, c_idx, basis, arms, shape3d, cshape,
+  File "/ssd1/wjb/SVD-VALID/scripts/gate_noise_independence.py", line 198, in calibrate
+    amp = amp_scale * float(np.sqrt(np.mean(np.abs(x2d[valid]) ** 2)))
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 151552 but size of corresponding boolean axis is 147456
