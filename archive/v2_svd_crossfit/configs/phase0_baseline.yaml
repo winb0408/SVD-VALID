@@ -1,0 +1,124 @@
+# Phase 0 baseline freeze -- CrossFit project
+#
+# Locks the data version, the official processing settings and the two network
+# baselines that every later comparison is measured against.  Nothing in this
+# file may be changed after Phase 1 without recording the reason and the date
+# (see Project_plan.md, section 2 "gateway" note).
+#
+# Generated 2026-10-15.  Companion report: reports/phase0_data_audit.md
+
+data:
+  root: /ssd1/wjb/Data/Dyrad/data          # NOT versioned
+  manifest: docs/data_manifest.md
+  files:
+    SA64:
+      path: SA64/Data_SA64.mat
+      sha256: b3370c9f96b1a95f09b04e9170d26c65d58320f87b383247857b2fa252b9d0d4
+      shape_zyxt: [37, 64, 64, 400]
+      dtype: complex64
+      frame_rate_hz: 46.875
+    HSA64:
+      path: HSA64/Data_HSA64.mat
+      sha256: 4f5788312892cc85d9770c87ab9c54a6e9f6f3e5e99ba345a7901f70f507ce51
+      shape_zyxt: [37, 64, 64, 400]
+      dtype: complex64
+      frame_rate_hz: 46.875
+  voxel_size_mm: 0.15
+  axis_order: >-
+    [Z, X, Y, T]; X/Y assignment unresolvable from the header (both 64),
+    affects display orientation only
+
+official_pipeline:
+  script_reference: main_supplementary_figure_2.m   # MATLAB; ported, no MATLAB on this machine
+  port: scripts/official_pipeline.py
+  blood_band_1based: [60, 350]      # official SVDcut1_400:SVDcut2_400, inclusive -> 291 modes
+  clutter_band: "modes above the blood band (1-based 1:59)"
+  residual_band: [350, 400]         # LOCAL construct for noise estimation, NOT official
+  frame_reduction: sum              # official; the older pipeline used mean
+  db_normalisation: "10*log10(PD / max(PD))"
+  display_clim_db: [-20, 0]
+  remap: {floor_pct: 1.0, ceil_pct: 99.9}   # project convention for network input, not official
+  # measured band-energy fractions (this port, 2026-10-15)
+  energy_fraction:
+    SA64:  {clutter_above_band: 0.999165, blood_band_kept: 0.000731, discarded: 0.000104}
+    HSA64: {clutter_above_band: 0.999912, blood_band_kept: 0.000084, discarded: 0.000004}
+  known_deviations:
+    - "older pipeline kept 290 modes via the 0-based slice V[:, 60:350]; official keeps 291 (1-based 60:350)"
+    - "older pipeline reduced with mean over frames; official sums"
+    - "the 350-400 residual band is a local construct; the official script has no such band"
+
+valid_mask:
+  # 17.96% of voxels are identically zero -- acquisition geometry, not filtering.
+  # Every pairwise / agreement statistic must be restricted to this mask, otherwise
+  # the dead voxels inflate agreement for free.
+  dead_fraction: 0.1796
+  artifact: data/processed/official/<sequence>/valid_mask.npy
+
+network_baseline:
+  model: models.network.NetworkCNR
+  features: 16
+  groups: 4
+  n_parameters: 1543710
+  # VALID v1.0 loss, reproduced exactly (l2neighbour + identity + weight_reg * Hessian
+  # on the Haar-DWT low bands).  The upstream DWT typo is fixed in this repository.
+  loss:
+    neighbour: "0.5*mse(ha, ya) + 0.5*mse(hb, yb)"
+    identity: "mse(ha, hb)"
+    weight_identity: 1.0
+    weight_reg: 1.0e-4
+    reg_on: "Hessian of the low-frequency Haar DWT bands of both outputs"
+  optimizer: {name: Adam, lr: 1.0e-4, betas: [0.9, 0.999]}
+  lr_schedule: "linear warmup over the first 10% epochs, then cosine decay"
+  patch: [32, 64, 64]
+  epochs: 50
+  steps_per_epoch: 200
+  grad_clip_norm: 20.0
+  inference:
+    script: infer.py
+    mode: overlapping sliding window, averaged
+    patch: [32, 64, 64]
+    # only z has >1 start for a 32x64x64 patch inside a 37x64x64 volume
+    distinct_origins: 6
+
+environment:
+  python: "3.10.19 (conda env threePM)"
+  interpreter: /data2/wjb/anaconda3/envs/threePM/bin/python
+  numpy: 2.2.6
+  scipy: 1.15.3
+  h5py: 3.16.0
+  torch: 2.6.0+cu124
+  cuda_available: true
+  gpu: "RTX A6000 (49140 MiB); GPU 0 free at Phase 0, GPUs 1-2-3 in use by other jobs"
+
+# The two frozen baselines.  Both are v1 runs, promoted unchanged; they are NOT
+# retrained for the CrossFit project because the input volume and every training
+# setting are identical.  Weights stay on disk under archive/ (not versioned);
+# the hashes below pin them.
+baselines:
+  M1_valid_random:
+    arm: faithful per-block random Tetris (VALID baseline)
+    source_run: archive/v1_svd_guided_sampling/runs/B3_sa64_remap_random
+    checkpoint_sha256_prefix: 98291821a09f81c7
+    input: data/processed/sa64_blood_remap/power_doppler.npy
+    status: frozen
+  M2_valid_fixed_pattern4:
+    arm: fixed pattern 4 for every patch, fixed roles
+    source_run: archive/v1_svd_guided_sampling/runs/F4_sa64_remap_fixed
+    checkpoint_sha256_prefix: 3a4621343459ec78
+    input: data/processed/sa64_blood_remap/power_doppler.npy
+    status: frozen
+  M1_hsa64_random:
+    arm: faithful per-block random Tetris (HSA64 replication)
+    source_run: archive/v1_svd_guided_sampling/runs/B4_hsa64_random
+    checkpoint_sha256_prefix: 8e7868a4d9339bc6
+    input: data/processed/hsa64_blood_remap/power_doppler.npy
+    status: frozen
+  # There is NO fixed-pattern-4 HSA64 run in v1: the HSA64 arms were random (B4)
+  # and guided (C4) only.  If the CrossFit plan needs a fixed-4 HSA64 baseline
+  # (M2 replication), it has to be trained; do not reuse C4 for it.
+  C4_hsa64_guided_REJECTED_AS_BASELINE:
+    arm: SVD-guided (v1 innovation 1) -- archived as evidence, NOT a baseline
+    source_run: archive/v1_svd_guided_sampling/runs/C4_hsa64_guided
+    checkpoint_sha256_prefix: 078338b85fee66b2
+    input: data/processed/hsa64_blood_remap/power_doppler.npy
+    status: evidence-only

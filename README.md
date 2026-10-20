@@ -1,103 +1,44 @@
 # SVD-VALID
 
-**SVD-guided Volumetric Orthogonal Self-Supervised Denoising for Ultrasound**
+**Current research direction (V3.0, planned): PSF- and Speckle-Correlation-Aware Orthogonal Self-Supervised Denoising for 3D Ultrasound Microvascular Imaging.**
 
-This repository is an initial research implementation that adapts the public VALID v1.0 framework to volumetric ultrasound. The initial version deliberately keeps the VALID CRN backbone and original three-term loss unchanged. The first methodological modification is the replacement of random Tetris sampling with an SVD-guided Tetris selector.
+**中文简介**：项目以最终三维微血管图像恢复质量为首要目标；拟用独立测量的 PSF、散斑/残余噪声空间相关性指导 VALID 三维正交采样，并在不同时修改 CRN 网络和主要损失函数的条件下，对照 faithful random Tetris、fixed-4 与最强固定方向，检验背景抑制与微血管结构保真能否得到真实改善。
 
-## Research hypothesis
+> **Status / 研究状态：** V3 研究方案已建立，Phase 0 仍待执行；**尚未实现或验证新采样算法**。当前 `train.py`、`infer.py`、`datasets/sampling.py` 等仍是历史 V1 的可用代码基础；不要将当前命令行选项视作 V3 实现。
 
-For an ultrafast ultrasound volume, SVD provides a data-dependent decomposition of the slow-time signal into subspaces associated with clutter/blood/noise. We use these subspace-derived signal and noise maps only to select better self-supervised orthogonal views:
+## Project documents / 项目文档
 
-Q(k) = Z(S(k)) - Z(N(k))
+- **[V3 detailed plan](Project%20log/Project_plan.md)** — 目标、假设、创新、分阶段任务、验收门槛、论文实验。
+- **[V3 progress tracker](Project%20log/Project_progress_status.md)** — 当前真实状态、Gate 与待办。
+- **[V3 experiment protocol](Project%20log/V3_experiment_protocol.md)** — 固定数据/网络条件、矩阵、评价、图表及负控制。
+- **[Research log](Project%20log/Project_log.md)** — V1/V2 逐次历史实验日志；旧内容保留，今后追加 V3 日志。
+- **[Historical archive](archive/README.md)** — V1、V2 的项目计划、状态、V2 原始报告/配置快照。
 
-where S(k) is cross-view structural similarity and N(k) is residual-noise similarity for Tetris pattern k. The denoising network and loss remain unchanged.
+## Research pipeline (planned / 待实现)
 
-This is intentionally a sampling-first, loss-minimal baseline. Later extensions can add anisotropic/PSF-aware constraints only after the sampling hypothesis is experimentally validated.
+```text
+Complex IQ data
+  -> validated SVD clutter filter -> Power Doppler (fixed representation)
+  -> separately calibrated 3D PSF / speckle & residual-noise covariance
+  -> VALID-compatible orthogonal sampling (pattern / role / distance)
+  -> same VALID CRN and loss
+  -> full 3D denoised volume
+  -> independent quality evaluation (noise + weak vessels + connectivity)
+```
 
-## Relationship to prior work
+**Primary scientific test:** exceed both faithful VALID random and the strongest reasonable **fixed sampling geometry**, without sacrificing weak vessels, branches or width. The primary test must use reliable truth/reference and non-leaking held-out acquisitions; metrics such as high-frequency suppression alone are insufficient.
 
-The implementation is derived from:
+## Historical lines
 
-- Gu et al., Science Advances (2026), "Enhancing biomedical optical volumetric imaging via self-supervised orthogonal learning" (VALID).
-- Zhang et al., 2026 preprint, "SVD-SN2N: Self-Inspired Noise2Noise Learning for Denoising Log-Compressed SVD-Filtered Ultrasound Imaging."
+- **V1** SVD-guided Tetris: the SVD selector did not demonstrate improvement independent of fixed pattern 4. Historical code is retained.
+- **V2** SVD-CrossFit: Phase 0/1 passed, Phase 2 predeclared residual-statistical gate failed; no Phase 3 model training was initiated. Original documents and reports are archived rather than discarded.
 
-The VALID v1.0 code is reused for the CRN architecture, 3-D Tetris pattern definitions and the Hessian regularizer. See THIRD_PARTY_LICENSES.md.
+## Reproducibility and existing code
 
-## Current v0.1 scope
+Original implementation references Gu et al., *Science Advances* (2026), VALID, and related self-supervised ultrasound methods. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [docs/datasets.md](docs/datasets.md) and historical configs/scripts. Existing CLI options belong to previous research phases; **there is not yet a V3 quick-start command**.
 
-1. Convert a beamformed ultrafast ultrasound time series (.mat / .npy) into an SVD-filtered power-Doppler volume.
-2. Estimate SVD signal/noise energy maps.
-3. Apply log compression.
-4. Generate four VALID-style Tetris subvolumes.
-5. Select Tetris patterns using SVD-derived structural/noise scores.
-6. Train the original VALID CRN with the original loss.
-7. Provide random-Tetris and SVD-guided-Tetris modes under the same network and loss.
+Install dependencies from `requirements.txt` if using the historical implementation. Data and weights not committed to GitHub must be supplied separately. Maintain the original sample/acquisition IDs, the valid spatial mask, SVD parameters and physical voxel spacing when running new experiments.
 
-## Recommended first dataset
+## Decision discipline
 
-Dryad 10.5061/dryad.47d7wm3qg is the preferred first validation target. It contains open 3-D RCA/CMUT ultrasound acquisitions as beamformed volumes with 37 x 64 x 64 voxels and 400/800 frames, and the supplied MATLAB script itself applies SVD clutter filtering to form power-Doppler volumes. See docs/datasets.md.
-
-## Quick start
-
-### 1. Environment
-
-Python 3.9+ and a CUDA-enabled PyTorch installation are recommended.
-
-    conda create -n svd-valid python=3.10
-    conda activate svd-valid
-    pip install -r requirements.txt
-
-Install a CUDA-compatible PyTorch build separately if required.
-
-### 2. Convert and SVD-filter a public ultrasound acquisition
-
-Rank band follows the official Dryad processing code (SA64/HSA64, 400 frames:
-clutter 0-60, blood 60-350, noise 350-400; PW1616 with 800 frames uses
-120/750 — see `Project log/Project_log.md` L9). `--contrast-remap` maps the
-nonzero-voxel dB distribution onto [0,1] so vessel contrast fills the dynamic
-range (L12); structural zeros stay at 0.
-
-    python scripts/prepare_svd.py --input /path/to/Data_SA64.mat --rank-low 60 --rank-high 350 --contrast-remap --output data/processed/sa64
-
-The script writes:
-
-- power_doppler.npy — contrast-remapped training volume in [0,1].
-- signal_map.npy — SVD retained-signal energy map.
-- noise_map.npy — high-rank residual energy map.
-- metadata.json — shape and SVD parameters.
-
-### 3. Train baseline VALID-style random Tetris
-
-    python train.py --train-volume data/processed/pw3232/power_doppler.npy --patch 32 64 64 --epochs 50 --steps-per-epoch 200 --mode random
-
-### 4. Train SVD-guided Tetris
-
-    python train.py --train-volume data/processed/pw3232/power_doppler.npy --signal-map data/processed/pw3232/signal_map.npy --noise-map data/processed/pw3232/noise_map.npy --patch 32 64 64 --epochs 50 --steps-per-epoch 200 --mode guided
-
-The two runs intentionally share the same CRN, optimizer, learning-rate schedule and loss. This makes the sampling contribution easier to attribute.
-
-## Important experimental rule
-
-Do not add new loss terms in v0.1. First test whether random Tetris -> SVD-guided Tetris reduces pairwise noise correlation and improves volumetric restoration while all optimization terms remain fixed.
-
-## Repository layout
-
-    SVD-VALID/
-    ├── datasets/
-    │   ├── __init__.py
-    │   └── sampling.py
-    ├── models/
-    │   ├── __init__.py
-    │   ├── model_CRN.py
-    │   ├── network.py
-    │   └── dwt3d.py
-    ├── scripts/
-    │   └── prepare_svd.py
-    ├── tests/
-    │   └── test_smoke.py
-    ├── docs/
-    │   └── datasets.md
-    ├── THIRD_PARTY_LICENSES.md
-    ├── requirements.txt
-    ├── train.py
-    └── infer.py
+Phase 0 baseline/evaluation -> Phase 1 physical measurement -> Phase 2 sampling prediction -> Phase 3 minimal training -> Phase 4 true image-quality evidence -> Phase 5 generalization -> Phase 6 paper. **Do not advance through a failed gate by increasing algorithm complexity or by changing the held-out test selection.**
