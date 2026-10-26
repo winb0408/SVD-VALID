@@ -54,6 +54,139 @@ def all_phases(volume):
     return [one_phase(volume, i) for i in range(8)]
 
 
+# --------------------------------------------------------------- V3 采样 ----
+# 为什么需要下面的东西（2026-10-20，接训练时发现）：
+#   8 个 tet 每个都恰好从 4 组"对顶角对"（{0,7},{1,6},{2,5},{3,4}）里各取一个，
+#   所以**任何一个 tet 内部都不存在体对角对**（逐模式枚举为空，见
+#   scripts/v3_phase3_probe.py 的自检）。而 V3 预注册的首选角色对正是体对角
+#   （reports/v3_phase2_role_order.md §4.1）。结论：要落地预注册的角色序，
+#   输入必须取 tet A、目标必须取它的互补 tet B —— 这也正是
+#   reports/phase2_pair_statistics.md 记录的 VALID 自己的配对
+#   （"两组互补体素"）。原来 `valid_random_tetris` 只返回同一个 tet 的 4 个视图，
+#   输入与目标都在 tet A 内，**实现不了预注册的首选**，所以这里补 cross 配对。
+
+COMPLEMENT_PATTERN = torch.tensor(
+    [7, 6, 4, 5, 2, 3, 1, 0], dtype=torch.long
+)  # COMPLEMENT_PATTERN[p] == the tet complementary to TETRIS_PATTERNS[p]
+
+
+def strided_phase(volume, index, stride=1):
+    """一个相位（tet 内的一个角点）在采样步距 `stride` 下的稠密视图。
+
+    stride=1 时与 :func:`one_phase` 逐体素相同（要求各轴为偶数）。
+    stride=m 时，一个 (2m)^3 的块里只有 8 个角点被采到，该相位每轴取
+    `m*o, m*o+2m, m*o+4m, ...`。要求各轴能被 2m 整除，否则 8 个相位不等长。
+    """
+    x = torch.as_tensor(volume).float()
+    if stride < 1:
+        raise ValueError("stride must be >= 1")
+    step = 2 * stride
+    if any(n % step for n in x.shape):
+        raise ValueError(
+            f"每个轴都必须能被 2*stride={step} 整除，实际形状 {tuple(x.shape)}"
+        )
+    dz, dy, dx = index_offset(index)
+    return x[stride * dz::step, stride * dy::step, stride * dx::step]
+
+
+def strided_views(volume, slots, stride=1):
+    """按显式相位槽位抽 4 个视图（`slots` 是相位编号 0..7，依次给 xa,xb,ya,yb）。"""
+    phases = [strided_phase(volume, i, stride) for i in range(8)]
+    return [phases[i] for i in slots]
+
+
+def check_cross_slots(slots):
+    """cross 配对的合法性：前两个槽位同属一个 tet，后两个同属它的互补 tet。"""
+    if len(slots) != 4 or sorted(slots) != sorted(set(slots)):
+        raise ValueError(f"--slots 必须是 4 个互不相同的相位编号，实际 {slots}")
+    if not set(slots) < set(range(8)):
+        raise ValueError(f"--slots 取值必须是 0..7，实际 {slots}")
+    src, tgt = set(slots[:2]), set(slots[2:])
+    p = next((i for i, pat in enumerate(TETRIS_PATTERNS.tolist()) if src <= set(pat)), None)
+    if p is None:
+        raise ValueError(f"输入槽位 {sorted(src)} 不属于同一个 tet")
+    comp = set(range(8)) - set(TETRIS_PATTERNS[p].tolist())
+    if not tgt <= comp:
+        raise ValueError(
+            f"目标槽位 {sorted(tgt)} 必须落在输入 tet {TETRIS_PATTERNS[p].tolist()} "
+            f"的互补 tet {sorted(comp)} 内"
+        )
+    return p
+
+
+def valid_random_tetris_strided(volume, stride=1, generator=None):
+    """与原版随机 Tetris 同样的抽样规则，但支持采样步距 m，且四种角色取自同一 tet。
+
+    stride=1 时与 :func:`valid_random_tetris` **逐体素相同**（同样的 RNG 消耗顺序），
+    这一点由 tests/test_smoke.py 的回归检查保证。
+    注意这是"同 tet 配对"，**用不了体对角角色对**；cross 配对见
+    :func:`valid_random_tetris_cross`。
+    """
+    x = torch.as_tensor(volume).float()
+    if x.ndim != 3:
+        raise ValueError("volume must have shape [D,H,W].")
+    step = 2 * stride
+    if any(n % step for n in x.shape):
+        raise ValueError(f"每个轴都必须能被 2*stride={step} 整除")
+    phases = [strided_phase(x, i, stride) for i in range(8)]
+    view_shape = phases[0].shape
+    nb = 1
+    for n in view_shape:
+        nb *= int(n)
+
+    k = torch.randint(0, len(TETRIS_PATTERNS), (nb,), generator=generator)
+    chosen = TETRIS_PATTERNS[k]                  # (nb, 4)
+    perm = torch.rand(nb, 4, generator=generator).argsort(dim=1)
+
+    zz, yy, xx = torch.meshgrid(
+        *[torch.arange(n) for n in view_shape], indexing="ij"
+    )
+    stack = torch.stack(phases)                  # (8, *view_shape)
+    subs = []
+    for i in range(4):
+        corner = chosen.gather(1, perm[:, i:i + 1]).squeeze(1).reshape(view_shape)
+        subs.append(stack[corner, zz, yy, xx])
+    return subs
+
+
+def valid_random_tetris_cross(volume, stride=1, generator=None):
+    """VALID 的互补配对 + 随机角色：输入取随机 tet 的两个角，目标取其互补 tet 的两个角。
+
+    与 :func:`valid_random_tetris_strided` 的区别**只在目标从哪来**：这里目标来自与
+    输入互补的那半个块，所以体对角角色对是可达的（它是 V3 预注册的首选）。
+    覆盖率和 within 配对一样是 4/8（每块 2 个输入角 + 2 个目标角），
+    两者采到的体素总数相同，区别是"目标的 2 个体素落在哪半个块里"。
+    """
+    x = torch.as_tensor(volume).float()
+    if x.ndim != 3:
+        raise ValueError("volume must have shape [D,H,W].")
+    step = 2 * stride
+    if any(n % step for n in x.shape):
+        raise ValueError(f"每个轴都必须能被 2*stride={step} 整除")
+    phases = [strided_phase(x, i, stride) for i in range(8)]
+    view_shape = phases[0].shape
+    nb = 1
+    for n in view_shape:
+        nb *= int(n)
+
+    k = torch.randint(0, len(TETRIS_PATTERNS), (nb,), generator=generator)
+    q = COMPLEMENT_PATTERN[k]
+    # 输入 tet 的 4 个角点里随机取 2 个（有序），目标在互补 tet 里同样取 2 个
+    rin = torch.rand(nb, 4, generator=generator).argsort(dim=1)
+    rtg = torch.rand(nb, 4, generator=generator).argsort(dim=1)
+    src_in = TETRIS_PATTERNS[k].gather(1, rin[:, :2])
+    src_tg = TETRIS_PATTERNS[q].gather(1, rtg[:, :2])
+
+    zz, yy, xx = torch.meshgrid(
+        *[torch.arange(n) for n in view_shape], indexing="ij"
+    )
+    stack = torch.stack(phases)
+    subs = []
+    for c in (src_in[:, 0], src_in[:, 1], src_tg[:, 0], src_tg[:, 1]):
+        subs.append(stack[c.reshape(view_shape), zz, yy, xx])
+    return subs
+
+
 def _space_to_depth(x, block_size=2):
     """(1,D,H,W) -> (D/2,H/2,W/2,8); last dim orders positions as dz*4+dy*2+dx."""
     n, d, h, w = x.shape

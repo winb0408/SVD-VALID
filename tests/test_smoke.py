@@ -15,8 +15,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from datasets.sampling import (  # noqa: E402
     TETRIS_PATTERNS,
     all_phases,
-    valid_random_tetris,
+    check_cross_slots,
     guided_tetris_subvolumes,
+    one_phase,
+    strided_phase,
+    strided_views,
+    valid_random_tetris,
+    valid_random_tetris_cross,
+    valid_random_tetris_strided,
 )
 from models.dwt3d import dwt3d_haar  # noqa: E402
 from models.network import NetworkCNR, HessianConstraintLoss3D  # noqa: E402
@@ -45,6 +51,89 @@ def test_valid_random_tetris_covers_and_disjoint():
     assert joint.unique().numel() == joint.numel(), "subvolumes must be disjoint"
     assert torch.isin(joint, torch.as_tensor(v).flatten()).all()
     print("ok: faithful random Tetris yields 4 disjoint half-coverage subvolumes")
+
+
+def test_strided_phase_regresses_to_one_phase():
+    """stride=1 时新采样器必须与老的 one_phase 逐体素相同。"""
+    v = torch.arange(4 * 8 * 8).float().reshape(4, 8, 8)
+    for i in range(8):
+        assert torch.equal(strided_phase(v, i, 1), one_phase(v, i)), f"phase {i}"
+    # stride>1：形状每轴 n/(2m)；每轴必须能被 2m 整除，否则拒绝（8 个相位不等长）
+    for m, shape in ((2, (4, 8, 8)), (3, (6, 12, 24))):
+        vol = torch.arange(int(np.prod(shape))).float().reshape(shape)
+        for i in range(8):
+            s = strided_phase(vol, i, m)
+            assert tuple(s.shape) == tuple(n // (2 * m) for n in shape)
+        assert strided_phase(vol, 0, m).numel() == vol.numel() // (2 * m) ** 3
+    try:
+        strided_phase(torch.zeros(4, 8, 8), 0, 3)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("不能被 2m 整除的形状必须被拒绝")
+    print("ok: strided_phase regresses to one_phase at m=1")
+
+
+def test_valid_random_tetris_strided_regresses_to_original():
+    """同样的 RNG 消耗顺序下，stride=1 的随机 Tetris 必须与原实现逐体素相同。"""
+    v = np.arange(4 * 8 * 8, dtype=np.float32).reshape(4, 8, 8)
+    torch.manual_seed(7)
+    ref = valid_random_tetris(v)
+    torch.manual_seed(7)
+    new = valid_random_tetris_strided(v, 1)
+    for a, b in zip(ref, new):
+        assert torch.equal(a, b)
+    print("ok: strided random Tetris regresses to the original at m=1")
+
+
+def test_cross_pairing_is_disjoint_with_targets_in_the_other_tet():
+    """cross 配对：四个视图互不重叠、总数与 within 相同；但目标的 2 个角点在输入 tet 之外。"""
+    v = np.arange(4 * 8 * 8, dtype=np.float32).reshape(4, 8, 8)
+    torch.manual_seed(3)
+    subs = valid_random_tetris_cross(v, 1)
+    joint = torch.stack(subs).flatten()
+    # 两种配对都是每块 4/8：覆盖一半，且不重复
+    assert joint.numel() == v.size // 2
+    assert joint.unique().numel() == joint.numel(), "views must be disjoint"
+    # 逐块检查：输入的 2 个角必须同属一个 tet，目标必须在其互补 tet 内
+    blk = valid_random_tetris_cross(torch.arange(8).float().reshape(2, 2, 2), 1)
+    corners = [int(s.reshape(-1)[0]) for s in blk]
+    # 注意：只给 2 个输入角点时 tet 并不唯一（如 {0,1} 同时属于 p0 和 p1），
+    # 所以判据是"存在某个 tet 使目标恰好是它的互补 tet"。
+    # 目标只抽了互补 tet 的 2 个角，所以是"包含于"，不是"等于"
+    ok = any(set(corners[2:]) <= set(range(8)) - set(pat)
+             for pat in TETRIS_PATTERNS.tolist() if set(corners[:2]) <= set(pat))
+    assert ok, f"目标 {corners[2:]} 不在输入 {corners[:2]} 的互补 tet 内"
+    print("ok: cross pairing is disjoint and its targets live in the complement tet")
+
+
+def test_body_diagonal_pair_needs_the_complement_tet():
+    """自检：任何 tet 内部都没有体对角对，所以预注册的首选只能在 cross 配对下实现。"""
+    def off(i):
+        return (i // 4, (i // 2) % 2, i % 2)
+
+    for pat in TETRIS_PATTERNS.tolist():
+        for a in pat:
+            for b in pat:
+                if a >= b:
+                    continue
+                xor = tuple(u ^ v for u, v in zip(off(a), off(b)))
+                assert xor != (1, 1, 1), f"pattern {pat} 竟含体对角对 {(a, b)}"
+    # 体对角：1(001)->6(110)、4(100)->3(011)，XOR 全为 111
+    assert check_cross_slots([1, 4, 6, 3]) == 0
+    # y 轴向：1->3、4->6，只差中间那一位
+    assert check_cross_slots([1, 4, 3, 6]) == 0
+    for bad in ([0, 1, 2, 4], [0, 1, 2, 7], [0, 1, 7, 7]):
+        try:
+            check_cross_slots(bad)
+        except ValueError:
+            continue
+        raise AssertionError(f"{bad} 应被判为非法")
+    # 关键隔离：两条臂用**同一批 4 个相位**，输入也相同，只把两个目标对调
+    assert set([1, 4, 6, 3]) == set([1, 4, 3, 6]), "两臂必须采到同一批体素"
+    assert (7 ^ 1, 7 ^ 4) == (6, 3), "体对角目标的取值"
+    assert ((1 ^ 2, 4 ^ 2)) == (3, 6), "y 轴向目标的取值" 
+    print("ok: body diagonal requires the complement tet; both arms share the same voxels")
 
 
 def test_pattern_semantics_match_upstream():
@@ -123,6 +212,10 @@ def test_train_loss_computation():
 
 if __name__ == "__main__":
     test_pattern_semantics_match_upstream()
+    test_strided_phase_regresses_to_one_phase()
+    test_valid_random_tetris_strided_regresses_to_original()
+    test_cross_pairing_is_disjoint_with_targets_in_the_other_tet()
+    test_body_diagonal_pair_needs_the_complement_tet()
     test_phases_partition_volume()
     test_valid_random_tetris_covers_and_disjoint()
     test_dwt3d_haar_energy()

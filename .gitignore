@@ -53,3 +53,6 @@ archive/v1_svd_guided_sampling/runs/pattern_scan/*
 !archive/v1_svd_guided_sampling/runs/selector_crosscheck/
 archive/v1_svd_guided_sampling/runs/selector_crosscheck/*
 !archive/v1_svd_guided_sampling/runs/selector_crosscheck/*.json
+
+# derived volume caches under reports/ are regenerable; the JSON numbers are the evidence
+reports/**/*.npz

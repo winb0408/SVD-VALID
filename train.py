@@ -27,10 +27,14 @@ from tqdm import trange
 
 from datasets.sampling import (
     TETRIS_PATTERNS,
+    check_cross_slots,
     guided_tetris_subvolumes,
     random_tetris_subvolumes,
+    strided_views,
     tetris_from_pattern,
     valid_random_tetris,
+    valid_random_tetris_cross,
+    valid_random_tetris_strided,
 )
 from models.network import NetworkCNR, HessianConstraintLoss3D
 from models.dwt3d import dwt3d_haar, VALID_REG_BANDS
@@ -82,6 +86,18 @@ def main():
                          "to the xa / xb / ya / yb roles. Default is 0,1,2,3. "
                          "The sampled voxel set is unchanged, so this isolates "
                          "the input->target pairing from the sampling phase.")
+    ap.add_argument("--stride", type=int, default=1,
+                    help="采样步距 m：一个 (2m)^3 的块里只采 8 个角点。m>1 需要每个轴"
+                         "能被 2m 整除；此时覆盖率为 8/(2m)^3，视图每轴长度为 n/(2m)。")
+    ap.add_argument("--pairing", choices=["within", "cross"], default="within",
+                    help="within: 四个视图全部取自同一个 tet（原有实现）；"
+                         "cross: 输入取 tet A 的两个角、目标取互补 tet B 的两个角"
+                         "（VALID 的互补配对，V3 预注册角色表的前提）。")
+    ap.add_argument("--slots", nargs=4, type=int, default=None,
+                    metavar=("XA", "XB", "YA", "YB"),
+                    help="cross 配对下的显式相位槽位（0..7）。前两个必须同属一个 tet，"
+                         "后两个必须落在它的互补 tet 内。例：体对角 1 4 6 3；"
+                         "y 轴向 1 4 3 6（**同一批 4 个体素、同样的输入，只把两个目标对调**）。")
     ap.add_argument("--patch", nargs=3, type=int, default=[32, 64, 64])
     ap.add_argument("--epochs", type=int, default=50)
     ap.add_argument("--steps-per-epoch", type=int, default=200)
@@ -107,6 +123,18 @@ def main():
         raise ValueError(f"--pattern must be in [0, {len(TETRIS_PATTERNS) - 1}].")
     if args.role_order is not None and sorted(args.role_order) != [0, 1, 2, 3]:
         raise ValueError("--role-order must be a permutation of 0,1,2,3.")
+    if args.pairing == "cross":
+        if args.mode == "guided":
+            raise ValueError("cross 配对只支持 random / fixed 两种 mode。")
+        if args.mode == "fixed" and args.slots is None:
+            raise ValueError("cross + fixed 必须给 --slots。")
+        if args.slots is not None:
+            check_cross_slots(args.slots)
+    elif args.slots is not None:
+        raise ValueError("--slots 只在 --pairing cross 下使用。")
+    if args.stride > 1 and any(p % (2 * args.stride) for p in args.patch):
+        raise ValueError(
+            f"--stride {args.stride} 要求每个 --patch 轴能被 {2 * args.stride} 整除。")
 
     device = torch.device(
         args.device if args.device.startswith("cuda") and torch.cuda.is_available() else "cpu"
@@ -143,7 +171,24 @@ def main():
         for _ in range(args.steps_per_epoch):
             patch, origin = crop3d(vol, tuple(args.patch), rng)
 
-            if args.mode == "guided":
+            if args.pairing == "cross":
+                # 输入取 tet A，目标取互补 tet B：这是预注册角色表与 VALID 原生配对的前提
+                if args.mode == "fixed":
+                    views = strided_views(patch, args.slots, args.stride)
+                else:
+                    views = valid_random_tetris_cross(patch, args.stride)
+                xa, xb, ya, yb = [tensor(v, device) for v in views]
+            elif args.stride > 1:
+                # 同 tet 配对但放大步距（覆盖率诊断臂）
+                if args.mode == "fixed":
+                    views = strided_views(patch, TETRIS_PATTERNS[args.pattern].tolist(),
+                                          args.stride)
+                    if args.role_order is not None:
+                        views = [views[i] for i in args.role_order]
+                else:
+                    views = valid_random_tetris_strided(patch, args.stride)
+                xa, xb, ya, yb = [tensor(v, device) for v in views]
+            elif args.mode == "guided":
                 z0, y0, x0 = origin
                 sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
                 npatch = noise[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
