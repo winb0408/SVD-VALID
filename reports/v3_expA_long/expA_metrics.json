@@ -11,9 +11,9 @@
  "scale_s_eval": 44932312.0,
  "bg_std_ref_input": 0.029215874150395393,
  "inference_api": "infer.py (full-volume sliding window, patch 32x64x64, overlap 0.1)",
- "budget": {
-  "epochs": 120,
-  "steps_per_epoch": 200,
+ "budget_requested": {
+  "epochs": 40,
+  "steps_per_epoch": 100,
   "patch": [
    32,
    64,
@@ -327,6 +327,42 @@
     "max": 105.27908584786897
    },
    "n_seeds": 1
+  }
+ },
+ "budget_checkpoints": {
+  "A_fixed4_s3407": {
+   "epochs": 120,
+   "steps_per_epoch": 200,
+   "patch": [
+    32,
+    64,
+    64
+   ],
+   "features": 16,
+   "pairing": "within",
+   "mode": "fixed",
+   "pattern": 4,
+   "stride": 1,
+   "seed": 3407,
+   "weight_reg": 0.0001,
+   "weight_identity": 1.0
+  },
+  "A_rand_s3407": {
+   "epochs": 120,
+   "steps_per_epoch": 200,
+   "patch": [
+    32,
+    64,
+    64
+   ],
+   "features": 16,
+   "pairing": "within",
+   "mode": "random",
+   "pattern": 4,
+   "stride": 1,
+   "seed": 3407,
+   "weight_reg": 0.0001,
+   "weight_identity": 1.0
   }
  }
 }

@@ -246,6 +246,24 @@ def figure(out_dir, rec, imgs, vol, truth, wiener_img, ves):
     print(f"wrote {out_dir}/fig_expA_mip.png  {out_dir}/fig_expA_metrics.png")
 
 
+def ckpt_budget(ckpt: Path) -> dict:
+    """从 checkpoint 里读出**实际**训练配置（`train.py` 会把 args 存进 latest.pt）。
+
+    为什么需要它：`--eval-only` 时命令行上的 `--epochs/--steps` 只是"请求值"，
+    忘了传就会把错误的预算写进 json（评测长预算时踩过这个坑，长跑 120×200 被记成 40×100）。
+    以 checkpoint 为准，命令行值只作对照。缺 torch 或字段不全时返回 error，不阻断评测。
+    """
+    try:
+        import torch
+        blob = torch.load(ckpt, map_location="cpu", weights_only=False)
+    except Exception as e:                                   # noqa: BLE001
+        return {"error": f"{type(e).__name__}: {e}"}
+    a = blob.get("args") or {}
+    keep = ("epochs", "steps_per_epoch", "patch", "features", "pairing", "mode",
+            "pattern", "stride", "seed", "weight_reg", "weight_identity")
+    return {k: a[k] for k in keep if k in a}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--train-sim", default="data/processed/v3_sim/sim_seed0.npz")
@@ -356,8 +374,8 @@ def main():
         "vessel_voxels_dilated": int((valid & ves).sum()),
         "scale_s_eval": s_eval, "bg_std_ref_input": ref_bg_std,
         "inference_api": "infer.py (full-volume sliding window, patch 32x64x64, overlap 0.1)",
-        "budget": {"epochs": args.epochs, "steps_per_epoch": args.steps,
-                   "patch": PATCH, "features": args.features, "seeds": args.seeds},
+        "budget_requested": {"epochs": args.epochs, "steps_per_epoch": args.steps,
+                             "patch": PATCH, "features": args.features, "seeds": args.seeds},
         "arms_args": ARMS, "baseline": {}, "arms": {},
         "truth_definition": "gt_flow_pd (blood-only after band SVD [59,350)) transformed by "
                             "log1p(./s) with s = median(pd_linear[valid]) of the eval volume",
@@ -398,6 +416,12 @@ def main():
               f"n2n_ves={m['n2n_ratio_ves']:.4f}  (global rmse={m['rmse']:.4f})")
 
     rec["summary"] = summarise(rec["arms"])
+    # 预算以 checkpoint 里存的训练 args 为准（命令行值只是"请求值"，见 ckpt_budget 文档）
+    rec["budget_checkpoints"] = {f"{a}_s{sd}": ckpt_budget(ck / "latest.pt")
+                                 for (a, sd), ck in sorted(ckpts.items())}
+    for name, b in rec["budget_checkpoints"].items():
+        print(f"  [ckpt] {name}: epochs={b.get('epochs')} steps/epoch={b.get('steps_per_epoch')} "
+              f"pairing={b.get('pairing')} mode={b.get('mode')} pattern={b.get('pattern')}")
     (out_dir / "expA_metrics.json").write_text(json.dumps(rec, indent=1, ensure_ascii=False))
 
     # ---------------------------------------------------------------- 结论行
