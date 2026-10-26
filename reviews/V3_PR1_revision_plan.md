@@ -65,19 +65,34 @@ the older pipeline used the 0-based slice `V[:, 60:350]`, i.e. **290** modes"。
 
 | 编号 | 优先级 | 审查要求（摘要） | 状态 | 本轮实际做的 | 证据 / 位置 | 剩余 |
 |---|---|---|---|---|---|---|
-| **R01** | P0 | 建上游 faithful VALID 基线；分离整卷推理与相位回填 | 🟡 | ①**上游 v1.0 `34f5637` 已拉取并逐项对照**：模式表逐项相同、训练重抽签一致；②**确认 `reconstruct()` 相位回填与 `cross` 配对均非上游**；③坐标契约与覆盖率固化为单测 | `reports/v3_repair_phase0_baselines.md` §1；`tests/test_v3_paired_preprocess.py` 5 项通过 | faithful 基线**未重训**（属实验 A）；网络/DWT 未与上游逐层比对 |
+| **R01** | P0 | 建上游 faithful VALID 基线；分离整卷推理与相位回填 | ✅ | ①**上游 v1.0 `34f5637` 已拉取并逐项对照**：模式表逐项相同、训练重抽签一致；②**确认 `reconstruct()` 相位回填与 `cross` 配对均非上游**；③坐标契约与覆盖率固化为单测；④**faithful 基线已按上游口径重训**（random Tetris / fixed-4，各 3 种子 × 4000 step），推理只走 `infer.py` 整卷滑窗 | `reports/v3_repair_phase0_baselines.md` §1；`tests/test_v3_paired_preprocess.py` 5 项通过；**`reports/v3_expA/expA_report.md`** | 网络/DWT 未与上游逐层比对（不阻塞判定）；长预算对照见 expA §4 |
 | **R02** | P0 | 不许把"采样距离"与"覆盖率"混为单变量 | 🟡 | ①发现**覆盖率口径错**：faithful 训练口径是 50% 而非 100%，"差 8 倍"应为"差 4 倍"；②m=1/m=2 覆盖率固化为单测；③该实验按审查要求更名为"稀疏覆盖 + 远距离耦合实验" | `reports/v3_repair_phase0_baselines.md` §2；`tests/test_v3_paired_preprocess.py::test_m1/m2` | 同覆盖率、只改角色/位移的对照**未跑**（属实验 C） |
 | **R03** | P0 | 物理先验端到端接入 sampler | ⬜ | — | — | 全部。缺 `sampler_config.json` 冻结与错误先验负控制 |
 | **R04** | P0 | linear / log1p / log(PD+ε) 三表示对照 | ⬜ | — | — | 全部（实验 B） |
 | **R05** | P0 | 收窄"0.5 普适上限"等表述 | ✅ | ①`phase4_report.md` §5.2 加审计更正块（5 条限定）+ 改称 "in-sample 局部线性诊断"；②§5.3/§5.4 就地更正；③保留全部原始数字与失败结论 | `reports/v3_phase4_2026-10-21/phase4_report.md` §5.2–5.4 | 反例构造（非高斯/非线性情形）未做，已在文中声明为局限 |
-| **R06** | P0 | 仿真器正向模型与真值定义审计 | 🔬 | 静态核验结论：`flow = gauss_field × vessels`，**不是**"血管密度→PSF 卷积→IQ→SVD"，血管半径 1.1 体素小于拟合核尺度 | `scripts/v3_simulator.py:175` | 显式前向模型、三类真值分离、PSF/剖面 sanity check **均未做** |
-| **R07** | P1 | A/B 统一归一化尺度；缓存键校验 | ✅ | ①`prep()` 增加 `shared_scale`，N2N 路径强制目标卷复用输入卷的 `s` 并 `assert` 逐位相等；②缓存键改为**文件内容 sha1 + PREP_VERSION + shape_div**（mtime 版已被测试证伪）；③valid 掩膜也进缓存 | `scripts/v3_phase4_train_n2n.py`；`tests/test_v3_paired_preprocess.py` 3 项通过 | **旧 checkpoint 是否受影响未评估**；受影响需重训（属实验 A） |
+| **R06** | P0 | 仿真器正向模型与真值定义审计 | ✅ | ①写出**显式前向模型**并列它与真实成像链的三处偏离；②**三类真值分离**（几何 `vessels` / 无噪成像 `gt_flow_pd` / 有噪 `pd_linear`）；③**证伪全部 RMSE 类端点**——无噪真值在血管外恒为 0、血管仅 1 体素厚，`zero` 控制即击败所有网络臂，故 RMSE 一律不作判据；④PSF sanity：z 方向吻合、**y 方向过相关 0.20**；⑤血管剖面/ACF 显示**无亚分辨能力** | `reports/v3_repair_R06_forward_model.md`；`scripts/v3_r06_forward_audit.py`；`reports/v3_r06/forward_audit.json`、`fig_r06_truths.png` | 修仿真器前向模型本身（PSF 卷积链）**未做**，且会改变真值定义 → 此前全部仿真数字不可与新口径直接比较（已列入剩余风险） |
+| **R07** | P1 | A/B 统一归一化尺度；缓存键校验 | ✅ | ①`prep()` 增加 `shared_scale`，N2N 路径强制目标卷复用输入卷的 `s` 并 `assert` 逐位相等；②缓存键改为**文件内容 sha1 + PREP_VERSION + shape_div**（mtime 版已被测试证伪）；③valid 掩膜也进缓存 | `scripts/v3_phase4_train_n2n.py`；`tests/test_v3_paired_preprocess.py` 3 项通过 | **旧 checkpoint 的影响已核（见下）**：不改判旧数字，但须标注训练/推理尺度口径不一致 |
 | **R08** | P1 | 区分仿真泛化 / 真实可训练性 / 零样本迁移 | ⬜ | — | — | 全部。需真实 A/B 统计检测（属实验 D 前置） |
 | **R09** | P1 | 限定 J1.2 的 B 项含义与阈值 | ✅ | ①`v3_judge.py` 新增 R09 节：恒等式、成立条件、**偏保守的方向**、`S_rel` 的盲区、J2 另建；②J1.2 判定与原始 JSON 保留不动 | `scripts/v3_judge.py` docstring；`reports/v3_judge/` | 真值体模的结构指标（弱血管 recall@FPR、宽度、连通性）**未实现**（属 R12） |
 | **R10** | P1 | 0.615 不是普适下限 | ✅ | `train_n2n.py` 注释与日志文案改为"经验参照值 + 需独立实现核对"；`phase4_report.md` §5.6.1 加更正块，说明 §5.6.2 的判定靠的是 n102/n103/n201 那张表而不是 0.615 | 同上 | 无 |
 | **R11** | P1 | SVD-SN2N 作为完整方法对照 | ⬜ | — | — | 全部（属实验 D） |
 | **R12** | P1 | 以微血管图像质量为主判据 | ⬜ | — | — | 全部。`eval_structure.py` 现有分区指标**不等于**弱血管 recall@FPR |
 | **R13** | P1 | 轴序/归一化/rank/valid_mask 审计 | 🟡 | ①发现并修正频带**少一个模式**：新增 `band_slice()`，官方口径 `[59,350)`=291 模式；②5 个脚本统一到该函数；③旧口径全部 JSON 原样备份到 `reports/v3_judge/legacy_band290/` 并写 README 禁止混引；④口径固化为 4 项单测；⑤**J1.2 标定在新口径下重跑，仍 5/5 通过**，幻影 w=7 的 `B_db=−10.29`（旧 −10.28），`THR_B_DB=−7.3` 的推导不变、**门槛未动**；⑥**真实数据判定已按新口径重跑完毕（§2.1）**，12 行判定与旧口径**逐行相同** | `scripts/v3_phase5_real_compare.py::band_slice`；`tests/test_v3_band_convention.py`；`runs/v3_judge_calib_officialband.log`；`reports/v3_judge/{SA64,HSA64}_judge.json` | 轴向坐标图与 manifest **未做**；轴序 `(37,64,64)` 与官方 `(64,64,37)` 的转置映射**未出图核验** |
+
+### 2.0 R07 对旧 checkpoint 的影响（已核，不改判旧数字）
+
+核对结论：**训练与推理的尺度口径本来就不一致**。
+
+- 训练（旧）：`prep()` 对每个 `.npz` 各算 `s = median(pd[valid])`，于是输入卷按 `s_A`、目标卷按
+  `s_B` 归一化。网络被训练成"输入一个尺度、输出另一个尺度"，等于学了一个**对整体电平不敏感的**
+  映射。
+- 推理（`v3_judge_real.py:111`、`v3_phase5_real_network.py:178`）：
+  `s = median(0.5*(o+e)[valid])`，**两卷共用**一个尺度。
+
+所以旧 checkpoint 的 ④ 数字是在"训练/推理口径不一致"下得到的。**这不足以判定它们全部作废**
+（因为 log1p 域的整体偏移对结构相关性影响有限），但也**不能声称它们等价于正确口径的结果**。
+处置：不删、不改判既有 ④ 的结论；在实验 B 起**所有新臂一律用修正后的共享尺度训练**，
+并在报告中并列"旧口径/新口径"两行，不得混引。此条已写入 `Project_log.md` L54。
 
 ### 2.1 R13 重跑结果（官方口径 `[59,350)`，判定与旧口径逐行相同）
 
@@ -123,6 +138,13 @@ the older pipeline used the 0-based slice `V[:, 60:350]`, i.e. **290** modes"。
 
 按审查给的依赖顺序推进；**前一步没出报告与 Gate 判定，不开下一步**。
 
+> **执行顺序已因实验 A 的结果调整（2026-10-26）**：实验 A 触发了预注册 Gate，B/C 的前置条件
+> （"faithful VALID 有效"）**未满足**。因此下一步不再按 A→B→C→D 顺序，而是先做 Gate 指定的
+> 修复工作：**(i) R06 前向模型返工**（血管→PSF 卷积→复数 IQ→SVD 带通→PD，真值不再是"血管外恒 0、
+> 1 体素厚"）；**(ii) 多体仿真训练集**（当前只有 1 个 (37,64,64) 体）；**(iii) 明确"保留什么/
+> 去掉什么"的目标函数定义**。这三项做完之后重跑实验 A；A 通过才开 B/C。此项调整是对计划的修改，
+> 理由来自 `reports/v3_expA/expA_report.md` §3–§5，不是事后调门槛（门槛一字未动）。
+
 ### 实验 A — 恢复基础能力（依赖 R01、R06、R07）
 
 - **对照**：输入本身 / ①Wiener / faithful VALID random / fixed-4，同一真值、同一 ROI、同一预算。
@@ -131,7 +153,19 @@ the older pipeline used the 0-based slice `V[:, 60:350]`, i.e. **290** modes"。
   图注必须写明 API。
 - **判定**：若 faithful VALID random 与 fixed-4 都**不优于输入**，则停止开发物理采样选择器，
   先解决任务与基础自监督基线；只有它们有效，才允许进入 B/C。
-- **状态**：⬜ 未运行。**缺口**：VALID 上游 commit 与源码对照表尚未落地。
+- **状态**：✅ **已运行并触发 Gate**（报告 `reports/v3_expA/expA_report.md`）。
+
+| 条件 | 输入 | ① Wiener w=7 | A_rand（faithful） | A_fixed4（最优固定模式） |
+|---|---|---|---|---|
+| `r_ves`（尺度无关） | **0.9456** | 0.9454 | 0.760 | 0.687 |
+| `bg_std_ratio`（1=没压） | **1.000** | **0.641** | 2.216 | 1.799 |
+| `n2n_ratio`（输入=1） | **1.000** | **0.781** | 10.70 | 9.12 |
+
+  三条排除性对照同时成立：① **不是没泛化**——在训练体自身上 `r_ves` 也只有 0.615–0.690；
+  ② **不是没训够**——预算加到 6 倍（24,000 step），训练 loss 降 26% 而 `r_ves` 从 0.760 掉到 0.218；
+  ③ **失败机理已定位**——输出近似"输入的轻度低通 + 向均值收缩"，而真值在 98.68% 的体素上**恰好为 0**、
+  且 98.85% 的方差集中在 1 体素粗的血管里，这个 N2N 目标的次优解按定义就保不住细血管。
+  → **依计划暂停物理采样选择器（I1），先修任务定义与前向模型（R06）与基础基线；B/C 前置未满足，暂不启动。**
 
 ### 实验 B — 表示对照（依赖 R04、R07）
 
