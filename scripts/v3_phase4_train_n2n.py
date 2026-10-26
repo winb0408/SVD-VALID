@@ -48,8 +48,20 @@ sys.path.insert(0, str(ROOT))
 PY = "/data2/wjb/anaconda3/envs/threePM/bin/python"
 
 
-def prep(npz: Path, shape_div: int = 32):
-    """与 scoreboard 完全相同的 log1p(pd/median(valid)) 预处理。"""
+PREP_VERSION = "prep-v2-shared-scale"   # R07: 缓存键与预处理口径的唯一版本号
+
+
+def prep(npz: Path, shape_div: int = 32, shared_scale: float | None = None):
+    """log1p(pd/s) 预处理。
+
+    R07 更正（2026-10-26，外部审查）：**A、B 必须用同一个 s**。
+    原实现里 A 与 B 各自调用本函数，于是各自用自己体积的 `median(pd[valid])` 归一化；
+    对 N2N 而言这等于给两卷加了**不同的确定性增益**，破坏了"两卷只差噪声"的前提。
+    现在由调用方先算出输入卷的 s，再用 `shared_scale=` 传给目标卷。
+
+    `shared_scale=None` 时仍按自己算（单卷场景用），但 N2N 训练路径不允许走这条。
+    返回 (volume, valid, s)，调用方负责断言 A/B 的 s 逐位相同。
+    """
     import numpy as np
     d = np.load(npz)
     pd = d["pd_linear"].astype("float32")
@@ -58,8 +70,23 @@ def prep(npz: Path, shape_div: int = 32):
     crop = tuple(slice(0, n) for n in shape)
     pd = pd[crop]
     valid = valid[crop]
-    s = float(np.median(pd[valid]))
-    return np.log1p(pd / max(s, 1e-12)).astype("float32"), valid.astype("float32")
+    s = float(np.median(pd[valid])) if shared_scale is None else float(shared_scale)
+    return np.log1p(pd / max(s, 1e-12)).astype("float32"), valid.astype("float32"), s
+
+
+def cache_key(npz: Path, shape_div: int) -> str:
+    """R07: 缓存键 = 文件内容哈希 + 预处理版本 + 形状参数。
+
+    用**内容**哈希而不是 mtime：mtime 在同一秒内可能不变，会让"文件改了但缓存没失效"
+    这件事悄悄发生（本测试已复现）。文件大小在 MB 级，一次 sha1 的开销远小于重新跑预处理。
+    """
+    import hashlib
+    h = hashlib.sha1()
+    with open(npz, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    h.update(f"|{PREP_VERSION}|{shape_div}".encode())
+    return h.hexdigest()[:16]
 
 
 def main():
@@ -89,28 +116,43 @@ def main():
     src = out_root / "_prepared"
     src.mkdir(exist_ok=True)
     assert len(args.input_npz) == len(args.target_npz), "输入与目标必须一一对应"
+    def prepare_pair(tag_a, tag_b, a_npz, b_npz, i):
+        """R07：先算输入卷的 s，再用同一个 s 处理目标卷；缓存键含内容与版本。
+
+        返回 (输入npy, 目标npy, valid_npy)。三者都用内容键缓存，任何一项缺失即重算。
+        """
+        import numpy as np
+        a_npz, b_npz = Path(a_npz), Path(b_npz)
+        ka, kb = cache_key(a_npz, 32), cache_key(b_npz, 32)
+        da = src / f"{tag_a}_{ka}.npy"
+        db = src / f"{tag_b}_{kb}.npy"
+        dv = src / f"V{i}_{ka}.npy"
+        meta_a = da.with_suffix(".json")
+        s_a = json.loads(meta_a.read_text())["s"] if meta_a.exists() else None
+        if s_a is None or not da.exists() or not dv.exists():
+            vol, valid, s_a = prep(a_npz)
+            np.save(da, vol)
+            np.save(dv, valid)
+            meta_a.write_text(json.dumps({"s": s_a, "src": str(a_npz),
+                                          "prep_version": PREP_VERSION}))
+            print(f"prepared {da.name}  (valid 占比 {valid.mean():.3f}, s={s_a:.6g})")
+        if not db.exists():
+            vol, _, s_b = prep(b_npz, shared_scale=s_a)
+            assert s_b == s_a, "目标卷必须复用输入卷的 s"
+            np.save(db, vol)
+            db.with_suffix(".json").write_text(json.dumps(
+                {"s": s_b, "src": str(b_npz), "shared_from": str(a_npz),
+                 "prep_version": PREP_VERSION}))
+            print(f"prepared {db.name}  (shared s={s_b:.6g})")
+        return da, db, dv
+
+    pair_paths = []
     for i, (a_npz, b_npz) in enumerate(zip(args.input_npz, args.target_npz)):
-        for tag, npz in ((f"A{i}", a_npz), (f"B{i}", b_npz)):
-            dst = src / f"{tag}.npy"
-            if not dst.exists():
-                import numpy as np
-                vol, valid = prep(Path(npz))
-                np.save(dst, vol)
-                if tag.startswith("A"):
-                    np.save(src / f"V{i}.npy", valid)
-                print(f"prepared {dst}  (valid 占比 {valid.mean():.3f})")
-    val = (None, None)
+        da, db, dv = prepare_pair(f"A{i}", f"B{i}", a_npz, b_npz, i)
+        pair_paths.append((da, db, dv))
+    val = (None, None, None)
     if args.val_input_npz:
-        for tag, npz in (("AV", args.val_input_npz), ("BV", args.val_target_npz)):
-            dst = src / f"{tag}.npy"
-            if not dst.exists():
-                import numpy as np
-                vol, valid = prep(Path(npz))
-                np.save(dst, vol)
-                if tag == "AV":
-                    np.save(src / "VV.npy", valid)
-                print(f"prepared {dst}")
-        val = (src / "AV.npy", src / "BV.npy")
+        val = prepare_pair("AV", "BV", args.val_input_npz, args.val_target_npz, "V")
 
     def launch(gpu, items):
         lines = []
@@ -120,9 +162,9 @@ def main():
             if (out / "latest.pt").exists():
                 continue
             cmd = [PY, "-u", "scripts/train_n2n.py",
-                   "--input", *[str(src / f"A{i}.npy") for i in range(len(args.input_npz))],
-                   "--target", *[str(src / f"B{i}.npy") for i in range(len(args.input_npz))],
-                   "--valid", *[str(src / f"V{i}.npy") for i in range(len(args.input_npz))],
+                   "--input", *[str(a) for a, _, _ in pair_paths],
+                   "--target", *[str(b) for _, b, _ in pair_paths],
+                   "--valid", *[str(v) for _, _, v in pair_paths],
                    "--patch", *[str(p) for p in args.patch],
                    "--epochs", str(args.epochs), "--steps-per-epoch", str(args.steps_per_epoch),
                    "--features", str(args.features), "--groups", str(args.groups),
@@ -130,7 +172,7 @@ def main():
                    "--residual", str(res), "--out", str(out)]
             if val[0]:
                 cmd += ["--val-input", str(val[0]), "--val-target", str(val[1]),
-                        "--val-valid", str(src / "VV.npy"), "--val-every", str(args.val_every)]
+                        "--val-valid", str(val[2]), "--val-every", str(args.val_every)]
             lines.append("cd %s && %s >> %s.log 2>&1" % (ROOT, " ".join(cmd), out))
         if not lines:
             return

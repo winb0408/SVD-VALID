@@ -107,7 +107,12 @@ def main():
 
     @torch.no_grad()
     def validate(ep):
-        """留出场景上的整卷比值。低于 0.615 只可能是记住了那次实现自己的噪声。"""
+        """留出场景上的整卷比值。
+
+        R10 更正（2026-10-26）：0.615 是本仿真协议下**有限个实现（3 个）的经验参照值**，
+        不是 Bayes 下界、也不是任何模型的普适下限。低于它是一条"值得怀疑"的提示，
+        判"是否记忆"必须看独立目标实现/独立场景上的验证曲线（见 phase4_report §5.6.2）。
+        """
         if val is None:
             return None
         model.eval()
@@ -120,7 +125,8 @@ def main():
         ratio = float(masked_mse(pred, y0, m) / masked_mse(xin, y0, m).clamp_min(1e-9))
         model.train()
         print(f"  [val ep{ep:03d}] ratio={ratio:.4f}"
-              + ("  <= 低于下限 0.615，已开始记忆" if ratio < 0.615 else ""), flush=True)
+              + ("  <= 低于经验参照 0.615，需用独立实现核对是否记忆" if ratio < 0.615 else ""),
+              flush=True)
         return ratio
 
     for ep in range(args.epochs):

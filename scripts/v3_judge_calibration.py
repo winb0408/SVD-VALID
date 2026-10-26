@@ -56,8 +56,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 
 from v3_phase5_real_compare import (                      # noqa: E402
-    FRAC_LO, FRAC_HI, band_pd, setup_cjk, structure_masks, svd_basis, to_unit, wiener,
-)
+    FRAC_LO, FRAC_HI, band_pd, setup_cjk, structure_masks, svd_basis, to_unit, wiener, band_slice)
 from v3_judge import (                                    # noqa: E402
     JUDGE_VERSION, THR_B_DB, THR_N_REL, THR_S_REL, THR_TEXT, judge, mse,
 )
@@ -101,11 +100,11 @@ def build_phantom(scene_seed, noise_seed, truth_reps):
         Ch = X.reshape(-1, t)[:, sl]
         th = Ch.shape[1]
         _, Vh = svd_basis(Ch)
-        halves[tag] = band_pd(Ch, Vh, round(FRAC_LO * th), round(FRAC_HI * th), shape3d)
+        halves[tag] = band_pd(Ch, Vh, *band_slice(th), shape3d)
         Vs[tag] = Vh
         del Ch
     th = t // 2
-    th_lo, th_hi = int(round(FRAC_LO * th)), int(round(FRAC_HI * th))
+    th_lo, th_hi = band_slice(th)
     print(f"[calib] 半卷 T={th} 血带=[{th_lo},{th_hi})")
 
     truth = {}

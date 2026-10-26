@@ -73,8 +73,7 @@ sys.path.insert(0, str(ROOT))
 from prepare_svd import load_array, normalize_shape          # noqa: E402
 from v3_phase5_real_compare import (                          # noqa: E402
     RAW, FRAC_LO, FRAC_HI, band_pd, keep_ratio, mse, setup_cjk,
-    structure_masks, svd_basis, to_unit, wiener,
-)
+    structure_masks, svd_basis, to_unit, wiener, band_slice)
 
 NET_Z = 32          # ② 的 patch=[32,64,64]，z 只能留 32 层
 CKPT_GLOB = "runs/v3_n2n_multi/res_s*/latest.pt"
@@ -138,7 +137,7 @@ def main():
     print(f"[{ds}] raw {raw.shape} {raw.dtype}")
     C = raw.reshape(-1, t)
     _, V = svd_basis(C)
-    lo_b, hi_b = int(round(FRAC_LO * t)), int(round(FRAC_HI * t))
+    lo_b, hi_b = band_slice(t)
     pd_full = band_pd(C, V, 0, t, shape3d)
     pd_svd = band_pd(C, V, lo_b, hi_b, shape3d)
     del C, V, raw
@@ -151,11 +150,11 @@ def main():
         _, Vh = svd_basis(Ch)
         halves[tag] = {
             "full": band_pd(Ch, Vh, 0, th, shape3d),
-            "svd": band_pd(Ch, Vh, round(FRAC_LO * th), round(FRAC_HI * th), shape3d),
+            "svd": band_pd(Ch, Vh, *band_slice(th), shape3d),
         }
         del Ch, Vh
     del raw4
-    th_lo, th_hi = int(round(FRAC_LO * (t // 2))), int(round(FRAC_HI * (t // 2)))
+    th_lo, th_hi = band_slice(t // 2)
     print(f"[{ds}] 全秩=[0,{t}) 血带=[{lo_b},{hi_b})  半卷 T={t//2} 血带=[{th_lo},{th_hi})")
 
     # ---------------- 裁剪到网络网格 (32,64,64) ----------------

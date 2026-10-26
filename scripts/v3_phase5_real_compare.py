@@ -57,6 +57,30 @@ RAW = {
 # 奇/偶半（T=200）才能落在同一物理位置上：60/400 = 0.15，350/400 = 0.875。
 FRAC_LO, FRAC_HI = 0.15, 0.875
 
+# R13 更正（2026-10-26，外部审查）：**比例直接取整会把官方带算少一个模式。**
+# 官方 MATLAB 的 `M(:, 60:350) * U(:, 60:350)'` 是 **1-based 闭区间**，含 291 个模式；
+# 对应的 0-based 半开区间是 `[59, 350)`，不是 `[60, 350)`。旧代码用
+# `round(0.15*T), round(0.875*T)` 得到 `[60,350)`（290 个模式）= MATLAB 61:350，
+# 整体右移一位。`scripts/official_pipeline.py::svd_blood_band(faithful=True)` 用的是
+# 正确口径 `(cut1-1, cut2)`。
+# 本常量默认 True → 采用官方口径；设为 False 可复现 2026-10-26 之前的旧数字。
+OFFICIAL_BAND = True
+
+
+def band_slice(T: int, frac_lo: float = FRAC_LO, frac_hi: float = FRAC_HI,
+               official: bool | None = None):
+    """把"官方 1-based 闭区间 [frac_lo*T, frac_hi*T]"换成 0-based 半开切片。
+
+    official=True  → (round(frac_lo*T) - 1, round(frac_hi*T))，T=400 时为 (59, 350)，291 个模式
+    official=False → (round(frac_lo*T),     round(frac_hi*T))，T=400 时为 (60, 350)，290 个模式
+    T=200 的半卷同理：官方口径 (29, 175)，146 个模式。
+    """
+    if official is None:
+        official = OFFICIAL_BAND
+    lo = int(round(frac_lo * T))
+    hi = int(round(frac_hi * T))
+    return (lo - 1, hi) if official else (lo, hi)
+
 
 # ---------------------------------------------------------------- SVD 功率多普勒
 def svd_basis(C):
@@ -161,7 +185,7 @@ def main():
     evals, V = svd_basis(C)
     del raw
 
-    lo_b, hi_b = int(round(FRAC_LO * t)), int(round(FRAC_HI * t))
+    lo_b, hi_b = band_slice(t)
     print(f"[{ds}] 全秩=[0,{t})  血带=[{lo_b},{hi_b})  半卷血带比例同")
 
     pd_full = band_pd(C, V, 0, t, shape3d)        # 去噪前
@@ -177,12 +201,12 @@ def main():
         _, Vh = svd_basis(Ch)
         halves[tag] = {
             "full": band_pd(Ch, Vh, 0, th, shape3d),
-            "svd": band_pd(Ch, Vh, round(FRAC_LO * th), round(FRAC_HI * th), shape3d),
+            "svd": band_pd(Ch, Vh, *band_slice(th), shape3d),
         }
         del Ch, Vh
     del raw4
     thalf = t // 2
-    th_lo, th_hi = int(round(FRAC_LO * thalf)), int(round(FRAC_HI * thalf))
+    th_lo, th_hi = band_slice(thalf)
     print(f"[{ds}] 半卷 T={thalf}  血带=[{th_lo},{th_hi})")
 
     # ---- 有效体素 ----
