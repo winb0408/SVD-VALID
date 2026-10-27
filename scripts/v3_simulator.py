@@ -64,6 +64,20 @@ class SimCfg:
     # 物理上对应的两次观测。设成与 seed 相同的值时，这里会把血管幽灵重画一遍
     # 以推进到同一流位置，结果与不设此字段**逐位相同**（已验证）。
     static_seed: int | None = None
+    # ---- 2026-10-26 新增（R06 整改，见 reports/v3_repair_R06_forward_model.md §1）----
+    # forward="v1"：血流 = `gauss_field(psf) * vessels`（散斑场乘布尔掩膜），真值在掩膜外**恒为 0**、
+    #   管内无内部结构。这就是 R06 指出的"不是血管密度卷积 PSF"。
+    # forward="v2"：血流 = `conv(sqrt(ρ) * 白噪, psf)`，ρ 为**连续血管密度**（抗锯齿软管），
+    #   即"血管密度 → PSF → 复数 IQ"，真值随之变成管周有晕、管内有脊的平滑场。
+    forward: str = "v1"
+    # v2 专用：把"血管 ROI（ρ≥0.5）的真值 PD"标定到**背景（ρ=0）PD 中位数**的多少 dB。
+    # 口径 = `scripts/v3_r06_v2_audit.py` 用的那个量，即带通之后、
+    # 背景用真血管外体素（ρ=0）。2026-10-27 修正后定标改为两阶迭代，seed 100/109/110 的
+    # 实测偏差 ≤0.04 dB（此前用未带通功率估计时逐体子散布 −1.7 ~ +9.6 dB）。
+    # 取值区间有实测依据：SA64 只有 0.05% 体素高于中位数 +6 dB，HSA64 有 6.6%，默认 6 dB 落在两者之间。
+    flow_contrast_db: float = 6.0
+    # v2 专用：密度斜坡宽度（体素）。1.5 表示"血管只占体素一部分"的部分容积近似。
+    density_soft: float = 1.5
 
 
 # --------------------------------------------------------------- 基础构件
@@ -127,12 +141,52 @@ def vessel_phantom(rng, shape, n_tubes, radius):
     return mask
 
 
+def vessel_density(rng, shape, n_tubes, radius, soft=1.5):
+    """R06/v2：随机游走管状血管的**连续密度** ρ ∈ [0,1]，取代布尔掩膜。
+
+    为什么要连续：真实血管比体素细，一个体素里只装得下血管的一部分；
+    布尔掩膜把"血管占 10% 的体素"和"血管占 100% 的体素"当成同一件事，
+    于是真值只能在 0 和 1 之间跳——这正是 R06 判定的"无亚分辨能力"。
+
+    实现：逐段点到轴距离 d，取线性斜坡 `clip((r + 0.5 − d) / soft, 0, 1)`。
+    `soft` 是斜坡宽度；它不是真实的部分容积积分，而是一个**声明过的近似**（见报告 §2.3）。
+    随机游走用的随机数与 `vessel_phantom` 完全一致，所以同一个 seed 得到同一套管子几何。
+    """
+    z, y, x = np.mgrid[0:shape[0], 0:shape[1], 0:shape[2]].astype(np.float32)
+    rho = np.zeros(shape, np.float32)
+    for _ in range(n_tubes):
+        p = np.array([rng.uniform(0, shape[0]), rng.uniform(0, shape[1]), rng.uniform(0, shape[2])])
+        d = rng.standard_normal(3)
+        d /= np.linalg.norm(d)
+        r = radius * rng.uniform(0.5, 1.4)
+        for _seg in range(60):
+            d = d + 0.35 * rng.standard_normal(3)
+            d /= np.linalg.norm(d)
+            p = p + d * 1.0
+            if not (0 <= p[0] < shape[0] and 0 <= p[1] < shape[1] and 0 <= p[2] < shape[2]):
+                break
+            dist = np.sqrt((z - p[0]) ** 2 + (y - p[1]) ** 2 + (x - p[2]) ** 2)
+            # .astype(np.float32)：dist 是 float64（p 来自 rng.uniform），np.maximum 会把
+            # rho 升成 float64，导致"同一个 seed 的 rho"在内存里出现两种 dtype
+            # （2026-10-27 发现：下游逐位自检因此误报 False，实际差 3e-8＝float32 舍入）
+            rho = np.maximum(rho, np.clip((r + 0.5 - dist) / soft, 0.0, 1.0)).astype(np.float32)
+    return rho
+
+
 # ------------------------------------------------------------------ 仿真
 def simulate(cfg: SimCfg):
     rng = np.random.default_rng(cfg.seed)
     S, T = tuple(cfg.shape), cfg.T
 
-    vessels = vessel_phantom(rng, S, cfg.n_tubes, cfg.vessel_radius)
+    valid = np.ones(S, bool)
+    valid[:2] = False                      # 模仿真实数据的近场死区
+
+    if cfg.forward == "v2":
+        rho = vessel_density(rng, S, cfg.n_tubes, cfg.vessel_radius, cfg.density_soft)
+        vessels = rho >= 0.5
+    else:
+        vessels = vessel_phantom(rng, S, cfg.n_tubes, cfg.vessel_radius)
+        rho = vessels.astype(np.float32)
     if cfg.noise_seed is not None:
         rng = np.random.default_rng(cfg.noise_seed)
 
@@ -171,11 +225,49 @@ def simulate(cfg: SimCfg):
     # （`band_and_pd(flow)` 的方差 ≈ 0）。现在用逐帧独立散斑：时间谱平坦，
     # 带通 59..349 留得住约 73% 的能量，PD 图上才真的出现血管结构。
     flow = np.empty(S + (T,), np.complex64)
-    for t in range(T):
-        flow[..., t] = gauss_field(rng, S, cfg.psf_sigma) * vessels
-    if vessels.any():
-        v_rms = np.sqrt(np.mean(np.abs(flow[..., 0][vessels]) ** 2))
-        flow *= (cfg.flow_amp * 0.6) / max(float(v_rms), 1e-12)
+    if cfg.forward == "v2":
+        # R06/v2：**密度先乘白噪、再经 PSF 卷积**。与 v1 的差别是卷积发生在乘掩膜之后，
+        # 于是 PSF 会把血管支撑"糊出晕"，真值不再是硬掩膜；sqrt(ρ) 使 PD ∝ 血流密度。
+        sq = np.sqrt(rho).astype(np.float32)
+        for t in range(T):
+            white = (rng.standard_normal(S) + 1j * rng.standard_normal(S)) / np.sqrt(2)
+            flow[..., t] = _fft_convolve(white.astype(np.complex64) * sq, cfg.psf_sigma)
+        # 幅度的**物理标定**：把"血管真值 PD 相对背景 PD 中位数"标到 cfg.flow_contrast_db。
+        #
+        # 2026-10-27 修正：初版用**未带通**的功率估背景与核心，结果逐体子的带通后对比度在
+        # −1.7 dB ~ +9.6 dB 之间乱跳（原因：静态散斑与杂波在带通后大幅衰减，而未带通估计
+        # 里它们是主导项；另外 ρ≥0.9 的"核心"只有 16–175 个体素，中位数极不稳定）。
+        # 现在改成**直接用带通后的功率**定标：先把不带血流的各项加起来做一次同一带通得到
+        # 背景 PD，再对血流做一次带通得到真值 PD，按二者之比定标。因为带通是线性的，
+        # 定标系数可以精确作用在 IQ 上，`gt = band(flow)` 随之等比变化，无需重算。
+        # 定标区改用 ρ≥0.5（体素量级 10²–10³，见 reports/v3_r06/v2_endpoint_audit.json）。
+        rest_iq = np.zeros(S + (T,), np.complex64)
+        for part in (static, dynamic, clutter, thermal):
+            rest_iq += part
+        filt_flow, _ = svd_blood_band(flow.astype(np.complex64), 60, 350, True)
+        gt_now = np.sum(np.abs(filt_flow) ** 2, axis=3)
+        cal = rho >= 0.5                     # 定标区：ρ≥0.5（体素量级 10²–10³）
+        bg_true = valid & (rho <= 0.0)       # 背景：真血管外（与审计脚本同一口径）
+        target_ratio = 10.0 ** (cfg.flow_contrast_db / 10.0)
+        if cal.any() and bg_true.any():
+            # 一阶：背景用**不含血流**的带通功率（血流自身的晕先不计）
+            pd_rest, _ = band_and_pd(rest_iq, valid)
+            r1 = float(np.median(gt_now[cal])) / max(float(np.median(pd_rest[bg_true])), 1e-30)
+            k = np.sqrt(target_ratio / max(r1, 1e-30))
+            flow *= k
+            # 二阶：血流 + 背景一起带通，把血流的"晕"算进背景（审计口径一致），再修一次
+            pd_obs, _ = band_and_pd(rest_iq + flow, valid)
+            r2 = (k ** 2 * float(np.median(gt_now[cal]))) / max(
+                float(np.median(pd_obs[bg_true])), 1e-30)
+            flow *= np.sqrt(target_ratio / max(r2, 1e-30))
+            del pd_rest, pd_obs
+        del rest_iq, filt_flow, gt_now
+    else:
+        for t in range(T):
+            flow[..., t] = gauss_field(rng, S, cfg.psf_sigma) * vessels
+        if vessels.any():
+            v_rms = np.sqrt(np.mean(np.abs(flow[..., 0][vessels]) ** 2))
+            flow *= (cfg.flow_amp * 0.6) / max(float(v_rms), 1e-12)
 
     X = np.zeros(S + (T,), np.complex64)
     for part in (static, dynamic, clutter, flow, thermal):
@@ -184,11 +276,8 @@ def simulate(cfg: SimCfg):
     # --- 数值上凑到和真实数据同量级的动态范围
     X = X.astype(np.complex64) * 1e3
 
-    valid = np.ones(S, bool)
-    valid[:2] = False                      # 模仿真实数据的近场死区
-
     return {"X": X, "flow": flow.astype(np.complex64) * 1e3, "vessels": vessels,
-            "valid": valid, "cfg": asdict(cfg)}
+            "rho": rho, "valid": valid, "cfg": asdict(cfg)}
 
 
 def band_and_pd(X, valid, cut=(60, 350)):
@@ -247,6 +336,11 @@ def main():
     ap.add_argument("--static-seed", type=int, default=None,
                     help="单独控制固定散斑的流；取与 --seed 相同 = 固定散斑与主流程一致，"
                          "用于造'静态共享、动态独立'的两次观测")
+    ap.add_argument("--forward", default="v1", choices=["v1", "v2"],
+                    help="v1=旧前向模型（散斑场乘布尔掩膜）；v2=R06 整改版"
+                         "（连续血管密度 → PSF 卷积），真值不再是硬掩膜")
+    ap.add_argument("--flow-contrast-db", type=float, default=6.0,
+                    help="v2 专用：血管核心真值 PD 相对背景 PD 中位数的 dB 数")
     ap.add_argument("--emit-halves", action="store_true",
                     help="额外存 pd_half1/pd_half2：把 400 帧按时间奇偶各半重建 PD。"
                          "这两个量的差给出**与判据同一种噪声**的空间分辨估计，"
@@ -288,9 +382,18 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     d = simulate(SimCfg(seed=args.seed, noise_seed=args.noise_seed,
-                        static_seed=args.static_seed))
+                        static_seed=args.static_seed, forward=args.forward,
+                        flow_contrast_db=args.flow_contrast_db))
     pd, filt = band_and_pd(d["X"], d["valid"])
     gt, _ = band_and_pd(d["flow"], d["valid"])
+    if args.forward == "v2":
+        # 如实记录**带通之后**真正达到的血管/背景对比度（标定阶段用的是未带通的一阶估计）
+        core = d["rho"] >= 0.5
+        bg = background_mask(pd, d["valid"], 0.20)
+        ach = 10.0 * np.log10(max(float(np.median(gt[core])), 1e-30)
+                              / max(float(np.median(pd[bg])), 1e-30))
+        print(f"  v2 对比度：目标 {args.flow_contrast_db} dB → 带通后实测 {ach:.2f} dB"
+              f"（核心体素 {int(core.sum())}，背景体素 {int(bg.sum())}）")
     name = f"sim_seed{args.seed}"
     if args.noise_seed is not None:
         name += f"_n{args.noise_seed}"
@@ -316,6 +419,7 @@ def main():
                         pd_linear=pd.astype(np.float32),
                         gt_flow_pd=gt.astype(np.float32),
                         vessels=d["vessels"], valid=d["valid"],
+                        rho=d["rho"].astype(np.float32),   # v2 的连续密度（v1 时等于掩膜）
                         cfg=json.dumps(d["cfg"]), **extra)
     e = acf_vs_target(pd, d["valid"], target, mode=args.target_mode)
     print(json.dumps(e, indent=1)[:1200])

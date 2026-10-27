@@ -68,7 +68,9 @@ def wavelet_hessian_loss(out1, out2, hessian):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--train-volume", required=True)
+    ap.add_argument("--train-volume", default=None,
+                    help="单卷训练体。与 --train-volumes 二选一：给了 --train-volumes 时本参数被忽略"
+                         "（参照卷取 vols[0]），可以省略；两者都不给才报错。")
     ap.add_argument("--signal-map")
     ap.add_argument("--noise-map")
     ap.add_argument("--mode", choices=["random", "patch_random", "guided", "fixed"],
@@ -102,10 +104,24 @@ def main():
     ap.add_argument("--epochs", type=int, default=50)
     ap.add_argument("--steps-per-epoch", type=int, default=200)
     ap.add_argument("--lr", type=float, default=1e-4)
+    ap.add_argument("--lr-schedule", choices=["poly", "cosine"], default="poly",
+                    help="poly = 上游 VALID v1.0 的 `utils/general.py:adjust_learning_rate`："
+                         "lr·(1−epoch/max_epoch)^0.9，**没有 warmup**；"
+                         "cosine = 本仓库此前用的 warmup+余弦（保留以便复现旧 run）。"
+                         "2026-10-26 核出此前一直用 cosine，与上游不同，故默认改为 poly。")
+    ap.add_argument("--clip-grad", type=float, default=100.0,
+                    help="上游 `clip_gradients` 默认 100.0；本仓库此前写死 20.0。")
+    ap.add_argument("--train-volumes", nargs="*", default=None,
+                    help="多个训练体的 npy 列表（每个都必须是同形状的 log1p 体）。"
+                         "给定时每步随机选一个体再裁 patch；不给则用 --train-volume 单卷。")
     ap.add_argument("--weight-reg", type=float, default=1e-4)
     ap.add_argument("--weight-identity", type=float, default=1.0,
                     help="Weight of loss_identity (mse(ha,hb)). VALID v1.0 uses "
                          "1.0; 0.0 is a diagnostic ablation only.")
+    ap.add_argument("--sampler-config", default=None,
+                    help="R03：物理先验采样器的冻结配置（configs/sampler_config.json）。"
+                         "给定时训练前先校验它与磁盘产物（ρ 曲线、角色序、频带、PSF、valid_mask）"
+                         "一致，校验不过直接退出，不写半截 checkpoint；通过则把副本 + sha1 写进 run 目录。")
     ap.add_argument("--features", type=int, default=16)
     ap.add_argument("--groups", type=int, default=4)
     ap.add_argument("--seed", type=int, default=3407)
@@ -143,23 +159,65 @@ def main():
     np.random.seed(args.seed)
     random.seed(args.seed)
 
-    vol = np.load(args.train_volume).astype(np.float32)
+    vols = None
+    if args.train_volumes:
+        # 多卷：--train-volume 可省略（2026-10-27 修：此前 required=True，导致 A/B/C 三个
+        # 多卷 launcher 会在 argparse 阶段直接报错退出，一格训练都跑不出来）
+        vols = [np.load(p).astype(np.float32) for p in args.train_volumes]
+        shapes = {v.shape for v in vols}
+        if len(shapes) != 1:
+            raise ValueError(f"--train-volumes 的形状不一致：{shapes}")
+        vol = vols[0]
+    elif args.train_volume:
+        vol = np.load(args.train_volume).astype(np.float32)
+    else:
+        ap.error("必须给 --train-volume 或 --train-volumes 之一")
     signal = np.load(args.signal_map).astype(np.float32) if args.signal_map else None
     noise = np.load(args.noise_map).astype(np.float32) if args.noise_map else None
 
     model = NetworkCNR(features=args.features, groups=args.groups).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999))
-    # VALID v1.0 schedule: linear warmup over the first 10% epochs, cosine decay.
-    lr_func = lambda epoch: min(
-        (epoch + 1) / (args.epochs * 0.1 + 1e-8),
-        0.5 * (math.cos(epoch / args.epochs * math.pi) + 1),
-    )
+    if args.lr_schedule == "poly":
+        # 上游 VALID v1.0：lr·(1 − epoch/max_epoch)^0.9，无 warmup
+        lr_func = lambda epoch: max(1.0 - epoch / max(args.epochs, 1), 0.0) ** 0.9
+    else:
+        # 本仓库此前一直用的（与上游**不同**，保留以复现旧 run）
+        lr_func = lambda epoch: min(
+            (epoch + 1) / (args.epochs * 0.1 + 1e-8),
+            0.5 * (math.cos(epoch / args.epochs * math.pi) + 1),
+        )
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_func)
     mse = torch.nn.MSELoss()
     hessian = HessianConstraintLoss3D()
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+
+    # R03：采样器配置的**端到端**接入点。校验不过就退出（不写半截 checkpoint），
+    # 通过则把副本与 sha1 落在 run 目录里 —— 这样任何一个 run 都能回答
+    # "它用的是哪一份物理先验 / 哪个秩带 / 哪条角色序"。
+    if args.sampler_config:
+        import hashlib
+        import subprocess
+        import sys as _sys
+        cfg_path = Path(args.sampler_config)
+        probe = subprocess.run(
+            [_sys.executable, str(Path(__file__).parent / "scripts" / "v3_sampler_config.py"),
+             "--check"],
+            cwd=str(Path(__file__).parent), capture_output=True, text=True)
+        if cfg_path.resolve() != (Path(__file__).parent / "configs" / "sampler_config.json").resolve():
+            print(f"[R03] 拒绝：--sampler-config 只接受仓库内的 configs/sampler_config.json"
+                  f"（校验脚本与它绑定），收到 {cfg_path}")
+            raise SystemExit(2)
+        if probe.returncode != 0:
+            print("[R03] sampler config 校验失败，拒绝开始训练：")
+            print(probe.stdout.strip() or probe.stderr.strip())
+            raise SystemExit(2)
+        raw = cfg_path.read_bytes()
+        (out / "sampler_config.json").write_bytes(raw)
+        digest = hashlib.sha1(raw).hexdigest()
+        (out / "sampler_config.sha1").write_text(digest + "\n")
+        print(f"[R03] sampler_config OK  sha1={digest[:12]}  -> {out / 'sampler_config.json'}")
 
     rng = random.Random(args.seed)
     history = []
@@ -169,7 +227,8 @@ def main():
         running = 0.0
 
         for _ in range(args.steps_per_epoch):
-            patch, origin = crop3d(vol, tuple(args.patch), rng)
+            src = vol if vols is None else vols[rng.randrange(len(vols))]
+            patch, origin = crop3d(src, tuple(args.patch), rng)
 
             if args.pairing == "cross":
                 # 输入取 tet A，目标取互补 tet B：这是预注册角色表与 VALID 原生配对的前提
@@ -216,7 +275,7 @@ def main():
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 20.0)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad)
             optimizer.step()
             running += float(loss.detach().cpu())
 

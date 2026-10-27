@@ -224,3 +224,23 @@ if __name__ == "__main__":
     test_guided_selection_runs()
     test_train_loss_computation()
     print("\nAll smoke tests passed.")
+
+
+def test_train_accepts_multi_volume_without_train_volume():
+    """回归：`--train-volume` 曾是 required=True，导致所有多卷 launcher（A 阶段 2 / B / C）
+    在 argparse 阶段就退出、一格训练都跑不出来（2026-10-27 发现并修）。
+
+    这里只验"不再在 argparse 阶段被拒"：给一个不存在的卷，错误必须发生在**读文件**，
+    而不是 "the following arguments are required: --train-volume"。
+    """
+    import subprocess
+    root = Path(__file__).resolve().parents[1]
+    r = subprocess.run(
+        [sys.executable, "train.py", "--train-volumes", "/nonexistent/nope.npy",
+         "--out", "/tmp/_never_written", "--steps-per-epoch", "1", "--epochs", "1"],
+        cwd=root, capture_output=True, text=True)
+    assert r.returncode != 0, "输入不存在时必须失败（否则说明它悄悄跑了别的卷）"
+    err = (r.stderr or "") + (r.stdout or "")
+    assert "required: --train-volume" not in err, err[-800:]
+    assert "nope.npy" in err, f"应报读文件失败，实际：{err[-800:]}"
+    print("ok: train.py 允许只给 --train-volumes")

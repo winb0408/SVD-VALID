@@ -1,0 +1,113 @@
+{
+ "meta": {
+  "prereg": "reports/v3_expC/prereg.md §4（写于任何 C 训练之前）",
+  "arms": {
+   "C_correct": [
+    0,
+    1,
+    7,
+    6
+   ],
+   "C_wrong_iso": [
+    2,
+    7,
+    5,
+    0
+   ],
+   "C_role_swap": [
+    0,
+    1,
+    6,
+    7
+   ],
+   "C_random": null
+  },
+  "patch": [
+   32,
+   64,
+   64
+  ],
+  "stride": 1
+ },
+ "T-C0": {
+  "patch": [
+   32,
+   64,
+   64
+  ],
+  "stride": 1,
+  "per_arm": {
+   "C_correct": {
+    "slots": [
+     0,
+     1,
+     7,
+     6
+    ],
+    "per_view_frac": 0.125,
+    "union_frac": 0.5,
+    "coordinate_set_sha1": "e3380344eb83e74b",
+    "n_views": 4,
+    "n_union": 65536
+   },
+   "C_wrong_iso": {
+    "slots": [
+     2,
+     7,
+     5,
+     0
+    ],
+    "per_view_frac": 0.125,
+    "union_frac": 0.5,
+    "coordinate_set_sha1": "b11045644e0cd087",
+    "n_views": 4,
+    "n_union": 65536
+   },
+   "C_role_swap": {
+    "slots": [
+     0,
+     1,
+     6,
+     7
+    ],
+    "per_view_frac": 0.125,
+    "union_frac": 0.5,
+    "coordinate_set_sha1": "e3380344eb83e74b",
+    "n_views": 4,
+    "n_union": 65536
+   },
+   "C_random": {
+    "slots": null,
+    "note": "每步随机抽 tet；覆盖率按**期望**为 4/8，逐块不同 （prereg §4 的『时间平均』口径）",
+    "per_view_frac": 0.125,
+    "union_frac": 0.5
+   }
+  },
+  "same_union_frac": true,
+  "same_coordinate_set": {
+   "C_correct_vs_C_role_swap": true,
+   "C_correct_vs_C_wrong_iso": false,
+   "expected": {
+    "C_correct_vs_C_role_swap": true,
+    "C_correct_vs_C_wrong_iso": false,
+    "why": "role_swap 用同样 4 个相位、只对调角色；wrong_iso 是另一组 4 个相位"
+   }
+  },
+  "random_matches_fixed_expectation": true,
+  "prereg_number_note": "prereg §2 写『8/64 体素 = 12.5%』，那是**单个视图**的覆盖率（1/8）；每条臂用 4 个视图，并集是 50%。T-C0 的实质（各臂同覆盖率）成立，绝对数字按此更正，不改任何门槛。",
+  "T-C0": "通过",
+  "T-C0_text": "T-C0 通过：三条固定臂并集覆盖率逐位相同、坐标集合符合设计"
+ },
+ "T-C1": {
+  "status": "未运行",
+  "why": "reports/v3_expC/metrics.json 不存在"
+ },
+ "T-C2": {
+  "status": "未运行",
+  "why": "reports/v3_expC/metrics.json 不存在"
+ },
+ "T-C3": {
+  "status": "未运行",
+  "why": "reports/v3_expC/metrics.json 不存在"
+ }
+}

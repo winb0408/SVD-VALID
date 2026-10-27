@@ -121,6 +121,30 @@ def infer(ckpt_dir: Path, vol_npy: Path, gpu: int) -> np.ndarray:
     return np.load(dst / "denoised.npy").astype(np.float32)
 
 
+def load_vol_and_truth(eval_sim: Path, pair_sim: Path):
+    """读评估体 + 第二观测，返回 (vol, truth, valid, ves, s, vol2)。
+
+    输入与真值**共用** `s = median(pd_linear[valid])`（R07）；第二观测也用同一个 s。
+    抽成函数是为了让 `v3_expA_reconstruct_eval.py` 与主评价共用同一份加载/口径代码，
+    避免两处各写一遍后悄悄漂移。
+    """
+    d = np.load(eval_sim)
+    pd = d["pd_linear"].astype(np.float32)
+    gt = d["gt_flow_pd"].astype(np.float32)
+    vessels = d["vessels"].astype(bool)
+    valid = d["valid"].astype(bool)
+    s = float(np.median(pd[valid]))
+    vol = np.log1p(pd / max(s, 1e-12)).astype(np.float32)
+    vol[~valid] = 0.0
+    truth = np.log1p(gt / max(s, 1e-12)).astype(np.float32)
+    ves = vessel_mask_dilated(vessels, 1) & valid
+    p2 = np.load(pair_sim)
+    if not np.array_equal(p2["vessels"], vessels):
+        raise SystemExit(f"{pair_sim} 的血管几何与 {eval_sim} 不同，不是同一场景的两次观测")
+    vol2 = np.log1p(p2["pd_linear"].astype(np.float32) / max(s, 1e-12)).astype(np.float32)
+    return vol, truth, valid, ves, s, vol2
+
+
 def vessel_mask_dilated(vessels, it=1):
     from scipy.ndimage import binary_dilation
     return binary_dilation(vessels.astype(bool), iterations=it) if it > 0 else vessels.astype(bool)
@@ -339,28 +363,11 @@ def main():
                 ckpts[(a, s)] = p
 
     # ---------------------------------------------------------------- 评估体
-    d = np.load(args.eval_sim)
-    # 不裁体积：infer.py 自己会把奇数边补到偶数再裁回（`pad_to_even`），
-    # 此前这里 `(n//2)*2` 的裁剪会**丢掉 37 层里的最后一层**，与训练体不一致。见 L55 更正记录。
-    shape = tuple(int(n) for n in d["pd_linear"].shape)
-    crop = tuple(slice(0, n) for n in shape)
-    pd = d["pd_linear"][crop].astype(np.float32)
-    gt = d["gt_flow_pd"][crop].astype(np.float32)
-    vessels = d["vessels"][crop].astype(bool)
-    valid = d["valid"][crop].astype(bool)
-    s_eval = float(np.median(pd[valid]))          # 输入与真值**共用**这个尺度
-    vol = np.log1p(pd / max(s_eval, 1e-12)).astype(np.float32)
-    vol[~valid] = 0.0
-    truth = np.log1p(gt / max(s_eval, 1e-12)).astype(np.float32)
-    ves = vessel_mask_dilated(vessels, 1) & valid
+    # 不裁体积（infer.py 自己补偶数再裁回）；加载与口径统一走 load_vol_and_truth
+    vol, truth, valid, ves, s_eval, vol2 = load_vol_and_truth(
+        ROOT / args.eval_sim, ROOT / args.pair_sim)
+    shape = tuple(int(n) for n in vol.shape)
     ref_bg_std = float(np.std(vol[valid & ~ves]))
-
-    # 第二次独立观测（同一场景、同一固定散斑、独立噪声实现）→ N2N 分母
-    pair2 = np.load(args.pair_sim)
-    if not np.array_equal(pair2["vessels"], d["vessels"]):
-        raise SystemExit(f"{args.pair_sim} 的血管几何与 {args.eval_sim} 不同，不是同一场景的两次观测")
-    vol2 = np.log1p(pair2["pd_linear"][crop].astype(np.float32) / max(s_eval, 1e-12))
-    vol2 = vol2.astype(np.float32)
 
     vol_npy = out_dir / "eval_input_log1p.npy"
     np.save(vol_npy, vol)
