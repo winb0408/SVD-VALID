@@ -63,21 +63,38 @@ the older pipeline used the 0-based slice `V[:, 60:350]`, i.e. **290** modes"。
 
 ## 2. R01–R13 逐条回复表
 
+> **状态速览（2026-10-27 07:50）**：✅ 7 条（R01 R05 R06 R07 R09 R10 R13）｜
+> 🟡 6 条（R02 R03 R04 R08 R11 R12）｜⬜ 0 条。
+> （02:27 修正：此前写"🟡 5 条"却列了 6 个编号，是数错了，以本行为准。）
+>
+> **实验 A 已结案（T1 未通过 04:05，T2 未通过 07:45）**，两条阶段互相独立、方向一致：
+>
+> | 阶段 | 数据 | 结论 | 证据 |
+> |---|---|---|---|
+> | 1（T1 门） | v1 仿真、200k = 4k 的 50 倍 | **未通过**：两臂 `r_ves` < 输入，`n2n` 11.8–19.2× | `reports/v3_expA_v2/results_stage1.md` |
+> | 2（T2 门） | v2 修正仿真 16 卷、200k | **未通过**：两臂 `n2n` ≥1.74、`r_roi` 全部低于输入（0.80/0.82） | `reports/v3_expA_v2/results_stage2.md` |
+>
+> **归因**：`zero` 对照仍劣于输入 300×（网关 `仍退化=False`）⇒ 判据未退化，**失败归于方法**，
+> 适用范围内写成"**Kong 等 2024 的自监督去噪教义 + 本项目仿真协议**"。
+> **按预注册，实验 B / C / D 冻结不启动**；`runs/v3_chain_after_T2.sh` 故意未运行
+> （它不判门，门没过就不该拉训练）。因此 R02/R03/R04 的"负控制未跑"与 R11 的实验 D
+> **不是拖延，是执行预注册的冻结条款**；这三条的其余部分已完成，见各行。
+
 | 编号 | 优先级 | 审查要求（摘要） | 状态 | 本轮实际做的 | 证据 / 位置 | 剩余 |
 |---|---|---|---|---|---|---|
 | **R01** | P0 | 建上游 faithful VALID 基线；分离整卷推理与相位回填 | ✅ | ①**上游 v1.0 `34f5637` 已拉取并逐项对照**：模式表逐项相同、训练重抽签一致；②**确认 `reconstruct()` 相位回填与 `cross` 配对均非上游**；③坐标契约与覆盖率固化为单测；④**faithful 基线已按上游口径重训**（random Tetris / fixed-4，各 3 种子 × 4000 step），推理只走 `infer.py` 整卷滑窗 | `reports/v3_repair_phase0_baselines.md` §1；`tests/test_v3_paired_preprocess.py` 5 项通过；**`reports/v3_expA/expA_report.md`** | 网络/DWT 未与上游逐层比对（不阻塞判定）；长预算对照见 expA §4 |
-| **R02** | P0 | 不许把"采样距离"与"覆盖率"混为单变量 | 🟡 | ①发现**覆盖率口径错**：faithful 训练口径是 50% 而非 100%，"差 8 倍"应为"差 4 倍"；②m=1/m=2 覆盖率固化为单测；③该实验按审查要求更名为"稀疏覆盖 + 远距离耦合实验" | `reports/v3_repair_phase0_baselines.md` §2；`tests/test_v3_paired_preprocess.py::test_m1/m2` | 同覆盖率、只改角色/位移的对照**未跑**（属实验 C） |
-| **R03** | P0 | 物理先验端到端接入 sampler | ⬜ | — | — | 全部。缺 `sampler_config.json` 冻结与错误先验负控制 |
-| **R04** | P0 | linear / log1p / log(PD+ε) 三表示对照 | ⬜ | — | — | 全部（实验 B） |
+| **R02** | P0 | 不许把"采样距离"与"覆盖率"混为单变量 | 🟡 | ①发现**覆盖率口径错**：faithful 训练口径是 50% 而非 100%，"差 8 倍"应为"差 4 倍"；②m=1/m=2 覆盖率固化为单测；③该实验按审查要求更名为"稀疏覆盖 + 远距离耦合实验"；④**实验 C 四臂设计成形**：`C_correct` [0,1,7,6] / `C_wrong_iso` [2,7,5,0] / `C_role_swap` [0,1,6,7]（**同 4 个体素、同覆盖率，只把目标对调**）/ `C_random`，槽位合法性已用 `check_cross_slots` 校验，门槛 T-C0–T-C3 写在结果之前；⑤**事前证伪一条负控制**：轴错位的先验把 27 个位移类的取值集合映射到自身，推出的槽位与实测**逐位相同** → 该臂标为 `void_undetectable` 不跑 | `scripts/v3_expC_prior_arms.py`；`data/processed/v3_expC/prior_arms.json`；`reports/v3_expC/prereg.md`；`runs/v3_expC_200k/launch.sh` | **同覆盖率的四臂对照未运行**（前置：实验 A 的 T2 门） |
+| **R03** | P0 | 物理先验端到端接入 sampler | 🟡 | ①`configs/sampler_config.json` 冻结六类外部输入（几何 m/w/角点表、实测 ρ 曲线、角色序、频带 291 模式、PSF/热噪声 σ、两套 valid_mask）并记录各自 **sha1**；②端到端接入点 `train.py --sampler-config`：训练前跑 `--check`，不过则 `SystemExit(2)` 不写半截 checkpoint，通过则把副本+sha1 落进 run 目录；③`--check` 逐项重算并比对，8 项测试专门验证"校验有牙齿"（改秩带/PSF/角点表/版本/换 ρ 文件/换掩膜都必须报错，8/8 通过；`pytest tests/ -q` 48 passed）；④顺带量化 **仿真有效区 ≠ 官方有效区**（0.919 vs 0.820，IoU 0.867，官方掩膜含扇形成像足迹） | `configs/sampler_config.json`；`scripts/v3_sampler_config.py`；`train.py`（`--sampler-config`）；`tests/test_v3_sampler_config.py`；`reports/v3_R03/sampler_config.md` | **错误先验负控制未跑**（属实验 C，实验 A 门未过前冻结）；~~阶段 1/阶段 2 的 8 个 run 在加该参数之前启动，没有配方卡~~ → **2026-10-27 02:08 已收窄**：阶段 2 的 launcher 在它**开跑之前**加上了 `--sampler-config`（smoke 已验证副本与 sha1 落盘），B/C 的 launcher 本来就有；只有**阶段 1 的 4 个 run** 没有配方卡（它们先于该钩子启动，无法补） |
+| **R04** | P0 | linear / log1p / log(PD+ε) 三表示对照 | 🟡 | ①**共享归一化尺度**落地：`s_glob = median(16 体 valid 合并样本)`（实测逐体中位数散布仅 4.5%，如实记录，不用它当借口）；②三表示训练体已生成（`repB/{linear,log1p,logeps}_train_s1{00..15}.npy`，往返误差 ≤2.7e-6，ε=1e-3 写死）；③评价脚本 `v3_expB_eval.py`：**先反变换回线性域**再算 `n2n_ratio_lin`（跨表示可比），并新增条件残差端点（`res_mass_frac_roi`、按输入电平十分位的残差能量、Spearman）；④四条对照已实测：输入 1.000、全零 78.3/83.0（**不退化**）、wiener 1.100/1.000、oracle 低通 10.9/12.0；⑤**门槛 T-B1–T-B4 写于任何 B 训练之前**，含三条可被证伪的方向性预测；⑥launch 脚本就绪（3 表示 × 2 seed，两波） | `scripts/v3_expB_make_representations.py`；`data/processed/v3_sim_v2/repB/scale.json`；`scripts/v3_expB_eval.py`；`runs/v3_expB_200k/launch.sh`；`reports/v3_expB/prereg.md` | **未运行**（属实验 B；实验 A 的 T2 门未通过前冻结）。B 的 `n2n_ratio_lin` 与 A 的 `n2n_ratio` 不可跨实验比大小 |
 | **R05** | P0 | 收窄"0.5 普适上限"等表述 | ✅ | ①`phase4_report.md` §5.2 加审计更正块（5 条限定）+ 改称 "in-sample 局部线性诊断"；②§5.3/§5.4 就地更正；③保留全部原始数字与失败结论 | `reports/v3_phase4_2026-10-21/phase4_report.md` §5.2–5.4 | 反例构造（非高斯/非线性情形）未做，已在文中声明为局限 |
-| **R06** | P0 | 仿真器正向模型与真值定义审计 | ✅ | ①写出**显式前向模型**并列它与真实成像链的三处偏离；②**三类真值分离**（几何 `vessels` / 无噪成像 `gt_flow_pd` / 有噪 `pd_linear`）；③**证伪全部 RMSE 类端点**——无噪真值在血管外恒为 0、血管仅 1 体素厚，`zero` 控制即击败所有网络臂，故 RMSE 一律不作判据；④PSF sanity：z 方向吻合、**y 方向过相关 0.20**；⑤血管剖面/ACF 显示**无亚分辨能力** | `reports/v3_repair_R06_forward_model.md`；`scripts/v3_r06_forward_audit.py`；`reports/v3_r06/forward_audit.json`、`fig_r06_truths.png` | 修仿真器前向模型本身（PSF 卷积链）**未做**，且会改变真值定义 → 此前全部仿真数字不可与新口径直接比较（已列入剩余风险） |
+| **R06** | P0 | 仿真器正向模型与真值定义审计 | ✅ | ①写出**显式前向模型**并列它与真实成像链的三处偏离；②**三类真值分离**（几何 `vessels` / 无噪成像 `gt_flow_pd` / 有噪 `pd_linear`）；③**证伪全部 RMSE 类端点**——无噪真值在血管外恒为 0、血管仅 1 体素厚，`zero` 控制即击败所有网络臂，故 RMSE 一律不作判据；④PSF sanity：z 方向吻合、**y 方向过相关 0.20**；⑤血管剖面/ACF 显示**无亚分辨能力** | `reports/v3_repair_R06_forward_model.md`；`scripts/v3_r06_forward_audit.py`；`reports/v3_r06/forward_audit.json`、`fig_r06_truths.png` | ~~修仿真器前向模型本身（PSF 卷积链）**未做**~~ → **2026-10-27 已做（v2）**：`flow_t = conv(sqrt(ρ_t)·白噪声, psf_sigma)`，ρ 为连续血管密度，真值不再是掩膜外恒 0；两段式带通定标把达成对比度从 −1.7 dB 拉到 5.94 / 5.96 dB；证伪记录：v1 里 `truth==0` 占 0.9903、全零输出击败输入 8.5×，v2 里这两条都消失（0.0000，且全零输出**输**）。见 `scripts/v3_simulator.py`、`scripts/v3_r06_v2_audit.py`、`reports/v3_r06/v2_endpoint_audit.json`、`reports/v3_repair_R06_forward_model.md` §6。**仍未修的**：y 方向自相关（v1 0.200 → v2 0.221，更过相关），故「仿真统计量已标定到真实数据」仍不成立 |
 | **R07** | P1 | A/B 统一归一化尺度；缓存键校验 | ✅ | ①`prep()` 增加 `shared_scale`，N2N 路径强制目标卷复用输入卷的 `s` 并 `assert` 逐位相等；②缓存键改为**文件内容 sha1 + PREP_VERSION + shape_div**（mtime 版已被测试证伪）；③valid 掩膜也进缓存 | `scripts/v3_phase4_train_n2n.py`；`tests/test_v3_paired_preprocess.py` 3 项通过 | **旧 checkpoint 的影响已核（见下）**：不改判旧数字，但须标注训练/推理尺度口径不一致 |
-| **R08** | P1 | 区分仿真泛化 / 真实可训练性 / 零样本迁移 | ⬜ | — | — | 全部。需真实 A/B 统计检测（属实验 D 前置） |
-| **R09** | P1 | 限定 J1.2 的 B 项含义与阈值 | ✅ | ①`v3_judge.py` 新增 R09 节：恒等式、成立条件、**偏保守的方向**、`S_rel` 的盲区、J2 另建；②J1.2 判定与原始 JSON 保留不动 | `scripts/v3_judge.py` docstring；`reports/v3_judge/` | 真值体模的结构指标（弱血管 recall@FPR、宽度、连通性）**未实现**（属 R12） |
+| **R08** | P1 | 区分仿真泛化 / 真实可训练性 / 零样本迁移 | 🟡 | ①三个说法给出**互不蕴含的操作定义**与各自判据（C1 需场景互斥+第二观测；C2 只能用 `n2n_ratio`，**不能**用 `r_roi`；C3 训练集只许是仿真）；②**C3 已测且失败**：零样本 `n2n_ratio` 0.944–0.965（SA64）/ 0.931–0.965（HSA64）vs Wiener **0.273/0.383**，`corr_odd_even` 也没超过输入（0.914–0.939 vs 0.9217）；③**C1 部分有证且方向是负的**：600 epoch 在训练用目标上 0.063（低于 0.615 物理下限=记住了那次噪声），换未见实现立刻回到 0.831–0.991；④**C2 写"未运行"**，并给出**不可判的原因**：现有唯一成对构造（奇偶帧拆半）实测相关 **0.92/0.99**，不满足自监督配对前提，需要真正的重复采集；⑤列出"能说/不能说"边界表，防止再用 C3 的失败去否定 C1/C2 | `reports/v3_R08/three_claims.md`；`reports/v3_phase5_real/{SA64,HSA64}_network.json`；`reports/v3_phase4_2026-10-21/phase4_report.md` §5.6.2 | **C2 在现有数据上不可判**（数据缺口，非方法缺口）；C1 的跨解剖部分要等实验 A 阶段 2；本文件只是重归位、**不产生新证据** |
+| **R09** | P1 | 限定 J1.2 的 B 项含义与阈值 | ✅ | ①`v3_judge.py` 新增 R09 节：恒等式、成立条件、**偏保守的方向**、`S_rel` 的盲区、J2 另建；②J1.2 判定与原始 JSON 保留不动 | `scripts/v3_judge.py` docstring；`reports/v3_judge/` | 真值体模的结构指标：**R12 已做并部分证伪**——`recall@fpr5/auc_weak/iou_core/cnr_weak_db/宽度` 在 v2 仿真上被证伪（无噪真值输给含噪输入），只保留区域 Pearson；详见 R12 行与 `reports/v3_R12/microvessel_metric.md` |
 | **R10** | P1 | 0.615 不是普适下限 | ✅ | `train_n2n.py` 注释与日志文案改为"经验参照值 + 需独立实现核对"；`phase4_report.md` §5.6.1 加更正块，说明 §5.6.2 的判定靠的是 n102/n103/n201 那张表而不是 0.615 | 同上 | 无 |
-| **R11** | P1 | SVD-SN2N 作为完整方法对照 | ⬜ | — | — | 全部（属实验 D） |
-| **R12** | P1 | 以微血管图像质量为主判据 | ⬜ | — | — | 全部。`eval_structure.py` 现有分区指标**不等于**弱血管 recall@FPR |
-| **R13** | P1 | 轴序/归一化/rank/valid_mask 审计 | 🟡 | ①发现并修正频带**少一个模式**：新增 `band_slice()`，官方口径 `[59,350)`=291 模式；②5 个脚本统一到该函数；③旧口径全部 JSON 原样备份到 `reports/v3_judge/legacy_band290/` 并写 README 禁止混引；④口径固化为 4 项单测；⑤**J1.2 标定在新口径下重跑，仍 5/5 通过**，幻影 w=7 的 `B_db=−10.29`（旧 −10.28），`THR_B_DB=−7.3` 的推导不变、**门槛未动**；⑥**真实数据判定已按新口径重跑完毕（§2.1）**，12 行判定与旧口径**逐行相同** | `scripts/v3_phase5_real_compare.py::band_slice`；`tests/test_v3_band_convention.py`；`runs/v3_judge_calib_officialband.log`；`reports/v3_judge/{SA64,HSA64}_judge.json` | 轴向坐标图与 manifest **未做**；轴序 `(37,64,64)` 与官方 `(64,64,37)` 的转置映射**未出图核验** |
+| **R11** | P1 | SVD-SN2N 作为完整方法对照 | 🟡 | ①**名称核实**：本机找不到任何名为 "SVD-SN2N" 的论文/代码，可核对的只有 **SN2N v0.3.5（Nat. Methods 21:1895–1908, 2024）**；凡"SN2N 用到超声 SVD 后 PD"的做法一律标为**本项目构造的近似扩展版**；②**逐项差异矩阵**（输入域/子视图/维度/插值/配对/损失/网络/推理/数据单位/适用对象 共 10 行，每行指到具体函数）：percentile(20,99.9)+逐 patch min-max、xy 对角 2×2 **平均**过渡视图、**傅里叶零填充**插值回 2×、双向 L1+自约束、sigmoid 输出、多快照模型平均；③**地基检验已做**：SN2N 要求两条对角视图噪声独立，实测 `corr(A,B)` = SA64 **0.945** / v2 仿真 0.923–0.927 / 解析（去平台）0.896–0.932，阈值 0.10 写于跑之前 → **前提被证伪，且高一个量级**；④实验 D 骨架预注册（含"像素位深/网络容量/多快照平均"三项必须控住的差异） | `reports/v3_R11/sn2n_difference_matrix.md`；`scripts/v3_r11_sn2n_subview_test.py`；`reports/v3_R11/sn2n_subview_test.json` | **SN2N 本身未在本项目数据上训练/评价**（属实验 D，前置门未过）；若审查方的 "SVD-SN2N" 指另一篇论文，需按其官方代码重做矩阵；仍**不能**说"SN2N 在超声上行/不行" |
+| **R12** | P1 | 以微血管图像质量为主判据 | 🟡 | ①新判据脚本 `v3_eval_microvessel.py`：区域 Pearson（`r_deep/r_core/r_weak`）为主判据，**已知答案标定通过**（真值 1.00 > 输入 0.79 > 低通 0.35–0.47 > 常数 0.00，s30/s31 双体）；②审计要求的体素级检测判据（`recall@fpr5`、`auc_weak`、`iou_core`、`ncomp_ratio`、`cnr_weak_db`）**在 v2 仿真上被证伪为不可用**——无噪声真值自身输给含噪输入（真值背景被 halo 填满），已全部降级为 `descriptive only` 并写进 JSON 与报告；③宽度指标**主动撤回**（halo 使真值血管与 PSF 同宽，测不出网络的作用）；④三条"反标定"检查写进脚本，端点若哪天变单调会直接 `SystemExit`；⑤结论：实验 C 的"漏掉弱血管"定性观察**不能**用 recall@FPR 量化，改用 `r_weak` 与强度剖面 | `scripts/v3_eval_microvessel.py`；`reports/v3_R12/microvessel_metric.md` | 实验 C/D 的最终定量仍需在实验 A 门通过后接入；真实数据无真值，本判据只用于仿真 |
+| **R13** | P1 | 轴序/归一化/rank/valid_mask 审计 | ✅ | ①发现并修正频带**少一个模式**：新增 `band_slice()`，官方口径 `[59,350)`=291 模式；②5 个脚本统一到该函数；③旧口径全部 JSON 原样备份到 `reports/v3_judge/legacy_band290/` 并写 README 禁止混引；④口径固化为 4 项单测；⑤**J1.2 标定在新口径下重跑，仍 5/5 通过**，幻影 w=7 的 `B_db=−10.29`（旧 −10.28），`THR_B_DB=−7.3` 的推导不变、**门槛未动**；⑥**真实数据判定已按新口径重跑完毕（§2.1）**，12 行判定与旧口径**逐行相同**；⑦**轴契约机器化**：`axis_manifest.json` + `fig_axis_mapping.png`，断言 `(Z,X,Y)=(37,64,64) ↔ (X,Y,Z)=(64,64,37)` 无翻转无缩放、往返置换位等、`M(:,60:350)`=291 模式；⑧C/F 展平序的频带功率差 0.867% 用**随机置换对照**（0.740%）定性为 `eigh` 数值下限（Gram 近简并），不是语义差异 | `scripts/v3_phase5_real_compare.py::band_slice`；`scripts/v3_r13_axis_manifest.py`；`reports/v3_R13/axis_manifest.json`；`fig_axis_mapping.png`；`tests/test_v3_band_convention.py`；`runs/v3_judge_calib_officialband.log`；`reports/v3_judge/{SA64,HSA64}_judge.json` | 无（归一化/rank/valid_mask 三项在 §2.1 与 R07 中已闭合；`band_power_rel_tolerance=1e-2` 为事后设定，已在 JSON 内注明依据是随机置换对照而非该数值本身） |
 
 ### 2.0 R07 对旧 checkpoint 的影响（已核，不改判旧数字）
 
@@ -153,7 +170,14 @@ the older pipeline used the 0-based slice `V[:, 60:350]`, i.e. **290** modes"。
   图注必须写明 API。
 - **判定**：若 faithful VALID random 与 fixed-4 都**不优于输入**，则停止开发物理采样选择器，
   先解决任务与基础自监督基线；只有它们有效，才允许进入 B/C。
-- **状态**：✅ **已运行并触发 Gate**（报告 `reports/v3_expA/expA_report.md`）。
+- **状态**：✅ **已运行并触发 Gate**（报告 `reports/v3_expA/expA_report.md`；下表之外的两处更正见该报告 **§8**——
+  原表未区分「相位回填」与 `infer.py` 滑窗两种推理口径，也未把 24,000 step 折算成上游预算的**比例**，改动原因见 §8.1/§8.2）。
+
+> **2026-10-27 追加：实验 A 的重跑分两阶段排队**（改动原因：R06 v2 改的是**数据**，只重跑一次看不出
+> 「失败到底是预算还是任务」）。**阶段 1** = 长预算 + v1 数据（200k step，上游步数的 20%）；**阶段 2** = 长预算 +
+> v2 数据，**除数据外与阶段 1 完全相同**，故「任务定义修好了没有」是唯一变量。两阶段的通过门槛**在训练开始前**
+> 写进 `reports/v3_expA_v2/prereg.md` §1.3 / §3.3（含 T1「预算不足可以解释实验 A」与 T2「任务定义问题已消除」
+> 两套判定，并附 `pen_ratio` 端点的撤除记录），门槛不因结果调整。链式脚本 `runs/v3_chain_after_stage1.sh`。
 
 | 条件 | 输入 | ① Wiener w=7 | A_rand（faithful） | A_fixed4（最优固定模式） |
 |---|---|---|---|---|
@@ -167,24 +191,37 @@ the older pipeline used the 0-based slice `V[:, 60:350]`, i.e. **290** modes"。
   且 98.85% 的方差集中在 1 体素粗的血管里，这个 N2N 目标的次优解按定义就保不住细血管。
   → **依计划暂停物理采样选择器（I1），先修任务定义与前向模型（R06）与基础基线；B/C 前置未满足，暂不启动。**
 
+**实验 A 结案（2026-10-27 07:45，两阶段都跑完）**
+
+| 阶段 | 臂 | `n2n_ratio` | 保真端点 | 结论 |
+|---|---|---|---|---|
+| 1（v1 数据 200k） | A_fixed4 / A_rand | 11.93 / 18.15 | `r_ves` 0.548 / −0.084（输入 0.9456） | **T1 未通过** |
+| 2（v2 数据 200k） | A_fixed4 / A_rand | 2.39 / 9.62 | `r_roi` 0.762 / 0.194（输入 0.799/0.821） | **T2 未通过** |
+
+两阶段方向一致、端点不同（v1 用 `r_ves`，v2 用 `r_roi`，见 prereg §3.2 的端点撤换记录），
+`zero` 对照两次都远劣于输入 ⇒ 判据未退化 ⇒ **失败归于方法，不归于预算、不归于判据**。
+按 prereg §3.3：**B/C/D 冻结**；结论适用范围 = "Kong 等 2024 的自监督教义 + 本项目仿真协议"。
+两份结案报告：`reports/v3_expA_v2/results_stage1.md`、`results_stage2.md`；
+机械判定：`reports/v3_expA_v2/gate_verdict.json`（含脚本 sha1 与 `predates` 自证）。
+
 ### 实验 B — 表示对照（依赖 R04、R07）
 
 - 固定 sampler/网络/损失/预算，只换 linear PD / log1p / log(PD+ε)，共享归一化尺度。
 - **必须报**：分信号水平桶的条件残差均值与方差、残差跨视图协方差、偏置随信号变化曲线；
   并显式检查 `E[目标噪声 | 输入]≈0` 是否成立。
-- **状态**：⬜ 未运行。
+- **状态**：🔒 **冻结**（2026-10-27 07:45 起，实验 A 的 T2 门未通过）。机器、数据、launcher、门槛全部就绪，只等门。
 
 ### 实验 C — I1 的第一次公平检验（依赖 R02、R03）
 
 - 同覆盖率、同坐标评价，只改角色/位移；对照 faithful random、fixed-4、同距离不同角色、
   同覆盖不同几何、正确物理先验、打乱/错误先验。
 - **主终点**：独立真值的弱血管/结构指标（依赖 R12），不是 n2n。
-- **状态**：⬜ 未运行。
+- **状态**：🔒 **冻结**（同上，T2 门未通过）。四臂的槽位、覆盖率、门槛已预注册，未启动。
 
 ### 实验 D — 超声特定方法参照（依赖 R08、R11）
 
 - 表示 ablation 与完整方法对照**分开报**；无法移植到 3D 时标"近似扩展版"。
-- **状态**：⬜ 未运行。
+- **状态**：🔒 **冻结**（同上）。R11 §3 的骨架与「子视图前提已被证伪」的直接检验已完成，训练部分未启动。
 
 ---
 

@@ -21,6 +21,23 @@ runs/*
 runs/phase0_baseline/*
 !runs/phase0_baseline/metadata.json
 
+# V3 experiment launchers: the reproduction recipe (arms, budget, lr schedule, data,
+# sampler config) is itself evidence of what was run. Only the .sh is versioned.
+!runs/v3_expA_200k/
+runs/v3_expA_200k/*
+!runs/v3_expA_200k/launch.sh
+!runs/v3_expA_v2_200k/
+runs/v3_expA_v2_200k/*
+!runs/v3_expA_v2_200k/launch.sh
+!runs/v3_expB_200k/
+runs/v3_expB_200k/*
+!runs/v3_expB_200k/launch.sh
+!runs/v3_expC_200k/
+runs/v3_expC_200k/*
+!runs/v3_expC_200k/launch.sh
+!runs/v3_chain_after_stage1.sh
+!runs/v3_chain_after_T2.sh
+
 # ---------------------------------------------------------------------------
 # Archived v1 evidence -- SVD-guided sampling (superseded project line).
 # The whole run tree including weights stays on disk under archive/, but only
