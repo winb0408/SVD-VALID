@@ -8,6 +8,12 @@
 **证据索引**：`reports/v3_round2/INDEX.md`（每条结论 → 数字 → 文件 → 复算命令）。
 **分支**：`v3/judge-acceptance`。**B/C/D 仍然冻结**（`runs/v3_chain_after_T2.sh` 不运行）。
 
+> **已有审查修订版（2026-10-28 晚）**：外部复审（GitHub PR #1 评论 + `Chatgpt/V3_PR1_round2_external_reaudit_2026-10-28.md`）
+> 指出本文件三处缺陷 —— §3 A2 的 `α=0.5 给 0.125`（应为 0.625，交叉项符号错）、§1.3 "缺口 100% 来自跨解剖迁移"
+> （过度归因）、§4 B3 里"关掉 identity 项"的消融（在 dense 臂上是空操作）。**这些内容原样保留在下方**，
+> 作为"当时怎么想的"记录；**执行一律以 `reviews/V3_PR1_round3_amended_plan.md` 为准**，
+> 逐条处置见 `reviews/V3_PR1_round3_external_review_response.md`。
+
 ---
 
 ## 0. 一句话
