@@ -66,6 +66,128 @@ def wavelet_hessian_loss(out1, out2, hessian):
     return hessian(stack)
 
 
+def dense_views(arr):
+    """`--mode dense` 的四个视图：**同一个满分辨率 patch**。
+
+    抽成模块级函数是为了能被单测钉住（Round3 审查 R3-P06）：在 dense 模式下
+    `xa is xb` 恒成立，于是同一个 CRN 对同一输入给出**逐位相同**的 `ha = hb`，
+    `mse(ha, hb)` 与它的梯度**恒为 0** —— 也就是说 `--weight-identity` 在 dense 臂上
+    是**空操作**，不能拿它做"关掉 identity 项会怎样"的消融。
+    """
+    return [arr, arr, arr, arr]
+
+
+def loss_terms(ha, hb, ya, yb, hessian, weight_reg, weight_identity):
+    """把三项损失分开返回，供 `--audit-loss-grads` 与单测逐项看梯度。
+
+    顺序与原实现逐位一致：`neighbor + weight_reg*reg + weight_identity*identity`。
+    """
+    neighbor = 0.5 * torch.nn.functional.mse_loss(ha, ya) + 0.5 * torch.nn.functional.mse_loss(hb, yb)
+    reg = wavelet_hessian_loss(ha, hb, hessian)
+    identity = torch.nn.functional.mse_loss(ha, hb)
+    total = neighbor + weight_reg * reg + weight_identity * identity
+    return {"neighbor": neighbor, "reg": reg, "identity": identity, "total": total}
+
+
+def grad_norm(term, model):
+    """单个损失项的梯度范数（不写回 `.grad`，可反复调用）。"""
+    params = [p for p in model.parameters() if p.requires_grad]
+    grads = torch.autograd.grad(term, params, retain_graph=True, allow_unused=True)
+    sq = sum(float(g.pow(2).sum()) for g in grads if g is not None)
+    return math.sqrt(sq)
+
+
+def build_model(args, device="cpu"):
+    """按 `--arch-head` / `--zero-init-final` 建模型。三臂配置见 Round3 B1：
+
+      direct                      : pred = net(x)                  （旧基线，逐位一致）
+      residual                    : pred = x + net(x)              （只加旁路）
+      residual + --zero-init-final: pred = x + net(x)，net.out 置零
+                                    ⇒ 训练起点**精确**等于输入（安全初始化）
+
+    起点为恒等**不保证**训练损失下降就等于去噪变好（监督 MSE 也可被拟合背景拉低）。
+    """
+    if args.arch_head == "direct" and args.zero_init_final:
+        raise ValueError("--zero-init-final 只对 --arch-head residual 有意义："
+                         "direct + 零初始化会让起点恒为 0，是退化配置")
+    model = NetworkCNR(features=args.features, groups=args.groups,
+                       residual=(args.arch_head == "residual"))
+    if args.zero_init_final:
+        model.zero_init_out()
+    return model.to(device)
+
+
+def sample_views(args, src, csrc, patch, origin, signal=None, noise=None, gen_seed=None):
+    """按当前臂的采样规则抽 4 个视图 `(xa, xb, ya, yb)`；`csrc` 给定时只换目标。
+
+    从 `main()` 里提出来是为了①梯度审计能复用同一套几何；②坐标/冲激单测能直接钉住
+    "输入视图与干净目标视图是不是同一批体素"（Round3 审查 R3-P04）。
+
+    `gen_seed` 为 None 时沿用旧行为：从**全局** torch RNG 抽一个种子。
+    给定则完全确定（审计/单测用）。
+    """
+
+    def build_views(arr, gen=None):
+        """按当前臂的采样规则从 arr 抽 4 个视图 (xa,xb,ya,yb)。
+
+        视图是**半尺寸的相位子采样**（每 2×2×2 块取 4 个角），所以有监督臂
+        不能在原分辨率上换目标，必须用**同一套采样几何**去抽无噪 patch 的视图。
+        因此这里收一个显式的 torch.Generator：同一条随机流跑两遍
+        （噪声 patch / 无噪 patch），几何逐体素对齐。
+        """
+        if args.mode == "dense":
+            # 归因诊断臂：**不做**任何相位抽稀，四个视图都是这张满分辨率 patch。
+            # 配合 --train-clean-volumes 时 views[2:] 会被替换成同位置干净 patch，
+            # 于是训练几何与部署几何（infer.py 的满分辨率滑窗）第一次对齐。
+            # **代价（R3-P06）**：xa is xb ⇒ ha == hb 逐位相同 ⇒ `mse(ha,hb)` 与其梯度
+            # 恒为 0，`--weight-identity` 在本臂上是空操作。
+            return dense_views(arr)
+        if args.pairing == "cross":
+            if args.mode == "fixed":
+                return strided_views(arr, args.slots, args.stride)
+            return valid_random_tetris_cross(arr, args.stride, generator=gen)
+        if args.stride > 1:
+            if args.mode == "fixed":
+                v = strided_views(arr, TETRIS_PATTERNS[args.pattern].tolist(),
+                                  args.stride)
+                return [v[i] for i in args.role_order] if args.role_order is not None else v
+            return valid_random_tetris_strided(arr, args.stride, generator=gen)
+        if args.mode == "guided":
+            z0, y0, x0 = origin
+            sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
+            npatch = noise[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
+            _, v, q = guided_tetris_subvolumes(arr, sp, npatch)
+            return v
+        if args.mode == "patch_random":
+            _, v = random_tetris_subvolumes(arr)
+            return v
+        if args.mode == "fixed":
+            v = tetris_from_pattern(arr, args.pattern)
+            return [v[i] for i in args.role_order] if args.role_order is not None else v
+        return valid_random_tetris(arr, generator=gen)
+
+    if csrc is not None:
+        # 有监督上界臂：**只改目标**。输入视图与目标视图都按同一套采样几何抽，
+        # 唯一差别是目标来自无噪 patch 而不是噪声 patch 的互补视图。
+        # 注意（R3-P04）：相位几何下目标落在**另一些相位位置**上（与输入不重叠），
+        # 只有 dense 臂才是同位置（same-voxel）监督。
+        cpatch = csrc[origin[0]:origin[0] + args.patch[0],
+                      origin[1]:origin[1] + args.patch[1],
+                      origin[2]:origin[2] + args.patch[2]]
+        gen = torch.Generator()
+        if gen_seed is None:
+            gen_seed = int(torch.randint(0, 2 ** 31 - 1, (1,)).item())
+        gen.manual_seed(int(gen_seed))
+        st = gen.get_state()
+        views = build_views(patch, gen)
+        gen.set_state(st)                       # 同一条随机流 → 几何逐体素一致
+        cviews = build_views(cpatch, gen)
+        views[2], views[3] = cviews[2], cviews[3]
+    else:
+        views = build_views(patch)
+    return views
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--train-volume", default=None,
@@ -130,6 +252,23 @@ def main():
                          "给定时训练前先校验它与磁盘产物（ρ 曲线、角色序、频带、PSF、valid_mask）"
                          "一致，校验不过直接退出，不写半截 checkpoint；通过则把副本 + sha1 写进 run 目录。")
     ap.add_argument("--features", type=int, default=16)
+    ap.add_argument("--arm-label", default=None,
+                    help="可选：写进 run 元数据的臂名。用于把旧简称换成描述性命名"
+                         "（如 S_phase_cross_clean / S_dense_same_voxel / "
+                         "D_dense_independent_pair），旧 run 不受影响。")
+    ap.add_argument("--audit-loss-grads", action="store_true",
+                    help="只做**一项**固定 minibatch 的三项损失 + 逐项梯度范数审计，"
+                         "写到 out/loss_grad_audit.json 后退出（不训练）。")
+    ap.add_argument("--audit-seed", type=int, default=1234,
+                    help="梯度审计用的采样种子（与训练种子分开，审计可重复）。")
+    ap.add_argument("--arch-head", choices=["direct", "residual"], default="direct",
+                    help="Round3 B1：direct = 现在的直接出图（基线）；"
+                         "residual = pred = input + net(input)（只加旁路，不动初始化）。"
+                         "与 --zero-init-final 正交，用于把『旁路』和『初始化』两件事拆开。")
+    ap.add_argument("--zero-init-final", action="store_true",
+                    help="Round3 B1：把输出层（net.out）的权重与偏置置零。"
+                         "只对 residual 有意义（起点精确等于输入）；对 direct 会是退化的全零起点，"
+                         "脚本会拒绝这种组合。")
     ap.add_argument("--groups", type=int, default=4)
     ap.add_argument("--seed", type=int, default=3407)
     ap.add_argument("--device", default="cuda")
@@ -205,7 +344,9 @@ def main():
         raise ValueError("--mode dense 必须配 --train-clean-volumes"
                          "（否则输入=目标=同一张图，只能学到恒等）")
 
-    model = NetworkCNR(features=args.features, groups=args.groups).to(device)
+    model = build_model(args, device)
+    if args.arch_head != "direct" or args.zero_init_final:
+        print(f"[B1] arch_head={args.arch_head} zero_init_final={args.zero_init_final}")
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999))
     if args.lr_schedule == "poly":
         # 上游 VALID v1.0：lr·(1 − epoch/max_epoch)^0.9，无 warmup
@@ -252,6 +393,50 @@ def main():
     rng = random.Random(args.seed)
     history = []
 
+    if args.audit_loss_grads:
+        # R3-P06：训练前先量一次"每项损失各自有多大梯度"。
+        # 目的不是评价网络，而是**证明哪些开关在这个臂上有意义**：
+        # dense 臂 xa is xb ⇒ identity 项梯度应当**精确为 0**，因此
+        # "--weight-identity 0" 在 dense 上是空操作，不能当作消融。
+        arng = random.Random(args.audit_seed)
+        if vols is None:
+            a_src, a_csrc = vol, (cleans[0] if cleans else None)
+        else:
+            a_src, a_csrc = vols[0], (cleans[0] if cleans else None)
+        a_patch, a_origin = crop3d(a_src, tuple(args.patch), arng)
+        a_views = sample_views(args, a_src, a_csrc, a_patch, a_origin, signal, noise,
+                               gen_seed=args.audit_seed)
+        axa, axb, aya, ayb = [tensor(v, device) for v in a_views]
+        model.eval()
+        aha, ahb = model(axa), model(axb)
+        t = loss_terms(aha, ahb, aya, ayb, hessian,
+                       args.weight_reg, args.weight_identity)
+        rec = {
+            "mode": args.mode, "pairing": args.pairing, "arm_label": args.arm_label,
+            "audit_seed": args.audit_seed, "patch": list(args.patch),
+            "features": args.features, "weight_reg": args.weight_reg,
+            "weight_identity": args.weight_identity,
+            "inputs_identical": bool(torch.equal(axa, axb)),
+            "loss": {k: float(v.detach().cpu()) for k, v in t.items()},
+            "grad_norm": {k: (grad_norm(v, model) if v.requires_grad else 0.0)
+                          for k, v in t.items()},
+            "weighted_grad_norm": {
+                "neighbor": grad_norm(t["neighbor"], model),
+                "reg": args.weight_reg * grad_norm(t["reg"], model),
+                "identity": args.weight_identity * grad_norm(t["identity"], model),
+            },
+            "out_pred_meanshift": float((torch.cat([aha, ahb]) - torch.cat([axa, axb])).mean()),
+        }
+        # 每条臂各写一份（同名文件会互相覆盖，导致"两个臂的审计数一样"这种假结论）
+        tag = args.arm_label or f"{args.mode}_{args.pairing}"
+        (out / f"loss_grad_audit_{tag}.json").write_text(
+            json.dumps(rec, indent=2, ensure_ascii=False) + "\n")
+        print(f"[audit] inputs_identical={rec['inputs_identical']}")
+        for k in ("neighbor", "reg", "identity"):
+            print(f"[audit] loss[{k}]={rec['loss'][k]:.6e}  grad_norm={rec['grad_norm'][k]:.6e}"
+                  f"  weighted={rec['weighted_grad_norm'][k]:.6e}")
+        return 0
+
     for epoch in trange(args.epochs, desc="epochs"):
         model.train()
         running = 0.0
@@ -264,68 +449,14 @@ def main():
                 src, csrc = vols[_i], (cleans[_i] if cleans else None)
             patch, origin = crop3d(src, tuple(args.patch), rng)
 
-            def build_views(arr, gen=None):
-                """按当前臂的采样规则从 arr 抽 4 个视图 (xa,xb,ya,yb)。
-
-                视图是**半尺寸的相位子采样**（每 2×2×2 块取 4 个角），所以有监督臂
-                不能在原分辨率上换目标，必须用**同一套采样几何**去抽无噪 patch 的视图。
-                因此这里收一个显式的 torch.Generator：同一条随机流跑两遍
-                （噪声 patch / 无噪 patch），几何逐体素对齐。
-                """
-                if args.mode == "dense":
-                    # 归因诊断臂：**不做**任何相位抽稀，四个视图都是这张满分辨率 patch。
-                    # 配合 --train-clean-volumes 时 views[2:] 会被替换成同位置干净 patch，
-                    # 于是训练几何与部署几何（infer.py 的满分辨率滑窗）第一次对齐。
-                    # 代价：xa==xb，identity 正则项恒为 0（它在这里不起作用，已记录）。
-                    return [arr, arr, arr, arr]
-                if args.pairing == "cross":
-                    if args.mode == "fixed":
-                        return strided_views(arr, args.slots, args.stride)
-                    return valid_random_tetris_cross(arr, args.stride, generator=gen)
-                if args.stride > 1:
-                    if args.mode == "fixed":
-                        v = strided_views(arr, TETRIS_PATTERNS[args.pattern].tolist(),
-                                          args.stride)
-                        return [v[i] for i in args.role_order] if args.role_order is not None else v
-                    return valid_random_tetris_strided(arr, args.stride, generator=gen)
-                if args.mode == "guided":
-                    z0, y0, x0 = origin
-                    sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
-                    npatch = noise[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
-                    _, v, q = guided_tetris_subvolumes(arr, sp, npatch)
-                    return v
-                if args.mode == "patch_random":
-                    _, v = random_tetris_subvolumes(arr)
-                    return v
-                if args.mode == "fixed":
-                    v = tetris_from_pattern(arr, args.pattern)
-                    return [v[i] for i in args.role_order] if args.role_order is not None else v
-                return valid_random_tetris(arr, generator=gen)
-
-            if csrc is not None:
-                # 有监督上界臂：**只改目标**。输入视图与目标视图都按同一套采样几何抽，
-                # 唯一差别是目标来自无噪 patch 而不是噪声 patch 的互补视图。
-                cpatch = csrc[origin[0]:origin[0] + args.patch[0],
-                              origin[1]:origin[1] + args.patch[1],
-                              origin[2]:origin[2] + args.patch[2]]
-                gen = torch.Generator()
-                gen.manual_seed(int(torch.randint(0, 2 ** 31 - 1, (1,)).item()))
-                st = gen.get_state()
-                views = build_views(patch, gen)
-                gen.set_state(st)                       # 同一条随机流 → 几何逐体素一致
-                cviews = build_views(cpatch, gen)
-                views[2], views[3] = cviews[2], cviews[3]
-            else:
-                views = build_views(patch)
+            views = sample_views(args, src, csrc, patch, origin, signal, noise)
             xa, xb, ya, yb = [tensor(v, device) for v in views]
 
             ha, hb = model(xa), model(xb)
 
-            loss_neighbor = 0.5 * mse(ha, ya) + 0.5 * mse(hb, yb)
-            loss_reg = wavelet_hessian_loss(ha, hb, hessian)
-            loss = loss_neighbor + args.weight_reg * loss_reg
-            if args.weight_identity:
-                loss = loss + args.weight_identity * mse(ha, hb)
+            terms = loss_terms(ha, hb, ya, yb, hessian,
+                               args.weight_reg, args.weight_identity)
+            loss = terms["total"]
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
@@ -348,4 +479,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

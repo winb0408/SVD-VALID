@@ -95,14 +95,34 @@ def corr_len(acf, voxel=1.0):
     return float(len(acf) * voxel)
 
 
-def conditional_variance(sig, noise_var, bins=8, mask=None):
-    """按信号分箱的噪声方差：`Var(noise | signal bin)`。
+def residual_corr_shared(a, b, s):
+    """共用**有噪**参考时两条残差的相关：`corr(a−s, b−s)`。
 
-    `sig` 用块平均 log PD（信号代理），`noise_var` 用**逐体素**的块间方差。
-    返回每个箱的中位信号、方差中位数、样本数、以及 log-log 斜率。
+    独立观测、等噪声时解析值 = Var(εs)/(Var(εa)+Var(εs))（等噪声恰为 1/3）。
+    这是 R3-P01 的反例口径：**非零不是证据，1/3 才是这条统计量的零点。**
     """
-    s = sig if mask is None else sig[mask]
-    v = noise_var if mask is None else noise_var[mask]
+    return float(np.corrcoef(a - s, b - s)[0, 1])
+
+
+def residual_corr_disjoint(a, b, c, d):
+    """参考互不共享：`corr(a−c, b−d)`，独立噪声下期望为 0。"""
+    return float(np.corrcoef(a - c, b - d)[0, 1])
+
+
+def conditional_variance_at(x, var, bins=8, mask=None, log_x=True):
+    """按**给定的**协变量分箱：`Var(noise | x bin)`，返回各箱与斜率。
+
+    与旧 `conditional_variance` 的两个区别（Round3 审查 R3-P02 的核心）：
+
+    1. **协变量由调用方显式给出**，函数内部不再擅自取 log；
+    2. `log_x` 明说自变量本身是不是"已经在对数刻度上"：
+       - `log_x=True`（旧线性分支的语义）：斜率 = `d log Var / d log x`，要求 x>0；
+       - `log_x=False`（对数刻度协变量的正确读法）：斜率 = `d log Var / d x`，
+         **x 可以为负**（如 x = log PD）。若这里仍对 x 取 log，负值会被 clip 成 1e-9，
+         整段自变量塌成常数 —— 这就是旧 `log_slope=−0.93` 不可解释的原因。
+    """
+    s = x if mask is None else x[mask]
+    v = var if mask is None else var[mask]
     ok = np.isfinite(s) & np.isfinite(v) & (v > 0)
     s, v = s[ok], v[ok]
     if s.size < bins * 20:
@@ -113,15 +133,27 @@ def conditional_variance(sig, noise_var, bins=8, mask=None):
         m = (s >= qs[i]) & (s <= qs[i + 1] if i == bins - 1 else s < qs[i + 1])
         if m.sum() < 20:
             continue
-        rows.append({"sig_med": float(np.median(s[m])), "var_med": float(np.median(v[m])),
+        rows.append({"x_med": float(np.median(s[m])), "var_med": float(np.median(v[m])),
                      "n": int(m.sum())})
     if len(rows) >= 3:
-        x = np.log(np.array([max(r["sig_med"], 1e-9) for r in rows]))
-        y = np.log(np.array([max(r["var_med"], 1e-12) for r in rows]))
-        slope = float(np.polyfit(x, y, 1)[0])
+        xx = np.array([r["x_med"] for r in rows], dtype=float)
+        yy = np.log(np.array([max(r["var_med"], 1e-12) for r in rows], dtype=float))
+        if log_x:
+            xx = np.log(np.maximum(xx, 1e-9))
+        slope = float(np.polyfit(xx, yy, 1)[0])
     else:
         slope = float("nan")
-    return {"bins": rows, "slope": slope, "n": int(s.size)}
+    return {"bins": rows, "slope": slope, "n": int(s.size), "log_x": bool(log_x)}
+
+
+def conditional_variance(sig, noise_var, bins=8, mask=None):
+    """**DEPRECATED（保留只为逐位复现旧 JSON）**：等价于 `conditional_variance_at(sig, ..., log_x=True)`。
+
+    Round3 审查 R3-P02 指出：对已经是对数的量（`sig_log = mean(log PD)`）再套这一层，
+    得到的是 `log(log PD)`，且 log PD<1 时被 `max(..., 1e-9)` 截断 ⇒ 斜率不可解释。
+    新代码一律用 `conditional_variance_at`，用 `log_x=False` 明确表示"协变量已是对数刻度"。
+    """
+    return conditional_variance_at(sig, noise_var, bins=bins, mask=mask, log_x=True)
 
 
 def audit(dataset: str, n_blocks: int = 4, do_figure: bool = True) -> dict:
@@ -223,12 +255,21 @@ def audit(dataset: str, n_blocks: int = 4, do_figure: bool = True) -> dict:
     logPD = np.log(np.maximum(PD, eps))
     varlog = logPD.var(axis=0, ddof=1)
     sig_log = logPD.mean(axis=0)
+    # Round3 审查 R3-P02：两个域必须用**同一个**协变量。x = log(块平均线性 PD)。
+    # 旧实现把 sig_log = mean(log PD) 再取一次 log（= log(log PD)，PD<1 时还被 clip），
+    # 斜率不可比；旧结果原样保留在 *_deprecated_double_log 里，不覆盖、不删。
+    x_common = np.log(np.maximum(sig_lin, 1e-9))
     rec["r0_2_conditional_var"] = {
-        "linear_vs_signal": conditional_variance(sig_lin, varlin, mask=bg),
-        "log_vs_signal": conditional_variance(sig_log, varlog, mask=bg),
+        "linear_vs_signal": conditional_variance_at(sig_lin, varlin, mask=bg, log_x=True),
+        "log_vs_signal": conditional_variance_at(x_common, varlog, mask=bg, log_x=False),
+        "log_vs_signal_deprecated_double_log": conditional_variance(sig_log, varlog, mask=bg),
+        "covariate": "两域共用同一个 x = log(块平均线性 PD)：linear 域斜率 = d log Var/d log x，"
+                     "log 域斜率 = d log Var(log noise)/d x（x 已是对数刻度，不再取 log）",
         "note": "斜率≈2 表示噪声方差 ∝ 信号²（乘性）；斜率≈0 表示与信号无关（log 后加性）。"
                 "只用背景体素（PD<=q20），因此不把血流的时间变化算进噪声；"
-                "但背景里若有缓慢运动，仍会被算进来，见报告 §限制",
+                "但背景里若有缓慢运动，仍会被算进来，见报告 §限制。"
+                "**R3-P02 更正**：log 域斜率 ≈ −1 表示 Var(log noise) 随 S⁻¹ 下降，"
+                "这**不是**同方差化的证据，方向恰好相反；判定见 G-R0-b2。",
     }
 
     # ---- 代理 ⑤：深度趋势 / 时间 ACF
@@ -258,13 +299,26 @@ def audit(dataset: str, n_blocks: int = 4, do_figure: bool = True) -> dict:
     }
     # ---- R0-3：扣掉共同信号后，两半之间还剩多少相关（配对能不能当 N2N）
     # 四等分：g0/g1 当作"两次观测"，g2+g3 的 PD 当作**共享信号**的估计（与 g0、g1 都不共享帧）。
+    #
+    # **Round3 审查 R3-P01 的更正（关键）**：上面这个构造里，`ra` 与 `rb` 共用同一个参考 `ls`，
+    # 而 `ls` 本身是**有噪**估计。设每块噪声方差 v，则
+    #     Var(ra) = Var(rb) = v + Var(ls)，Cov(ra, rb) = Var(ls)  ⇒  Corr = Var(ls)/(v+Var(ls))
+    # g2+g3 的噪声方差是单块的 1/2（200 帧 vs 100 帧），所以**即使两次观测的噪声完全独立**，
+    # 也会得到 Corr = (v/2)/(v + v/2) = **1/3**。实测 0.357/0.374 ≈ 1/3 因此**不能**说明
+    # "有 36% 的真实相关"。这里补两样东西：解析基线，以及**互不共享参考**的版本。
     g0, g1 = np.arange(0, T // 4), np.arange(T // 4, T // 2)
+    g2 = np.arange(T // 2, (3 * T) // 4)
+    g3 = np.arange((3 * T) // 4, T)
     g23 = np.arange(T // 2, T)
     pd_a = block_pd(coeff, Q, g0, shape3d)
     pd_b = block_pd(coeff, Q, g1, shape3d)
+    pd_c = block_pd(coeff, Q, g2, shape3d)
+    pd_d = block_pd(coeff, Q, g3, shape3d)
     pd_s = block_pd(coeff, Q, g23, shape3d)
-    la, lb, ls = (np.log(np.maximum(v, eps)) for v in (pd_a, pd_b, pd_s))
-    ra, rb = la - ls, lb - ls
+    la, lb, lc, ld, ls = (np.log(np.maximum(v, eps))
+                          for v in (pd_a, pd_b, pd_c, pd_d, pd_s))
+    ra, rb = la - ls, lb - ls                 # 共用参考（旧口径，含伪相关）
+    ra_x, rb_x = la - lc, lb - ld             # 互不共享参考（新口径）
     rec["r0_3_pairing"] = {
         "cross_half_residual_corr_bg": float(np.corrcoef(ra[bg], rb[bg])[0, 1]),
         "cross_half_residual_corr_vessel": float(np.corrcoef(ra[vessel], rb[vessel])[0, 1]),
@@ -273,8 +327,51 @@ def audit(dataset: str, n_blocks: int = 4, do_figure: bool = True) -> dict:
                                 max(np.var(la[bg]), eps)),
         "note": "g0、g1 是两段互不重叠的 100 帧；共享信号用 g2+g3 的 PD 估计（与 g0/g1 都不共享帧）。"
                 "两者残差的相关 = 扣掉共同信号之后两次观测还剩多少共同成分（含未建模的运动、"
-                "非线性、以及共用的固定基）。这是 pseudo-pair 能不能当 N2N 对的第一个直接读数",
+                "非线性、以及共用的固定基）。"
+                "**R3-P01：本口径的参考 ls 有噪，独立噪声下期望 Corr = 1/3，不是 0。**",
+        "reference_is_shared": True,
+        "independence_null_corr": 1.0 / 3.0,
+        "excess_over_null_bg": None,      # 下面算完补
+        "shared_reference_artifact_note":
+            "Corr_null = Var(ls)/(v+Var(ls))；g23 是 200 帧、g0/g1 各 100 帧，"
+            "等噪声功率下 Var(ls)=v/2 ⇒ 恰为 1/3。差 14% 的 0.86 与这里同源。",
     }
+    # ---- R0-3b（新，R3-P01 要求）：互不共享参考的两个残差
+    rec["r0_3_pairing_disjoint"] = {
+        "residual_corr_bg": float(np.corrcoef(ra_x[bg], rb_x[bg])[0, 1]),
+        "residual_corr_vessel": float(np.corrcoef(ra_x[vessel], rb_x[vessel])[0, 1]),
+        "null_corr": 0.0,
+        "construction": "r_A = log PD(g0) − log PD(g2)，r_B = log PD(g1) − log PD(g3)；"
+                        "四个 100 帧块两两不共享帧，参考也不共享（g0↔g2、g1↔g3）",
+        "note": "两个残差的参考互不相同，因此**独立噪声下期望相关为 0**。"
+                "这是 R3-P01 要求的反例标定 + 对照：若本口径也给出 ≈1/3，则说明相关来自数据"
+                "而非参考构造；若明显低于 1/3，则旧的 0.357/0.374 主要是参考伪像。"
+                "残余偏差仍可能来自共用 SVD 基、时间漂移与 log 非线性，不能当'噪声独立'的证明。",
+    }
+    # 同一构造、同一噪声场：两个口径的差 = 参考伪像的直接读数（块间置换给不确定性）
+    rec["r0_3_pairing"]["excess_over_null_bg"] = float(
+        rec["r0_3_pairing"]["cross_half_residual_corr_bg"] - 1.0 / 3.0)
+    rec["r0_3_pairing"]["disjoint_minus_shared_bg"] = float(
+        rec["r0_3_pairing_disjoint"]["residual_corr_bg"]
+        - rec["r0_3_pairing"]["cross_half_residual_corr_bg"])
+
+    # 块顺序置换：同一份数据、换"谁当观测、谁当参考"，给出统计量自身的波动
+    # （R3-P01 要求"按 block 置换顺序复算并展示结果波动"）
+    blocks4 = [la, lb, lc, ld]
+    perm_stats = []
+    for i, j, k, l in ((0, 1, 2, 3), (1, 0, 3, 2), (0, 1, 3, 2),
+                       (1, 0, 2, 3), (2, 3, 0, 1), (3, 2, 1, 0)):
+        r1 = blocks4[i][bg] - blocks4[k][bg]
+        r2 = blocks4[j][bg] - blocks4[l][bg]
+        perm_stats.append({"obs": (i, j), "ref": (k, l),
+                           "corr_bg": float(np.corrcoef(r1, r2)[0, 1])})
+    cs = np.array([p["corr_bg"] for p in perm_stats])
+    rec["r0_3_pairing_disjoint"]["permutations"] = perm_stats
+    rec["r0_3_pairing_disjoint"]["perm_corr_median"] = float(np.median(cs))
+    rec["r0_3_pairing_disjoint"]["perm_corr_range"] = [float(cs.min()), float(cs.max())]
+    rec["r0_3_pairing_disjoint"]["perm_note"] = (
+        "6 种 (观测块对, 参考块对) 分配下的相关；这里的波动只反映'块间非平稳'，"
+        "不是抽样误差，也不能当置信区间用。")
     # ---- R0-3b：两种**同积分长度**的二分法对比（奇偶 vs 连续前后半），G-R0-a 就靠这一对
     half_a = block_pd(coeff, Q, np.arange(0, T // 2), shape3d)
     half_b = block_pd(coeff, Q, np.arange(T // 2, T), shape3d)
@@ -319,13 +416,17 @@ def audit(dataset: str, n_blocks: int = 4, do_figure: bool = True) -> dict:
         axes[1].axhline(1 / np.e, ls="--", c="k", lw=0.8)
         axes[1].set_xlabel("lag (voxel)"); axes[1].set_ylabel("ACF of block difference")
         axes[1].set_title("noise ACF (shared signal removed)"); axes[1].legend()
-        for key, lab in (("linear_vs_signal", "linear PD"), ("log_vs_signal", "log PD")):
+        # 横轴统一用线性 PD 的 bin 中位数（x_med 是各域自己的协变量，不可共用一条横轴）
+        rows_lin = rec["r0_2_conditional_var"]["linear_vs_signal"]["bins"]
+        for key, lab in (("linear_vs_signal", "Var(linear PD)"),
+                         ("log_vs_signal", "Var(log PD)")):
             rows = rec["r0_2_conditional_var"][key]["bins"]
-            if rows:
-                axes[2].loglog([r["sig_med"] for r in rows], [r["var_med"] for r in rows],
+            if rows and rows_lin and len(rows) == len(rows_lin):
+                axes[2].loglog([r["x_med"] for r in rows_lin],
+                               [max(r["var_med"], 1e-12) for r in rows],
                                marker="o", ms=3, label=f"{lab} (slope "
                                f"{rec['r0_2_conditional_var'][key]['slope']:.2f})")
-        axes[2].set_xlabel("signal (bin median)"); axes[2].set_ylabel("noise variance")
+        axes[2].set_xlabel("linear PD (bin median)"); axes[2].set_ylabel("noise variance")
         axes[2].set_title("Var(noise | signal), background only"); axes[2].legend(fontsize=7)
         fig.tight_layout()
         fig.savefig(out / f"fig_r0_{dataset}.png", dpi=130)

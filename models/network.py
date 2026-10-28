@@ -43,9 +43,16 @@ class HessianConstraintLoss3D(nn.Module):
 
 
 class NetworkCNR(nn.Module):
-    """VALID CRN wrapper."""
+    """VALID CRN wrapper.
 
-    def __init__(self, in_channels=1, out_channels=1, features=16, groups=4):
+    `residual=True`（Round3 B1）把输出改成 `pred = input + net(input)`。
+    状态字典的键**完全不变**（旁路是模块级行为，不是参数），所以
+    `residual=False` 建的模型能原样加载旧 checkpoint，`infer.py` 只需按
+    checkpoint 里记录的 `arch_head` 重建即可。
+    """
+
+    def __init__(self, in_channels=1, out_channels=1, features=16, groups=4,
+                 residual: bool = False):
         super().__init__()
         self.net = CRN(
             in_channels=in_channels,
@@ -53,6 +60,15 @@ class NetworkCNR(nn.Module):
             n_features=features,
             n_groups=groups,
         )
+        self.residual = bool(residual)
 
     def forward(self, x):
-        return self.net(x)
+        y = self.net(x)
+        return x + y if self.residual else y
+
+    def zero_init_out(self):
+        """把输出层置零：配合 `residual=True` 时训练起点**精确**等于输入。"""
+        with torch.no_grad():
+            self.net.out.weight.zero_()
+            if self.net.out.bias is not None:
+                self.net.out.bias.zero_()

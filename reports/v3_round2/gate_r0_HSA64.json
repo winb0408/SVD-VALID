@@ -47,10 +47,24 @@
  },
  "G_R0_b": {
   "linear_slope": 2.140982641902822,
-  "log_slope": 0.24072238617923233,
+  "log_slope": 0.10358029781215226,
   "slope_min_abs": 0.1,
   "pass": true,
-  "note": "线性域斜率≈2 ⇒ 噪声方差随信号成正比（乘性）；log 域斜率≈0 ⇒ 信号无关。两条都要测得出，才能说 log 变换改变了噪声-信号依赖"
+  "status": "historical — 只当『斜率可测性检查』，不再当同方差化判据",
+  "note": "线性域斜率≈2 ⇒ 噪声方差随信号成正比（乘性）；log 域斜率≈0 ⇒ 信号无关。两条都要测得出，才能说 log 变换改变了噪声-信号依赖。**Round3 审查 R3-P02 更正**：本判据只看『斜率是否不为零』，它奖励的是『有斜率』，与『同方差化』的科学目标相反；真正的判据见 G-R0-b2。"
+ },
+ "G_R0_b2": {
+  "log_slope_same_x": 0.10358029781215226,
+  "log_slope_deprecated_double_log": 0.24072238617923233,
+  "slope_tol": 0.2,
+  "log_var_ratio_max_over_bins": 1.1154387016197025,
+  "linear_var_ratio_max_over_bins": 3.236004248470272,
+  "bin_ratio_max": 2.0,
+  "slope_within_tol": true,
+  "bins_within_ratio": true,
+  "pass": true,
+  "criteria": "①|log 域斜率| ≤ 0.20（同一 x）；②log 域方差跨 8 箱 max/min ≤ 2.0",
+  "note": "**判据是『log 域方差与信号无关』，不是『测得出斜率』。** 旧 G-R0-b 的 abs(slope)≥0.10 恰好在奖励非零斜率，且它的 log 分支用的是 log(log PD)，已被 R3-P02 判定口径不一致；旧数原样保留在 JSON 里，不改不删。"
  },
  "G_R0_c": {
   "bg_noise_frac_odd_even": 0.15347526758830562,
@@ -64,10 +78,31 @@
   "pass": true,
   "note": "只要两种拆分的读数不同（背景差 2 个百分点以上或血管差 2 个百分点以上），就说明配对方式本身是主导因素之一，不存在唯一可用的伪配对"
  },
+ "G_R0_d": {
+  "corr_shared_reference_bg": 0.3742618667941887,
+  "corr_disjoint_reference_bg": 0.0355086504080747,
+  "independence_null_shared": 0.3333333333333333,
+  "independence_null_disjoint": 0.0,
+  "excess_over_null_shared": 0.0409285334608554,
+  "perm_corr_range": [
+   0.0355086504080747,
+   0.05523916951483595
+  ],
+  "bands": {
+   "artifact_dominated_upper": 0.15,
+   "data_dominated_lower": 0.3
+  },
+  "verdict": "artifact_dominated",
+  "pass": null,
+  "note": "本项**不设过门**：它是旧结论的更正项，只要求①两种口径都报；②旧的 0.357/0.374 加注『含共用参考伪像』；③不得再把 0.36 读成『噪声相关 36%』。"
+ },
+ "version": "v2 (2026-10-28, Round3 审查 R3-P01/P02 修订；旧判据原样保留在 G_R0_b)",
  "verdict": {
   "a": "pass",
   "b": "pass",
-  "c": "pass"
+  "b2": "pass",
+  "c": "pass",
+  "d": "artifact_dominated"
  },
  "interpretation": "三条全过 = 真实数据有可测、非伪影、且配对可分辨的残余噪声 ⇒ 『真实数据优先』这条路可行；任何一条不过则在报告里写清适用边界，不外推"
 }

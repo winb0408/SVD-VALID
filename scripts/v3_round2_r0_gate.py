@@ -148,8 +148,69 @@ def main() -> int:
     gb = {"linear_slope": lin_slope, "log_slope": log_slope,
           "slope_min_abs": SLOPE_MIN,
           "pass": bool(abs(lin_slope) >= SLOPE_MIN and abs(log_slope) >= SLOPE_MIN),
+          "status": "historical — 只当『斜率可测性检查』，不再当同方差化判据",
           "note": "线性域斜率≈2 ⇒ 噪声方差随信号成正比（乘性）；log 域斜率≈0 ⇒ 信号无关。"
-                  "两条都要测得出，才能说 log 变换改变了噪声-信号依赖"}
+                  "两条都要测得出，才能说 log 变换改变了噪声-信号依赖。"
+                  "**Round3 审查 R3-P02 更正**：本判据只看『斜率是否不为零』，"
+                  "它奖励的是『有斜率』，与『同方差化』的科学目标相反；"
+                  "真正的判据见 G-R0-b2。"}
+
+    # ---- G-R0-b2（Round3 新增，R3-P02）：log 域是否真的同方差 ----
+    # 门槛**先写**（2026-10-28，在看 v2 数之前定）：
+    #   ① 斜率落在等效零区间 |slope| ≤ 0.20；
+    #   ② 8 个信号分位箱内，Var(log noise) 的 max/min ≤ 2.0（一个 2 倍以内）。
+    # 依据：'同方差'若成立，方差沿信号轴应基本平坦；一个 2 倍的摆动已经是宽松上限。
+    CV = r0["r0_2_conditional_var"]
+
+    def _bin_ratio(entry):
+        vs = [b.get("var_med") for b in (entry.get("bins") or []) if b.get("var_med")]
+        return float(max(vs) / min(vs)) if len(vs) >= 3 else None
+
+    slope_tol, bin_ratio_max = 0.20, 2.0
+    log_ratio = _bin_ratio(CV["log_vs_signal"])
+    lin_ratio = _bin_ratio(CV["linear_vs_signal"])
+    dep = CV.get("log_vs_signal_deprecated_double_log") or {}
+    gb2 = {
+        "log_slope_same_x": log_slope,
+        "log_slope_deprecated_double_log": dep.get("slope"),
+        "slope_tol": slope_tol,
+        "log_var_ratio_max_over_bins": log_ratio,
+        "linear_var_ratio_max_over_bins": lin_ratio,
+        "bin_ratio_max": bin_ratio_max,
+        "slope_within_tol": bool(np.isfinite(log_slope) and abs(log_slope) <= slope_tol),
+        "bins_within_ratio": bool(log_ratio is not None and log_ratio <= bin_ratio_max),
+        "pass": bool(np.isfinite(log_slope) and abs(log_slope) <= slope_tol
+                     and log_ratio is not None and log_ratio <= bin_ratio_max),
+        "criteria": "①|log 域斜率| ≤ 0.20（同一 x）；②log 域方差跨 8 箱 max/min ≤ 2.0",
+        "note": "**判据是『log 域方差与信号无关』，不是『测得出斜率』。** 旧 G-R0-b 的 "
+                "abs(slope)≥0.10 恰好在奖励非零斜率，且它的 log 分支用的是 log(log PD)，"
+                "已被 R3-P02 判定口径不一致；旧数原样保留在 JSON 里，不改不删。",
+    }
+
+    # ---- G-R0-d（Round3 新增，R3-P01）：残差相关里的"参考伪像" ----
+    lsl = r0["r0_3_pairing"]
+    dis = r0.get("r0_3_pairing_disjoint") or {}
+    corr_shared = lsl["cross_half_residual_corr_bg"]
+    corr_dis = dis.get("residual_corr_bg")
+    # 门槛先写：独立噪声下共享参考应给 ≈1/3（解析值），互不共享参考应给 ≈0。
+    # 判定分档（不看结果先定）：disjoint ≤ 0.15 → 旧数主要是伪像；≥ 0.30 → 数据侧确有关系；
+    # 中间 → 只能说"部分伪像 + 部分未建模成分"，不得量化成"噪声相关 36%"。
+    gd = {
+        "corr_shared_reference_bg": corr_shared,
+        "corr_disjoint_reference_bg": corr_dis,
+        "independence_null_shared": 1.0 / 3.0,
+        "independence_null_disjoint": 0.0,
+        "excess_over_null_shared": (float(corr_shared) - 1.0 / 3.0
+                                    if corr_shared is not None else None),
+        "perm_corr_range": dis.get("perm_corr_range"),
+        "bands": {"artifact_dominated_upper": 0.15, "data_dominated_lower": 0.30},
+        "verdict": ("NOT_RUN" if corr_dis is None else
+                    "artifact_dominated" if corr_dis <= 0.15 else
+                    "data_side_component" if corr_dis >= 0.30 else "mixed"),
+        "pass": None,
+        "note": "本项**不设过门**：它是旧结论的更正项，只要求①两种口径都报；"
+                "②旧的 0.357/0.374 加注『含共用参考伪像』；③不得再把 0.36 读成『噪声相关 36%』。",
+    }
 
     # ---- G-R0-c：两种拆分的残差相关可分离 ----
     sp = r0["r0_3_split_types"]
@@ -168,11 +229,14 @@ def main() -> int:
                   "就说明配对方式本身是主导因素之一，不存在唯一可用的伪配对"}
 
     rec = {"dataset": D, "source": RAW[D],
-           "G_R0_a": ga, "G_R0_b": gb, "G_R0_c": gc,
+           "G_R0_a": ga, "G_R0_b": gb, "G_R0_b2": gb2, "G_R0_c": gc, "G_R0_d": gd,
+           "version": "v2 (2026-10-28, Round3 审查 R3-P01/P02 修订；旧判据原样保留在 G_R0_b)",
            "verdict": {
                "a": "pass" if ga["pass"] else "fail",
                "b": "pass" if gb["pass"] else "fail",
-               "c": "pass" if gc["pass"] else "fail"},
+               "b2": "pass" if gb2["pass"] else "fail",
+               "c": "pass" if gc["pass"] else "fail",
+               "d": gd["verdict"]},
            "interpretation": ("三条全过 = 真实数据有可测、非伪影、且配对可分辨的残余噪声 ⇒ "
                               "『真实数据优先』这条路可行；任何一条不过则在报告里写清适用边界，"
                               "不外推")}
@@ -184,7 +248,12 @@ def main() -> int:
     print(f"  G-R0-a  时间={noise_var_temporal:.4e}  空间(噪声场)={ps_noise:.4e}  "
           f"ratio={ratio_controlled:.2f}  [全图口径的假比值 {ratio_naive:.2f}]  → "
           f"{'pass' if ga['pass'] else 'fail'}")
-    print(f"  G-R0-b  线性斜率={lin_slope:.2f}  log 斜率={log_slope:.2f}  → {'pass' if gb['pass'] else 'fail'}")
+    print(f"  G-R0-b  线性斜率={lin_slope:.2f}  log 斜率={log_slope:.2f}  → {'pass' if gb['pass'] else 'fail'}"
+          f"  （historical：只测『有没有斜率』，不是同方差判据）")
+    print(f"  G-R0-b2 log 斜率={log_slope:.2f}（tol {slope_tol}）  方差跨箱 max/min={log_ratio}（上限 {bin_ratio_max}）"
+          f"  → {'pass' if gb2['pass'] else 'fail'}")
+    print(f"  G-R0-d  共享参考 {corr_shared:.3f}（null 0.333）  非共享参考 "
+          f"{'未跑' if corr_dis is None else f'{corr_dis:.3f}'}（null 0.000）  → {gd['verdict']}")
     print(f"  G-R0-c  bg {sp['bg']['odd_even']['noise_frac_of_var']:.3f} vs "
           f"{sp['bg']['contiguous_halves']['noise_frac_of_var']:.3f} | "
           f"vessel {sp['vessel']['odd_even']['noise_frac_of_var']:.3f} vs "

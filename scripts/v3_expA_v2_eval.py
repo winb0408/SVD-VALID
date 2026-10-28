@@ -122,7 +122,8 @@ def ckpt_budget(ckpt: Path) -> dict:
     a = blob.get("args") or {}
     keep = ("epochs", "steps_per_epoch", "patch", "features", "pairing", "mode",
             "pattern", "stride", "seed", "weight_reg", "clip_grad", "lr_schedule",
-            "train_volumes", "train_volume")
+            "train_volumes", "train_volume", "arch_head", "zero_init_final",
+            "arm_label")
     return {k: a[k] for k in keep if k in a}
 
 
