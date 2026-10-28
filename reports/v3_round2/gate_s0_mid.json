@@ -1,0 +1,257 @@
+{
+ "level": "mid",
+ "prereg": "reviews/V3_PR1_round2_plan.md §3.2（写在训练启动之前）",
+ "thresholds_literal": {
+  "n2n_lt": 1.0,
+  "r_roi_gt_input": true
+ },
+ "inputs": {
+  "metrics": "reports/v3_round2/s0_mid_metrics.json",
+  "calibration": "reports/v3_round2/s0_calibration_mid.json"
+ },
+ "predates": {},
+ "arms": {
+  "A_rand_s3407": {
+   "s0_mid_e900": {
+    "n2n_ratio": 0.9630425889812949,
+    "input_n2n": 1.0,
+    "r_roi": 0.9853615046807571,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": true,
+    "pass_r_roi": true
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 1.1316672898417515,
+    "input_n2n": 1.0,
+    "r_roi": 0.9940796396873477,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": true
+   }
+  },
+  "A_rand_s3408": {
+   "s0_mid_e900": {
+    "n2n_ratio": 1.16714164569808,
+    "input_n2n": 1.0,
+    "r_roi": 0.9750790603428314,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 1.3230291416261317,
+    "input_n2n": 1.0,
+    "r_roi": 0.9909956129701404,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "A_fixed4_s3407": {
+   "s0_mid_e900": {
+    "n2n_ratio": 1.6998909446171984,
+    "input_n2n": 1.0,
+    "r_roi": 0.9514562890562122,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 2.1526733783170164,
+    "input_n2n": 1.0,
+    "r_roi": 0.9804727405912049,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "A_fixed4_s3408": {
+   "s0_mid_e900": {
+    "n2n_ratio": 1.605980565248217,
+    "input_n2n": 1.0,
+    "r_roi": 0.9665233604183148,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 2.042158400787697,
+    "input_n2n": 1.0,
+    "r_roi": 0.982061044446018,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "S_rand_s3407": {
+   "s0_mid_e900": {
+    "n2n_ratio": 0.9593574960860446,
+    "input_n2n": 1.0,
+    "r_roi": 0.9852356136138692,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": true,
+    "pass_r_roi": true
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 1.1432201142371945,
+    "input_n2n": 1.0,
+    "r_roi": 0.9941425182612255,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": true
+   }
+  },
+  "S_rand_s3408": {
+   "s0_mid_e900": {
+    "n2n_ratio": 1.1535160821935069,
+    "input_n2n": 1.0,
+    "r_roi": 0.974729328637804,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 1.3180573885050375,
+    "input_n2n": 1.0,
+    "r_roi": 0.9910303970019263,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "S_fixed4_s3407": {
+   "s0_mid_e900": {
+    "n2n_ratio": 1.6738772279523706,
+    "input_n2n": 1.0,
+    "r_roi": 0.9532407446246465,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 2.106973935494032,
+    "input_n2n": 1.0,
+    "r_roi": 0.9812287196059609,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "S_fixed4_s3408": {
+   "s0_mid_e900": {
+    "n2n_ratio": 1.628765656930755,
+    "input_n2n": 1.0,
+    "r_roi": 0.9660441466007152,
+    "input_r_roi": 0.9793722331053223,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_mid_e901": {
+    "n2n_ratio": 2.1401383577080146,
+    "input_n2n": 1.0,
+    "r_roi": 0.9808674783682899,
+    "input_r_roi": 0.9911507324053055,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  }
+ },
+ "G_S0_1_n2n": {
+  "per_arm": {
+   "A_rand_s3407": {
+    "mean_n2n": 1.0473549394115231,
+    "all_cells_pass": false
+   },
+   "A_rand_s3408": {
+    "mean_n2n": 1.245085393662106,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3407": {
+    "mean_n2n": 1.9262821614671073,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3408": {
+    "mean_n2n": 1.824069483017957,
+    "all_cells_pass": false
+   },
+   "S_rand_s3407": {
+    "mean_n2n": 1.0512888051616196,
+    "all_cells_pass": false
+   },
+   "S_rand_s3408": {
+    "mean_n2n": 1.2357867353492722,
+    "all_cells_pass": false
+   },
+   "S_fixed4_s3407": {
+    "mean_n2n": 1.8904255817232012,
+    "all_cells_pass": false
+   },
+   "S_fixed4_s3408": {
+    "mean_n2n": 1.8844520073193847,
+    "all_cells_pass": false
+   }
+  },
+  "pass_strict": false,
+  "pass_arm_mean": false
+ },
+ "G_S0_2_r_roi": {
+  "per_arm": {
+   "A_rand_s3407": {
+    "mean_r_roi": 0.9897205721840524,
+    "all_cells_pass": true
+   },
+   "A_rand_s3408": {
+    "mean_r_roi": 0.983037336656486,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3407": {
+    "mean_r_roi": 0.9659645148237086,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3408": {
+    "mean_r_roi": 0.9742922024321664,
+    "all_cells_pass": false
+   },
+   "S_rand_s3407": {
+    "mean_r_roi": 0.9896890659375474,
+    "all_cells_pass": true
+   },
+   "S_rand_s3408": {
+    "mean_r_roi": 0.9828798628198652,
+    "all_cells_pass": false
+   },
+   "S_fixed4_s3407": {
+    "mean_r_roi": 0.9672347321153036,
+    "all_cells_pass": false
+   },
+   "S_fixed4_s3408": {
+    "mean_r_roi": 0.9734558124845025,
+    "all_cells_pass": false
+   }
+  },
+  "pass_strict": false,
+  "pass_arm_mean": false
+ },
+ "G_S0_3_calibration": {
+  "n_checks": 10,
+  "n_failed": 0,
+  "failed": [],
+  "excluded": [
+   "r_roi:fake"
+  ],
+  "pass": true
+ },
+ "zero_control": {
+  "s0_mid_e900": {
+   "n2n": 212.6432096534275,
+   "still_degenerate": true
+  },
+  "s0_mid_e901": {
+   "n2n": 226.1134888137338,
+   "still_degenerate": true
+  }
+ },
+ "zero_still_degenerate": true,
+ "verdict": "S0-未通过",
+ "attribution": "判据未退化（zero 仍远差于输入）→ 失败归因于实现/训练目标/评价链，不得升级为 I1 科学证伪（审查 §7）"
+}

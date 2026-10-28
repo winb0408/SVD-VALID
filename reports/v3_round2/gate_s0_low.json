@@ -1,0 +1,153 @@
+{
+ "level": "low",
+ "prereg": "reviews/V3_PR1_round2_plan.md §3.2（写在训练启动之前）",
+ "thresholds_literal": {
+  "n2n_lt": 1.0,
+  "r_roi_gt_input": true
+ },
+ "inputs": {
+  "metrics": "reports/v3_round2/s0_low_metrics.json",
+  "calibration": "reports/v3_round2/s0_calibration_low.json"
+ },
+ "predates": {},
+ "arms": {
+  "A_rand_s3407": {
+   "s0_low_e900": {
+    "n2n_ratio": 2.2171688971516335,
+    "input_n2n": 1.0,
+    "r_roi": 0.9881876746724945,
+    "input_r_roi": 0.9947214492811826,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_low_e901": {
+    "n2n_ratio": 2.716579502235461,
+    "input_n2n": 1.0,
+    "r_roi": 0.9950317604773736,
+    "input_r_roi": 0.9977627525734518,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "A_rand_s3408": {
+   "s0_low_e900": {
+    "n2n_ratio": 2.628794465621118,
+    "input_n2n": 1.0,
+    "r_roi": 0.9810252376371,
+    "input_r_roi": 0.9947214492811826,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_low_e901": {
+    "n2n_ratio": 3.0421898672418664,
+    "input_n2n": 1.0,
+    "r_roi": 0.9928381281531667,
+    "input_r_roi": 0.9977627525734518,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "A_fixed4_s3407": {
+   "s0_low_e900": {
+    "n2n_ratio": 4.800647048359616,
+    "input_n2n": 1.0,
+    "r_roi": 0.9546041190124546,
+    "input_r_roi": 0.9947214492811826,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_low_e901": {
+    "n2n_ratio": 6.330984601426016,
+    "input_n2n": 1.0,
+    "r_roi": 0.9814403040486928,
+    "input_r_roi": 0.9977627525734518,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  },
+  "A_fixed4_s3408": {
+   "s0_low_e900": {
+    "n2n_ratio": 5.035440986608214,
+    "input_n2n": 1.0,
+    "r_roi": 0.9653597289809928,
+    "input_r_roi": 0.9947214492811826,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   },
+   "s0_low_e901": {
+    "n2n_ratio": 6.730880745933515,
+    "input_n2n": 1.0,
+    "r_roi": 0.9808442503968441,
+    "input_r_roi": 0.9977627525734518,
+    "pass_n2n": false,
+    "pass_r_roi": false
+   }
+  }
+ },
+ "G_S0_1_n2n": {
+  "per_arm": {
+   "A_rand_s3407": {
+    "mean_n2n": 2.4668741996935473,
+    "all_cells_pass": false
+   },
+   "A_rand_s3408": {
+    "mean_n2n": 2.835492166431492,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3407": {
+    "mean_n2n": 5.565815824892816,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3408": {
+    "mean_n2n": 5.883160866270865,
+    "all_cells_pass": false
+   }
+  },
+  "pass_strict": false,
+  "pass_arm_mean": false
+ },
+ "G_S0_2_r_roi": {
+  "per_arm": {
+   "A_rand_s3407": {
+    "mean_r_roi": 0.9916097175749341,
+    "all_cells_pass": false
+   },
+   "A_rand_s3408": {
+    "mean_r_roi": 0.9869316828951333,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3407": {
+    "mean_r_roi": 0.9680222115305737,
+    "all_cells_pass": false
+   },
+   "A_fixed4_s3408": {
+    "mean_r_roi": 0.9731019896889184,
+    "all_cells_pass": false
+   }
+  },
+  "pass_strict": false,
+  "pass_arm_mean": false
+ },
+ "G_S0_3_calibration": {
+  "n_checks": 10,
+  "n_failed": 0,
+  "failed": [],
+  "excluded": [
+   "r_roi:fake"
+  ],
+  "pass": true
+ },
+ "zero_control": {
+  "s0_low_e900": {
+   "n2n": 848.5583645682591,
+   "still_degenerate": true
+  },
+  "s0_low_e901": {
+   "n2n": 902.4964326779595,
+   "still_degenerate": true
+  }
+ },
+ "zero_still_degenerate": true,
+ "verdict": "S0-未通过",
+ "attribution": "判据未退化（zero 仍远差于输入）→ 失败归因于实现/训练目标/评价链，不得升级为 I1 科学证伪（审查 §7）"
+}

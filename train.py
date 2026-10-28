@@ -73,13 +73,15 @@ def main():
                          "（参照卷取 vols[0]），可以省略；两者都不给才报错。")
     ap.add_argument("--signal-map")
     ap.add_argument("--noise-map")
-    ap.add_argument("--mode", choices=["random", "patch_random", "guided", "fixed"],
+    ap.add_argument("--mode", choices=["random", "patch_random", "guided", "fixed", "dense"],
                     default="random",
                     help="random: faithful per-block VALID Tetris; "
                          "patch_random: single random pattern per patch, fixed "
                          "roles (control for guided); guided: SVD-guided "
                          "pattern per patch; fixed: one fixed pattern "
-                         "(--pattern) for every patch.")
+                         "(--pattern) for every patch. "
+                         "dense: **只做归因诊断用**——不做任何相位抽稀，输入输出都是满分辨率 patch；"
+                         "必须配 --train-clean-volumes，否则输入=目标=同一张图（平凡恒等）。")
     ap.add_argument("--pattern", type=int, default=4,
                     help="Tetris pattern id used by --mode fixed (0..7).")
     ap.add_argument("--role-order", nargs=4, type=int, default=None,
@@ -111,6 +113,11 @@ def main():
                          "2026-10-26 核出此前一直用 cosine，与上游不同，故默认改为 poly。")
     ap.add_argument("--clip-grad", type=float, default=100.0,
                     help="上游 `clip_gradients` 默认 100.0；本仓库此前写死 20.0。")
+    ap.add_argument("--train-clean-volumes", nargs="*", default=None,
+                    help="**有监督上界臂**（Round2 S0 归因用）：与 --train-volumes 一一对应、"
+                         "同形状的**无噪** log1p 体。给定时目标 y 改成同位置的无噪 patch，"
+                         "输入采样（tet / 相位）不变——于是「只把目标从互补视图换成真值」这一个变量"
+                         "被单独拿出来。不给时行为与之前逐位相同。")
     ap.add_argument("--train-volumes", nargs="*", default=None,
                     help="多个训练体的 npy 列表（每个都必须是同形状的 log1p 体）。"
                          "给定时每步随机选一个体再裁 patch；不给则用 --train-volume 单卷。")
@@ -174,6 +181,29 @@ def main():
         ap.error("必须给 --train-volume 或 --train-volumes 之一")
     signal = np.load(args.signal_map).astype(np.float32) if args.signal_map else None
     noise = np.load(args.noise_map).astype(np.float32) if args.noise_map else None
+    # 有监督上界臂：与 vols 一一对应的无噪体
+    cleans = None
+    if args.train_clean_volumes:
+        cleans = [np.load(p).astype(np.float32) for p in args.train_clean_volumes]
+        if vols is None:
+            raise ValueError("--train-clean-volumes 需要配 --train-volumes（按索引一一对应）")
+        if len(cleans) != len(vols):
+            raise ValueError(f"--train-clean-volumes 数量 {len(cleans)} 与 "
+                             f"--train-volumes 数量 {len(vols)} 不一致")
+        for a, b in zip(vols, cleans):
+            if a.shape != b.shape:
+                raise ValueError(f"干净体形状 {b.shape} 与噪声体 {a.shape} 不一致")
+        # 措辞必须中性：这个开关只负责"目标视图来自另一组体"，内容可以是无噪真值
+        # （有监督上界臂），也可以是**第二次含噪观测**（满分辨率自监督臂 D_n2n）。
+        # 早期日志写成"无噪 patch"，在 D_n2n 的日志里会是错的。
+        print(f"[S0] 目标视图来自 --train-clean-volumes（{len(cleans)} 卷；"
+              f"真值或第二次观测由调用方决定）")
+
+    if args.mode == "dense" and cleans is None:
+        # 满分辨率模式下输入与目标来自同一张图；没有干净体就退化成"学恒等"，
+        # 那样的数是**平凡**的，必须直接拒绝，而不是留一个能跑出好看数的口子。
+        raise ValueError("--mode dense 必须配 --train-clean-volumes"
+                         "（否则输入=目标=同一张图，只能学到恒等）")
 
     model = NetworkCNR(features=args.features, groups=args.groups).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999))
@@ -227,43 +257,67 @@ def main():
         running = 0.0
 
         for _ in range(args.steps_per_epoch):
-            src = vol if vols is None else vols[rng.randrange(len(vols))]
+            if vols is None:
+                src, csrc = vol, (cleans[0] if cleans else None)
+            else:
+                _i = rng.randrange(len(vols))
+                src, csrc = vols[_i], (cleans[_i] if cleans else None)
             patch, origin = crop3d(src, tuple(args.patch), rng)
 
-            if args.pairing == "cross":
-                # 输入取 tet A，目标取互补 tet B：这是预注册角色表与 VALID 原生配对的前提
-                if args.mode == "fixed":
-                    views = strided_views(patch, args.slots, args.stride)
-                else:
-                    views = valid_random_tetris_cross(patch, args.stride)
-                xa, xb, ya, yb = [tensor(v, device) for v in views]
-            elif args.stride > 1:
-                # 同 tet 配对但放大步距（覆盖率诊断臂）
-                if args.mode == "fixed":
-                    views = strided_views(patch, TETRIS_PATTERNS[args.pattern].tolist(),
+            def build_views(arr, gen=None):
+                """按当前臂的采样规则从 arr 抽 4 个视图 (xa,xb,ya,yb)。
+
+                视图是**半尺寸的相位子采样**（每 2×2×2 块取 4 个角），所以有监督臂
+                不能在原分辨率上换目标，必须用**同一套采样几何**去抽无噪 patch 的视图。
+                因此这里收一个显式的 torch.Generator：同一条随机流跑两遍
+                （噪声 patch / 无噪 patch），几何逐体素对齐。
+                """
+                if args.mode == "dense":
+                    # 归因诊断臂：**不做**任何相位抽稀，四个视图都是这张满分辨率 patch。
+                    # 配合 --train-clean-volumes 时 views[2:] 会被替换成同位置干净 patch，
+                    # 于是训练几何与部署几何（infer.py 的满分辨率滑窗）第一次对齐。
+                    # 代价：xa==xb，identity 正则项恒为 0（它在这里不起作用，已记录）。
+                    return [arr, arr, arr, arr]
+                if args.pairing == "cross":
+                    if args.mode == "fixed":
+                        return strided_views(arr, args.slots, args.stride)
+                    return valid_random_tetris_cross(arr, args.stride, generator=gen)
+                if args.stride > 1:
+                    if args.mode == "fixed":
+                        v = strided_views(arr, TETRIS_PATTERNS[args.pattern].tolist(),
                                           args.stride)
-                    if args.role_order is not None:
-                        views = [views[i] for i in args.role_order]
-                else:
-                    views = valid_random_tetris_strided(patch, args.stride)
-                xa, xb, ya, yb = [tensor(v, device) for v in views]
-            elif args.mode == "guided":
-                z0, y0, x0 = origin
-                sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
-                npatch = noise[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
-                _, views, q = guided_tetris_subvolumes(patch, sp, npatch)
-                xa, xb, ya, yb = [tensor(v, device) for v in views]
-            elif args.mode == "patch_random":
-                _, views = random_tetris_subvolumes(patch)
-                xa, xb, ya, yb = [tensor(v, device) for v in views]
-            elif args.mode == "fixed":
-                views = tetris_from_pattern(patch, args.pattern)
-                if args.role_order is not None:
-                    views = [views[i] for i in args.role_order]
-                xa, xb, ya, yb = [tensor(v, device) for v in views]
+                        return [v[i] for i in args.role_order] if args.role_order is not None else v
+                    return valid_random_tetris_strided(arr, args.stride, generator=gen)
+                if args.mode == "guided":
+                    z0, y0, x0 = origin
+                    sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
+                    npatch = noise[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
+                    _, v, q = guided_tetris_subvolumes(arr, sp, npatch)
+                    return v
+                if args.mode == "patch_random":
+                    _, v = random_tetris_subvolumes(arr)
+                    return v
+                if args.mode == "fixed":
+                    v = tetris_from_pattern(arr, args.pattern)
+                    return [v[i] for i in args.role_order] if args.role_order is not None else v
+                return valid_random_tetris(arr, generator=gen)
+
+            if csrc is not None:
+                # 有监督上界臂：**只改目标**。输入视图与目标视图都按同一套采样几何抽，
+                # 唯一差别是目标来自无噪 patch 而不是噪声 patch 的互补视图。
+                cpatch = csrc[origin[0]:origin[0] + args.patch[0],
+                              origin[1]:origin[1] + args.patch[1],
+                              origin[2]:origin[2] + args.patch[2]]
+                gen = torch.Generator()
+                gen.manual_seed(int(torch.randint(0, 2 ** 31 - 1, (1,)).item()))
+                st = gen.get_state()
+                views = build_views(patch, gen)
+                gen.set_state(st)                       # 同一条随机流 → 几何逐体素一致
+                cviews = build_views(cpatch, gen)
+                views[2], views[3] = cviews[2], cviews[3]
             else:
-                subs = valid_random_tetris(patch)
-                xa, xb, ya, yb = [tensor(v, device) for v in subs]
+                views = build_views(patch)
+            xa, xb, ya, yb = [tensor(v, device) for v in views]
 
             ha, hb = model(xa), model(xb)
 
