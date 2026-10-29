@@ -261,6 +261,29 @@
 在搞清楚"为什么一次平滑比训练四十轮还好"之前，加任何模块都无法证明是它在起作用。
 按事先约定的中止条件，下一步是停下来解释这件事，而不是继续叠加复杂度。
 
+### Round3 补记 — 真实数据阶段什么时候能开（2026-10-29，写于开跑前）
+
+**改动原因**：用户提出"到底什么时候才能进入下一阶段真实数据训练"，并要求看 input / our method / GT 三联图。
+这两个问题都不能靠在脑子里判断，所以把门槛与"真实数据上没有 GT"这件事写进文档，条件先立、结果后看。
+
+**门槛（完整版在 [修订版 §7A](../reviews/V3_PR1_round3_amended_plan.md)）**：真实数据训练启动需要同时满足
+① low6 上有一臂 `n2n ≤ 0.80` 且 6/6 优于输入臂**且击败盲高斯模糊 0.618**；② 第二个档位方向一致；
+③ 有一个与 `n2n` 正交的机制量能解释"为什么比盲模糊强"；④ 先有一次不训练的真实数据零样本评估。
+**当前：①未满足**（四臂全负），所以真实数据训练不启动。
+
+**真实数据没有真值**：SA64/HSA64 没有干净的微血管 GT，全秩链的 n2n 退化（241.8×/5180.4×，phase4 §8.1）。
+因此用户要的"带 GT 的三联图"**只能在模拟数据上出**（Round3 四张图）；真实数据能做的只有
+"input / 我们的方法 / 独立参考"，且必须标"无 GT"。
+
+**已存在的真实数据可视化（Phase 5 零样本，不训练）**：
+
+| 图 | 内容 | 结论 |
+|---|---|---|
+| [v3_real_denoise_SA64.png](../reports/figures/v3_real_denoise_SA64.png)、[HSA64](../reports/figures/v3_real_denoise_HSA64.png) | 不处理（全秩）/ 纯 SVD / SVD+①Wiener 三链并排 MIP | 杂波主导，全秩链一片灰是结论不是画错 |
+| [v3_real_network_SA64.png](../reports/figures/v3_real_network_SA64.png)、[HSA64](../reports/figures/v3_real_network_HSA64.png) | 网络零样本 × 4 seed vs 不处理 vs ①Wiener | **0/4 通过**；dark 区注入结构（保留 2.7–7.3 倍） |
+| [v3_phase4_method_comparison.png](../reports/figures/v3_phase4_method_comparison.png) | 模拟器内几条修法互比（无"去噪前"，用户已指出"看不出什么"） | 仅作方法内部对比 |
+| [fig_r0_SA64.png](../reports/v3_round2/fig_r0_SA64.png)、[HSA64](../reports/v3_round2/fig_r0_HSA64.png) | R0 噪声统计（共参考伪相关的现场） | 旧 36% 相关是假象，真实 2%–4% |
+
 ## 4. 现在最该做的事（按证据强度排序）
 
 > **Round3 A/B 之后的插入项（最高优先级）**：先解释"为什么盲高斯模糊能在 low6 拿到 0.618、
