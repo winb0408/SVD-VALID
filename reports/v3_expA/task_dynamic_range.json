@@ -1,0 +1,13 @@
+{
+ "scale_s": 44932312.0,
+ "input_mean_valid": 0.712641179561615,
+ "truth_mean_valid": 0.011763648129999638,
+ "input_mean_ves": 1.247042179107666,
+ "truth_mean_ves": 0.32874006032943726,
+ "input_mean_bg": 0.6928085088729858,
+ "truth_mean_bg": 0.0,
+ "truth_var_share_in_vessels": 0.9884653687477112,
+ "input_var_share_in_vessels": 0.9618709087371826,
+ "frac_truth_lt_0p01_in_valid": 0.9868094308035714,
+ "frac_truth_eq_0_in_valid": 0.9868094308035714
+}

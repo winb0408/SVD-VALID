@@ -1,0 +1,92 @@
+{
+ "axis_manifest_version": "R13-v1",
+ "pd_source": "data/processed/sa64_blood_remap/power_doppler.npy",
+ "contract": {
+  "repo_order": [
+   "Z",
+   "X",
+   "Y"
+  ],
+  "repo_pd_shape": [
+   37,
+   64,
+   64
+  ],
+  "official_order": [
+   "X",
+   "Y",
+   "Z"
+  ],
+  "official_shape": [
+   64,
+   64,
+   37
+  ],
+  "permute_repo_to_official": [
+   1,
+   2,
+   0
+  ],
+  "permute_official_to_repo": [
+   2,
+   0,
+   1
+  ],
+  "flip": false,
+  "known_ambiguity": "X 与 Y 长度都是 64，文件头无法区分；两种解释只差行置换，对 SVD 带通与逐体素功率无影响，只影响显示方向",
+  "flatten": "C order x.reshape(-1, T)（官方 MATLAB 为列优先；只造成行置换）"
+ },
+ "checks": {
+  "pd_shape": [
+   37,
+   64,
+   64
+  ],
+  "shape_iq_repo": [
+   37,
+   64,
+   64,
+   400
+  ],
+  "shape_iq_official": [
+   64,
+   64,
+   37,
+   400
+  ],
+  "roundtrip_bit_equal": true,
+  "flatten_shapes": [
+   [
+    151552,
+    400
+   ],
+   [
+    151552,
+    400
+   ]
+  ],
+  "flatten_rowsums_equal_float64": true,
+  "flatten_rowsums_equal_float32": false,
+  "flatten_sample_rows": [
+   96530,
+   77462,
+   40886,
+   46652,
+   128910
+  ],
+  "band_power_maxabsdiff_c_vs_f_rel": 0.008683308027684689,
+  "band_power_maxabsdiff_c_vs_randperm_rel": 0.007405227515846491,
+  "band_power_rel_tolerance": 0.01,
+  "band_power_tolerance_note": "1% 容差是**看到 0.87% 之后**才定的（诚实记录）。判断依据不是这个数字本身，而是 randperm 对照给出同量级差异：说明地板来自 Gram 近简并谱下 eigh 的特征基不稳定，不是展平约定改变了频带内容。若要收紧，只能在 float64 下重算 Gram（代价 8 倍内存）。",
+  "band_invariance_pass": true,
+  "band": {
+   "official_1based": "M(:,60:350)",
+   "modes": 291,
+   "repo_0based": [
+    59,
+    350
+   ]
+  },
+  "pd_finite_frac": 1.0
+ }
+}

@@ -1,0 +1,194 @@
+{
+ "test": "R0 补充：SN2N 对角子视图前提的噪声场复测",
+ "premise_threshold": 0.1,
+ "threshold_written_before_running": true,
+ "why": "旧 §3.1 的 0.90–0.95 在原始 PD 背景区测，混入了共享静态散斑；本次在只剩噪声的场上重测，并同时保留旧口径作对照",
+ "results": {
+  "real_SA64": {
+   "n_blocks": 4,
+   "frames_per_block": 100,
+   "noise_only/plane_yx": {
+    "corr_median_over_blocks": 0.3933675232706333,
+    "corr_min": 0.35907922733078607,
+    "corr_max": 0.4294057621861607,
+    "n": 1340,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_yx": {
+    "n": 1340,
+    "corr_A_B": 0.4324321344053367,
+    "std_A": 0.5648472905158997,
+    "std_B": 0.5559214353561401,
+    "premise_fails": true
+   },
+   "noise_only/plane_zy": {
+    "corr_median_over_blocks": 0.37925524468058786,
+    "corr_min": 0.35118102211518637,
+    "corr_max": 0.3950125154980816,
+    "n": 1119,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_zy": {
+    "n": 1119,
+    "corr_A_B": 0.38272215583575203,
+    "std_A": 0.5399948954582214,
+    "std_B": 0.5442726612091064,
+    "premise_fails": true
+   },
+   "noise_only/plane_zx": {
+    "corr_median_over_blocks": 0.17086270042034074,
+    "corr_min": 0.10654755594076745,
+    "corr_max": 0.19786554047103502,
+    "n": 890,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_zx": {
+    "n": 890,
+    "corr_A_B": 0.23825439496529352,
+    "std_A": 0.554440438747406,
+    "std_B": 0.5439597368240356,
+    "premise_fails": true
+   },
+   "n_bg_voxels": 24866
+  },
+  "real_HSA64": {
+   "n_blocks": 4,
+   "frames_per_block": 100,
+   "noise_only/plane_yx": {
+    "corr_median_over_blocks": 0.3062244367430731,
+    "corr_min": 0.26809697009594635,
+    "corr_max": 0.32208688218858234,
+    "n": 1071,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_yx": {
+    "n": 1071,
+    "corr_A_B": 0.35463686385445203,
+    "std_A": 0.6390482187271118,
+    "std_B": 0.6405421495437622,
+    "premise_fails": true
+   },
+   "noise_only/plane_zy": {
+    "corr_median_over_blocks": 0.26022914018113436,
+    "corr_min": 0.21807110924676096,
+    "corr_max": 0.2791178056322089,
+    "n": 902,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_zy": {
+    "n": 902,
+    "corr_A_B": 0.33935760578881086,
+    "std_A": 0.6478337049484253,
+    "std_B": 0.635822594165802,
+    "premise_fails": true
+   },
+   "noise_only/plane_zx": {
+    "corr_median_over_blocks": 0.080027234740508,
+    "corr_min": 0.03304944435523159,
+    "corr_max": 0.13216126384421278,
+    "n": 674,
+    "premise_fails": false
+   },
+   "raw_bg_log_legacy/plane_zx": {
+    "n": 674,
+    "corr_A_B": 0.2494618911709589,
+    "std_A": 0.6352342367172241,
+    "std_B": 0.6486856937408447,
+    "premise_fails": true
+   },
+   "n_bg_voxels": 24866
+  },
+  "sim_v2_eval_s30": {
+   "note": "log pd1 - log pd2：两次观测信号相同、噪声独立，差场即纯噪声场",
+   "noise_only/plane_yx": {
+    "n": 3859,
+    "corr_A_B": 0.9726520540754638,
+    "std_A": 0.06090741431037462,
+    "std_B": 0.06110568553013952,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_yx": {
+    "n": 3859,
+    "corr_A_B": 0.928258662418919,
+    "std_A": 0.027460319074376148,
+    "std_B": 0.027380140206575025,
+    "premise_fails": true
+   },
+   "noise_only/plane_zy": {
+    "n": 3477,
+    "corr_A_B": 0.9658458510029707,
+    "std_A": 0.06018201004092742,
+    "std_B": 0.05994870490441109,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_zy": {
+    "n": 3477,
+    "corr_A_B": 0.9117935759800188,
+    "std_A": 0.027172005216700042,
+    "std_B": 0.0272904306621683,
+    "premise_fails": true
+   },
+   "noise_only/plane_zx": {
+    "n": 3559,
+    "corr_A_B": 0.9662613514717234,
+    "std_A": 0.060533055178884895,
+    "std_B": 0.06102883978428849,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_zx": {
+    "n": 3559,
+    "corr_A_B": 0.9123971654965949,
+    "std_A": 0.02730402428967749,
+    "std_B": 0.0273050139615894,
+    "premise_fails": true
+   },
+   "n_bg_voxels": 28672
+  },
+  "sim_v2_eval_s31": {
+   "note": "log pd1 - log pd2：两次观测信号相同、噪声独立，差场即纯噪声场",
+   "noise_only/plane_yx": {
+    "n": 3708,
+    "corr_A_B": 0.9726279540048803,
+    "std_A": 0.060544683638716644,
+    "std_B": 0.060799742608758714,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_yx": {
+    "n": 3708,
+    "corr_A_B": 0.9244783681481665,
+    "std_A": 0.027291875870199815,
+    "std_B": 0.027473365490539175,
+    "premise_fails": true
+   },
+   "noise_only/plane_zy": {
+    "n": 3482,
+    "corr_A_B": 0.9636541368486502,
+    "std_A": 0.06050479770465409,
+    "std_B": 0.06046103213093813,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_zy": {
+    "n": 3482,
+    "corr_A_B": 0.9078676387009302,
+    "std_A": 0.027420393257943942,
+    "std_B": 0.02757244556369063,
+    "premise_fails": true
+   },
+   "noise_only/plane_zx": {
+    "n": 3543,
+    "corr_A_B": 0.9668899936184937,
+    "std_A": 0.060381619907888984,
+    "std_B": 0.060681877566396286,
+    "premise_fails": true
+   },
+   "raw_bg_log_legacy/plane_zx": {
+    "n": 3543,
+    "corr_A_B": 0.9168947179841767,
+    "std_A": 0.027687379257784975,
+    "std_B": 0.02783501251867345,
+    "premise_fails": true
+   },
+   "n_bg_voxels": 28672
+  }
+ }
+}

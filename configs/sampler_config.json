@@ -1,0 +1,250 @@
+{
+ "sampler_config_version": "R03-v1",
+ "purpose": "冻结物理先验采样器的全部外部输入；任何一项变化都必须刷新本文件并重跑受影响实验",
+ "geometry": {
+  "m": 2,
+  "w": 3,
+  "block_voxels_per_axis": 4,
+  "phases": 8,
+  "tetris_patterns": [
+   [
+    0,
+    1,
+    2,
+    4
+   ],
+   [
+    0,
+    1,
+    3,
+    5
+   ],
+   [
+    1,
+    2,
+    3,
+    7
+   ],
+   [
+    0,
+    2,
+    3,
+    6
+   ],
+   [
+    0,
+    4,
+    5,
+    6
+   ],
+   [
+    1,
+    4,
+    5,
+    7
+   ],
+   [
+    2,
+    4,
+    6,
+    7
+   ],
+   [
+    3,
+    5,
+    6,
+    7
+   ]
+  ],
+  "complement_pattern": [
+   7,
+   6,
+   4,
+   5,
+   2,
+   3,
+   1,
+   0
+  ],
+  "usable_prefix_rule": "(n // (2m)) * (2m)，各轴独立；z=37 -> 36，其余轴 64 全用",
+  "usable_prefix": [
+   36,
+   64,
+   64
+  ],
+  "shape_zyx": [
+   37,
+   64,
+   64
+  ],
+  "coverage_m1": 1.0,
+  "coverage_m2": 0.125
+ },
+ "roles": {
+  "preregistered_in": "reports/v3_phase2_role_order.md §4（写于 2026-10-21，先于任何训练）",
+  "preferred_class": "body_diagonal",
+  "slots": {
+   "body_diagonal": [
+    1,
+    4,
+    6,
+    3
+   ],
+   "y_axial_role_swap": [
+    1,
+    4,
+    3,
+    6
+   ]
+  },
+  "slots_note": "两行是**同一批 4 个体素、同样的输入**，只把两个目标对调 —— 实验 C 的'正确 vs 错误先验'配对臂就是把二者对调，覆盖率与坐标完全一致",
+  "forbidden": [
+   "x_axial",
+   "z_axial"
+  ],
+  "forbidden_reason": "x 轴向泄漏 0.536/0.468、z 轴向 0.378/0.318，一条就吃掉目标噪声的 1/3–1/2",
+  "role_order_file": {
+   "path": "data/processed/v3_role_order_m2.json",
+   "sha1": "023f604bd33c1f9ef4ae2fcdef64c0ae368b919c",
+   "summary": {
+    "SA64": {
+     "best_shift": [
+      -1,
+      -1,
+      -1
+     ],
+     "best_L": 0.016578845223484323,
+     "worst_shift": [
+      0,
+      0,
+      1
+     ],
+     "worst_L": 0.5363140483431094,
+     "n_pairs": 128,
+     "shift_class_spread_max": 0.0
+    },
+    "HSA64": {
+     "best_shift": [
+      -1,
+      -1,
+      1
+     ],
+     "best_L": 0.03620088086944087,
+     "worst_shift": [
+      0,
+      0,
+      1
+     ],
+     "worst_L": 0.46839389393168707,
+     "n_pairs": 128,
+     "shift_class_spread_max": 0.0
+    }
+   }
+  },
+  "caveat": "本表只冻结**噪声侧**（泄漏 L）排序；信号侧 S(k) 未测，「体对角最好」这句话仍然不成立（见 v3_phase2_role_order.md §5）"
+ },
+ "prior": {
+  "kind": "measured_speckle_autocorrelation",
+  "source": {
+   "path": "data/processed/v3_correlation_length.json",
+   "sha1": "788e3c096402f5d71ef0f919a0320aae0779809b",
+   "sequences": [
+    "HSA64",
+    "SA64"
+   ]
+  },
+  "deplateau": "fast_curve(acf, plateau)：去掉静态散斑的平台，只保留快速分量",
+  "leak_model": "L = c^T C^{-1} c（输入 = a 在 ±w cell 内全部位点，w=3）",
+  "not_used": "静态散斑平台本身不进采样器（它属于「该保留」的一侧，进采样器会把噪声当信号）"
+ },
+ "band": {
+  "official_1based": "M(:,60:350)",
+  "modes": 291,
+  "repo_0based": [
+   59,
+   350
+  ],
+  "frozen_in": "scripts/v3_phase5_real_compare.py::band_slice（4 项单测）"
+ },
+ "imaging_constants": {
+  "psf_sigma_zyx": [
+   3.0,
+   2.37,
+   3.97
+  ],
+  "thermal_sigma_zyx": [
+   1.0,
+   1.2,
+   1.1
+  ],
+  "source": "scripts/v3_simulator.py::SimCfg（标定值，见 reports/v3_r06/）",
+  "role": "既用于仿真前向，也用于 oracle_lowpass 对照（同一核，保证对照不偷步）"
+ },
+ "valid_mask": {
+  "official_SA64": {
+   "path": "data/processed/official/SA64/valid_mask.npy",
+   "sha1": "b0723971e986f91488a87ce1f091ba0253d511b2",
+   "coverage": 0.8203652871621622,
+   "z_all_false": [
+    0,
+    1,
+    2
+   ],
+   "note": "含扇形成像足迹（z=3..13 逐层渐开），不是简单死区"
+  },
+  "official_HSA64": {
+   "path": "data/processed/official/HSA64/valid_mask.npy",
+   "sha1": "b0723971e986f91488a87ce1f091ba0253d511b2",
+   "coverage": 0.8203652871621622,
+   "same_as_SA64": true
+  },
+  "sim": {
+   "rule": "valid = ones(shape); valid[:2] = False  # 近场死区",
+   "sha1": "feb12ccc78aca9e3353557d38a838637d3674eff",
+   "coverage": 0.9459459459459459
+  },
+  "sim_vs_official_SA64": {
+   "iou": 0.8672433035714285,
+   "coverage_gap": 0.12558065878378377,
+   "disclaimer": "仿真有效区**不等于**真实有效区：仿真只挖掉近场死区（覆盖 0.919），真实官方掩膜还挖掉扇形成像足迹（覆盖 0.820）。所以「仿真指标可迁移到真实数据」这句话在有效区口吻上也不成立；仿真内部各臂之间可比，跨仿真/真实的绝对值不可比。"
+  }
+ },
+ "negative_controls": {
+  "status": "spec_frozen_not_run",
+  "why_not_run": "属实验 C；实验 A 的门（reports/v3_expA_v2/prereg.md §3.3 T2）通过前不启动。规格与「先验变体会指向哪些槽位」已在 reports/v3_expC/prereg.md §1 算好，训练本身尚未运行",
+  "prior_arms_source": "data/processed/v3_expC/prior_arms.json（scripts/v3_expC_prior_arms.py）",
+  "arms": [
+   {
+    "name": "correct_prior",
+    "spec": "实测 ρ 推出的体对角槽位 [0,1,7,6]（与预注册的 [1,4,6,3] 同类，只是换了 tet）",
+    "isolates": "基线臂，其余三条臂都与它比"
+   },
+   {
+    "name": "wrong_role_swap",
+    "spec": "同样 4 个体素、同样覆盖率，只把两个目标对调：[0,1,7,6] -> [0,1,6,7]",
+    "isolates": "采样**角色/位移**，覆盖率与坐标完全不变（最干净的单变量对照）"
+   },
+   {
+    "name": "wrong_prior_isotropic",
+    "spec": "ρ 换成 exp(-|δ|/ℓ)；SA64 上推出 [2,7,5,0]",
+    "isolates": "先验的**各向异性**部分——注意 HSA64 上它推出与实测相同的槽位，所以只在 SA64 上作数（同分内由枚举顺序决定）"
+   },
+   {
+    "name": "wrong_prior_axis_permuted",
+    "spec": "ρ 的三轴曲线循环错位 (z,y,x)->(y,x,z)",
+    "status": "void_undetectable",
+    "why_void": "27 个位移类的取值集合映射到自身，排序完全不变（32.3× 仍 32.3×），推出的槽位与实测逐位相同。**这条臂已事前证伪为空操作**，不跑；与 R13 known_ambiguity（x/y 等长，轴错位只影响显示）一致"
+   },
+   {
+    "name": "random_cross",
+    "spec": "每步随机抽 tet（上游 VALID 的做法）",
+    "isolates": "随机化本身是否必要"
+   }
+  ]
+ },
+ "consumers": {
+  "train.py --sampler-config": "训练前校验本文件并把副本+sha1 写进 run 目录（见 train.py）",
+  "scripts/v3_role_order.py": "生成角色序（本文件记录它的输出 hash）",
+  "scripts/v3_probe_prior_sensitivity.py": "错误先验的负控制（未实现，属实验 C）"
+ }
+}

@@ -1,0 +1,51 @@
+{
+ "dataset": "HSA64",
+ "grid": [
+  32,
+  64,
+  64
+ ],
+ "w": 7,
+ "b_stats": {
+  "sig2": 0.0622173547744751,
+  "frac_b_lt_0.05": 0.5128709213495006,
+  "frac_b_gt_0.95": 0.00021110685965352086,
+  "b_median": 0.0,
+  "lv_median": 0.0622173547744751,
+  "sig2_over_lv_median": 1.0,
+  "frac_lv_lt_sig2": 0.4999934029106358
+ },
+ "mip_contrast": {
+  "②SVD": {
+   "dark_median_db": 64.86363220214844,
+   "core_median_db": 76.55461120605469,
+   "body_median_db": 69.4300765991211,
+   "contrast_core_minus_dark_db": 11.69097900390625,
+   "contrast_body_minus_dark_db": 4.566444396972656,
+   "dark_db_spatial_std": 0.4999253451824188,
+   "grad_energy_body": 2.329397678375244,
+   "p50_db": 67.58003997802734,
+   "p99_9_db": 80.08574676513672,
+   "clip_hi_frac": 0.0012755102040816326,
+   "clip_lo_frac": 0.0009566326530612245
+  },
+  "③SVD+Wiener": {
+   "dark_median_db": 64.36653137207031,
+   "core_median_db": 75.70086669921875,
+   "body_median_db": 68.18302154541016,
+   "contrast_core_minus_dark_db": 11.334335327148438,
+   "contrast_body_minus_dark_db": 3.8164901733398438,
+   "dark_db_spatial_std": 0.6048356294631958,
+   "grad_energy_body": 1.8095142841339111,
+   "p50_db": 66.74988555908203,
+   "p99_9_db": 78.90341186523438,
+   "clip_hi_frac": 0.0,
+   "clip_lo_frac": 0.01020408163265306
+  }
+ },
+ "shared_window": {
+  "vlo": 63.69710922241211,
+  "vhi": 80.08574676513672
+ },
+ "note": "归因诊断，不产生判据、不改变任何预注册结论"
+}

@@ -1,0 +1,36 @@
+{
+  "cells": 44,
+  "tol": 0.05,
+  "max_abs_err": 0.03677712097635233,
+  "worst": [
+    "s0_low_metrics.json",
+    "A_fixed4_s3408",
+    "s0_low_e901",
+    6.730880745933515,
+    3.5196885160358047,
+    6.694103624957163,
+    -0.03677712097635233
+  ],
+  "gate": "PASS",
+  "files": [
+    "s0_low_metrics.json",
+    "s0_low_metrics_dense.json",
+    "s0_low60_metrics.json",
+    "s0_vlow_metrics.json",
+    "s0_mid_metrics.json"
+  ],
+  "loss_to_n2n": {
+    "0.11": {
+      "r_train": 0.33166247903553997,
+      "n2n_eq": 0.555
+    },
+    "0.16": {
+      "r_train": 0.4,
+      "n2n_eq": 0.58
+    },
+    "1.15": {
+      "r_train": 1.0723805294763609,
+      "n2n_eq": 1.075
+    }
+  }
+}
