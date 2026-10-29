@@ -281,8 +281,16 @@
 |---|---|---|
 | [v3_real_denoise_SA64.png](../reports/figures/v3_real_denoise_SA64.png)、[HSA64](../reports/figures/v3_real_denoise_HSA64.png) | 不处理（全秩）/ 纯 SVD / SVD+①Wiener 三链并排 MIP | 杂波主导，全秩链一片灰是结论不是画错 |
 | [v3_real_network_SA64.png](../reports/figures/v3_real_network_SA64.png)、[HSA64](../reports/figures/v3_real_network_HSA64.png) | 网络零样本 × 4 seed vs 不处理 vs ①Wiener | **0/4 通过**；dark 区注入结构（保留 2.7–7.3 倍） |
+| [v3_real_network_SA64_round3.png](../reports/figures/v3_real_network_SA64_round3.png)、[HSA64_round3](../reports/figures/v3_real_network_HSA64_round3.png) | **B1 四臂**零样本 vs 不处理 vs ①Wiener（2026-10-29 新增） | **0/4 通过**；n2n 0.059–0.53、dark 1.02–1.11×（病灶已修掉，但仍输 Wiener） |
 | [v3_phase4_method_comparison.png](../reports/figures/v3_phase4_method_comparison.png) | 模拟器内几条修法互比（无"去噪前"，用户已指出"看不出什么"） | 仅作方法内部对比 |
 | [fig_r0_SA64.png](../reports/v3_round2/fig_r0_SA64.png)、[HSA64](../reports/v3_round2/fig_r0_HSA64.png) | R0 噪声统计（共参考伪相关的现场） | 旧 36% 相关是假象，真实 2%–4% |
+
+**补记之后又跑了一次（2026-10-29，不训练）**：条件 ④（先有一次不训练的真实数据零样本评估）**已完成并留档**
+→ [reports/v3_round3_real_zeroshot.md](../reports/v3_round3_real_zeroshot.md)。B1 的输出头改动把 Phase 5 的两个病灶
+（n2n ≈0.95 几乎不改善、dark 区注入 2.7–7.3×）修成 n2n 0.059–0.53、dark 1.02–1.11×，但**没有一臂同时满足
+`n2n ≤ ①Wiener` 与 `core ≥ 0.95`**：低 n2n 一律伴随过度平滑（core 0.738–0.917），唯一 core ≥ 0.95 的臂 n2n 反超 ①。
+这是一条真实数据上可观测的 **n2n ↔ 结构权衡**，与仿真 low6 上"盲模糊 0.618 靠平滑取胜"同源。
+条件 ①②③ **仍全部未满足**，真实数据训练**仍不启动**。
 
 ## 4. 现在最该做的事（按证据强度排序）
 

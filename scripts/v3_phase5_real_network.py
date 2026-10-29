@@ -80,7 +80,18 @@ CKPT_GLOB = "runs/v3_n2n_multi/res_s*/latest.pt"
 
 
 def net_estimator(ckpt_paths, shape3d, device):
-    """返回 [(name, fn)]：每个 checkpoint 一个整卷前向的估计器（②=残差+中心可见）。"""
+    """返回 [(name, fn, args)]：每个 checkpoint 一个整卷前向的估计器。
+
+    **2026-10-29 扩展（Round3 零样本对照用）**：原版只认 `infer == "full"`（Round2 的 `v3_n2n_multi`
+    约定）。Round3 的 B1 检查点用 `--mode dense` + `--arch-head {direct,residual}`，
+    根本不写 `infer`/`residual` 两个键，于是原版会把它们当成"不是整卷前向"直接拒掉。
+    这里改为**两种约定都认**：
+      · `infer == "full"`（旧）；
+      · `mode == "dense"` 且 `patch == [32,64,64]`（B1）——dense 模式在整卷上做一次前向，
+        与 `infer=="full"` 是同一件事，只是键名不同。
+    残差语义同样两种都认：`residual` 或 `arch_head == "residual"`（`zeroinit` 是残差 + 末层零初始化，
+    前向与 residual 完全相同，区别只在训练起点）。
+    """
     import torch
     from models.network import NetworkCNR
 
@@ -88,21 +99,24 @@ def net_estimator(ckpt_paths, shape3d, device):
     for ck in ckpt_paths:
         blob = torch.load(ck, map_location="cpu", weights_only=False)
         a = blob["args"]
-        if a.get("infer") != "full":
-            raise SystemExit(f"{ck} 不是整卷前向的 ② checkpoint（infer={a.get('infer')}）")
+        dense_full = (a.get("mode") == "dense" and list(a.get("patch") or []) == [32, 64, 64])
+        if a.get("infer") != "full" and not dense_full:
+            raise SystemExit(f"{ck} 不是整卷前向的 checkpoint（infer={a.get('infer')} mode={a.get('mode')}）")
+        residual = bool(a.get("residual")) or a.get("arch_head") in ("residual", "zeroinit")
         model = NetworkCNR(features=a["features"], groups=a["groups"]).to(device)
         model.load_state_dict(blob["model"])
         model.eval()
 
-        def fn(x, model=model, a=a):
+        def fn(x, model=model, residual=residual):
             with torch.no_grad():
                 xin = torch.as_tensor(np.ascontiguousarray(x), device=device)[None, None].float()
                 h = model(xin)
-                pred = (xin + h if a.get("residual") else h)[0, 0].cpu().numpy()
+                pred = (xin + h if residual else h)[0, 0].cpu().numpy()
             return pred.astype(np.float32)
 
+        head = a.get("arch_head") or ("residual" if a.get("residual") else "direct")
         name = f"④SVD+②网络 {ck.parent.name}"
-        out.append((name, fn, a))
+        out.append((name, fn, dict(a, _resolved_head=head)))
     return out
 
 
@@ -114,6 +128,10 @@ def main():
     ap.add_argument("--w", type=int, default=7, help="① 的窗口（与 L50 一致）")
     ap.add_argument("--ckpt-glob", default=CKPT_GLOB)
     ap.add_argument("--out-dir", default="reports/v3_phase5_real")
+    # 2026-10-29：加 --tag 是为了**不覆盖 Phase 5 的既有产物**（`reports/figures/v3_real_network_{ds}.png`
+    # 与 `{ds}_network.json` 已被文档引用）。给 tag 时输出改名为 `v3_real_network_{ds}_{tag}.png` /
+    # `{ds}_network_{tag}.json`，原文件一个字节都不动。
+    ap.add_argument("--tag", default="", help="输出文件后缀，用于与 Phase 5 既有产物并存")
     args = ap.parse_args()
 
     import torch
@@ -263,7 +281,8 @@ def main():
         "note": ("真实数据 n2n 不做绝对通过/不通过判定（天花板未校准）；上表的通过线是"
                  "**相对 ①** 的预注册门槛，只用于回答'④ 能不能赢 ①'。"),
     }
-    (out_dir / f"{ds}_network.json").write_text(
+    sfx = f"_{args.tag}" if args.tag else ""
+    (out_dir / f"{ds}_network{sfx}.json").write_text(
         json.dumps(rec, ensure_ascii=False, indent=1))
 
     # ---------------- 图：四栏 MIP + 放大 + 柱状 ----------------
@@ -345,10 +364,10 @@ def main():
     fig.suptitle(f"{ds}：第四条链 = SVD + 本项目 ② 网络（零样本，未在真实数据上训练）"
                  f"　通过 {n_pass}/{len(net_names)} 个 seed", fontsize=14)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
-    outp = fig_dir / f"v3_real_network_{ds}.png"
+    outp = fig_dir / f"v3_real_network_{ds}{sfx}.png"
     fig.savefig(outp, dpi=110)
     print(f"[{ds}] 图 → {outp}")
-    print(f"[{ds}] 数值 → {out_dir / f'{ds}_network.json'}")
+    print(f"[{ds}] 数值 → {out_dir / f'{ds}_network{sfx}.json'}")
 
 
 if __name__ == "__main__":

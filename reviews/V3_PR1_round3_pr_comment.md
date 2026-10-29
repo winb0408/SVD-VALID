@@ -192,3 +192,54 @@ dark 区注入结构 2.7–7.3 倍）、`v3_real_denoise_{SA64,HSA64}.png`（全
 **本次改动文件**：`reviews/V3_PR1_round3_amended_plan.md`（新增 §7A）、
 `Project log/Project_progress_status.md`（Round3 补记）、本文件（§7 与顶部指针）。
 **未运行**：任何训练、任何新探针；C/I1、D、`runs/v3_chain_after_T2.sh` 仍未动。
+
+---
+
+## 8. 真实数据零样本评估已执行（2026-10-29 追加，无训练）
+
+**为什么加这一节**：§7 的条件 ④ 要求"先有一次不训练的真实数据零样本评估"。用户选择了现在就做，
+所以用 Round3 的 B1 四臂 checkpoint，在真实 SA64/HSA64 上跑了一遍（**未训练、未调参、未改阈值**）。
+这次执行只用来回答"新输出头有没有把 Phase 5 的病灶修掉"，**不作为真实数据训练启动的依据**。
+
+**协议与 §7 / Phase 5 完全一致**：血流带 `[0.15, 0.875]×400`、`log1p(PD/s)` 归一化、网格 `[32,64,64]`、
+判定 `n2n ≤ n2n(①Wiener w=7)` 且 `core ≥ 0.95`（预注册写在输出 JSON 的 `prereg.written_before_run=true`）。
+命令：
+
+```bash
+python -u scripts/v3_phase5_real_network.py --dataset SA64  --ckpt-glob 'runs/v3_round3/b1_*/B1_*/latest.pt' \
+  --out-dir reports/v3_round3_real --tag round3
+python -u scripts/v3_phase5_real_network.py --dataset HSA64 --ckpt-glob 'runs/v3_round3/b1_*/B1_*/latest.pt' \
+  --out-dir reports/v3_round3_real --tag round3
+```
+
+**结果：SA64 0/4、HSA64 0/4 通过。**
+
+| 臂 | SA64 n2n / core / dark | HSA64 n2n / core / dark |
+|---|---|---|
+| 不处理（SVD 输出） | 1.0000 / 1.000 / 1.000 | 1.0000 / 1.000 / 1.000 |
+| ①Wiener w=7 | 0.2759 / 0.976 / 1.047 | 0.3774 / 0.933 / 1.240 |
+| B1_low_residual | **0.0591** / 0.738 / 1.051 | **0.1512** / 0.814 / **1.111** |
+| B1_low_zeroinit | 0.1619 / 0.877 / 1.035 | 0.5262 / 0.949 / 1.042 |
+| B1_vlow_residual | 0.2651 / 0.873 / 1.033 | 0.3543 / 0.917 / 1.066 |
+| B1_vlow_zeroinit | 0.4777 / **0.960** / 1.022 | 0.7697 / **0.986** / 1.027 |
+
+**对比 Phase 5（Round2 权重）**：最好 n2n 0.9536（SA64）/ 0.9503（HSA64），dark 注入 4.9–7.3× / 2.7–3.8×。
+所以 B1 的输出头把两个病灶都修掉了；**但没有换来对 ① 的胜利**。
+
+**读法与限制**
+
+1. 真实数据上可观测到一条 **n2n ↔ 结构权衡**：低 n2n 一律伴随 `core` 0.738–0.917（过度平滑），
+   唯一 `core ≥ 0.95` 的 `B1_vlow_zeroinit` n2n 0.478/0.770 反超 ①。与仿真 low6 上"盲模糊 0.618 靠平滑取胜"同源。
+2. HSA64 上 `B1_low_residual` 的 n2n（0.1512）与 dark（1.111）双双优于 ①（0.3774 / 1.240），但 core 0.814 < 0.933，
+   故只记"一维更好、核心结构更差"，**不写"胜过 Wiener"**。
+3. 真实数据 **无 GT**，全秩链 n2n 退化 ×241.8/×5180.4（phase4 §8.1），**真实数据 n2n 没有校准地板**；
+   0.059 只做臂间相对比较，不能解读为"接近完美"。
+4. 因此 §7 条件 ④ **已完成并留档**，条件 ①②③ **仍全部未满足**，真实数据训练**仍不启动**。
+
+**脚本改动（两处）**：① `net_estimator` 接受 `mode=dense` + `arch_head` 的 checkpoint 约定（B1 checkpoint 无
+`infer`/`residual` 键，原版直接拒绝）；② 新增 `--tag`，输出写到 `reports/v3_round3_real/` 与 `*_round3.png`，
+**Phase 5 既有产物未被覆盖**。
+
+**产物**：`reports/v3_round3_real/{SA64,HSA64}_network_round3.json`、
+`reports/figures/v3_real_network_{SA64,HSA64}_round3.png`、[reports/v3_round3_real_zeroshot.md](reports/v3_round3_real_zeroshot.md)。
+**未运行**：任何训练、任何新探针；C/I1、D、`runs/v3_chain_after_T2.sh` 仍未动。
