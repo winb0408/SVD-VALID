@@ -292,6 +292,16 @@
 这是一条真实数据上可观测的 **n2n ↔ 结构权衡**，与仿真 low6 上"盲模糊 0.618 靠平滑取胜"同源。
 条件 ①②③ **仍全部未满足**，真实数据训练**仍不启动**。
 
+**Round4-0（P0，2026-10-29，零训练，GPU·h ≈ 0.15 / 训练作业 0）已完成** →
+[reports/v3_round4/baseline_pareto.md](../reports/v3_round4/baseline_pareto.md)。结构尺子重建三次
+（v1 voxel 检测、v2 段级 CNR 均失败留档；v3 `rmse²=bias²+var` 分解通过 6/6×2 档，含合成噪声控制）。
+公平 baseline 与 Pareto 后，预注册 0 Gate 给出 `BASELINE_DOMINATED = False`，但 `bg_std_ratio` 轴退化
+（0.983–1.002）使其**无判别力，本轮不采信**。随后按写死的 β 规则在**未见**的 e906–e911 上确认：
+**vlow 档 β=0.5 的 net_residual / net_zeroinit 通过**（对 gauss 的 `|bias_ves|` 6/6 更小、`var_bg` 5/6 不劣，
+对 wiener 三条 6/6）；**low 档三臂 `NO_FEASIBLE_BETA`**，即旧 Gate"网络输给盲高斯"在该档不变。
+这是本项目**第一次在预注册判据 + 未见数据下**得到的正向结果，强度上限为"该仿真器 + 该 6 卷可复现"，
+不可外推到真实数据。Round4-B/C/D 均未启动。
+
 ## 4. 现在最该做的事（按证据强度排序）
 
 > **Round3 A/B 之后的插入项（最高优先级）**：先解释"为什么盲高斯模糊能在 low6 拿到 0.618、

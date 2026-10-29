@@ -10,6 +10,11 @@
 > **2026-10-29 追加（第三次推送，§8）**：`§8. 真实数据零样本评估已执行`——用 B1 四臂在真实 SA64/HSA64 上
 > 做了一次**不训练**的零样本评估（提交 `7eaadfa`）。判据在跑之前写死：`n2n ≤ ①Wiener` 且 `core ≥ 0.95`；
 > 结果 **SA64 0/4、HSA64 0/4**。§7 条件 ④ 已完成，条件 ①②③ 仍未满足，真实数据训练仍不启动。
+>
+> **2026-10-29 追加（第四次推送，§9）**：`§9. Round4-0（P0，零训练）已执行`——按 Round4 计划先重建结构尺子
+> （v1/v2 失败留档、v3 校验通过），再做公平 baseline 与 Pareto，最后在**未见过的 e906–e911** 上跑预注册确认。
+> **vlow 档 β=0.5 的 net_residual / net_zeroinit 确认通过**（对 gauss 的 `|bias_ves|` 6/6 更小、`var_bg` 5/6 不劣）；
+> **low 档三臂 `NO_FEASIBLE_BETA`，旧 Gate 结论不变**。零训练，GPU·h ≈ 0.15。
 
 ---
 
@@ -247,3 +252,72 @@ python -u scripts/v3_phase5_real_network.py --dataset HSA64 --ckpt-glob 'runs/v3
 **产物**：`reports/v3_round3_real/{SA64,HSA64}_network_round3.json`、
 `reports/figures/v3_real_network_{SA64,HSA64}_round3.png`、[reports/v3_round3_real_zeroshot.md](reports/v3_round3_real_zeroshot.md)。
 **未运行**：任何训练、任何新探针；C/I1、D、`runs/v3_chain_after_T2.sh` 仍未动。
+
+## 9. Round4-0（P0，零训练）已执行：先重建尺子，再拿到一个预注册确认的正向结果（2026-10-29 追加）
+
+**预算消耗**：GPU·h ≈ 0.15，新增训练作业 **0**（Round4 上限 8 GPU·h / 8 作业）。
+
+### 9.1 三把尺子，前两把失败
+
+| 版本 | 指标 | 已知答案控制 | 处置 |
+|---|---|---|---|
+| v1 | voxel `recall@fpr5` / `iou_core` / `ncomp` | **失败**：完美真值自己只有 0.36–0.57，输入/高斯同量级；断枝 0/6、造假 1/6 | 留 `metric_controls.json` |
+| v2 | 段级 CNR | **失败**：真值/输入/高斯两位小数相同；断枝 0/6 | 留 `metric_controls_v2.json` |
+| v3 | 对 PSF 匹配真值的 `rmse² = bias² + var` 分解 | **通过**：恒等式 + 五个构造臂，两档各 6/6 | `metric_checks_v3.json` |
+
+**失败根因（一条硬结论）**：`PSF_PD σ=(4.24,3.35,5.61)` 体素 ≫ 血管半径 0.75–1.5 体素，
+且段尺度上噪声被平均掉 ⇒ **任何阈值化检测型结构指标在本仿真器上都没有判别区间**。
+v3 不阈值化；v3.1 另记一条数据事实：vlow 档 σ*=0.5 的盲高斯 n2n 好（0.81–0.85），
+但对真值 RMSE 只略优于不动，且压低血管幅度 0.0045–0.0051。
+
+### 9.2 主表（held e902–e905；操作点只在 e900/e901 上选）
+
+| 臂 | low rmse / bias_ves / var_bg | vlow rmse / bias_ves / var_bg |
+|---|---|---|
+| 不处理 | 0.0199–0.0205 / ±7e-4 / 3.8–4.1e-4 | 0.0066–0.0068 / ±2e-4 / 4.3–4.5e-5 |
+| gauss(σ*) | **0.0097–0.0102** / −0.0070…−0.0083 / **0.91–1.02e-4** | **0.0053–0.0057** / −0.0045…−0.0051 / **2.7–3.1e-5** |
+| wiener(w=3) | 0.0130–0.0141 / −0.0115…−0.0141 / 1.66–1.94e-4 | 0.0100–0.0113 / −0.0121…−0.0145 / 9.7e-5–1.23e-4 |
+| net_direct | 0.0244–0.0559 / −0.0426…+0.0184 / 5.9e-4–1.08e-3 | 0.0208–0.0527 / −0.0417…+0.0178 / 4.3e-4–8.2e-4 |
+| net_residual | 0.0235–0.0334 / −0.0016…−0.0090 / 5.4e-4–1.04e-3 | 0.0053–0.0062 / **−0.0004…−0.0011** / 2.7–3.7e-5 |
+| net_zeroinit | 0.0154–0.0171 / **−0.0017…−0.0028** / 2.4–2.9e-4 | 0.0061–0.0071 / **−0.0003…−0.0006** / 3.8–4.9e-5 |
+
+**0 Gate**：`BASELINE_DOMINATED = False`，两档三臂"非支配"。**但这个 Gate 无判别力**：
+`bg_std_ratio` 全部落在 0.983–1.002（背景波动由 PSF 旁瓣主导），该轴在本仿真器上退化。
+明细里 `net_direct` 在 4 卷中的 3 卷被 gauss 与 wiener 同时支配，只因规则要求"全部 held 卷"才未判支配。
+按预注册"不得因某轴无判别力就宣告胜利"，**本轮不使用这个 Gate 声称任何结论**。
+
+### 9.3 确认实验（e906–e911，六卷；β 规则在看数据之前写死）
+
+β 选点规则（`V3_PR1_round4_prereg_v4_confirm.md` §1，只在 e900/e901 上算）：
+`β* = argmin |bias_ves(β)| s.t. var_bg(β) ≤ var_bg(gauss σ*)`，空集 → `NO_FEASIBLE_BETA`。
+通过线：对 gauss 与 wiener 各三条指标（`var_bg` / `|bias_ves|` / `overall_rmse`）都不劣，≥5/6 卷。
+
+| 档 | 臂 | β* | vs gauss（var/bias/rmse） | vs wiener | 结论 |
+|---|---|---|---|---|---|
+| low | net_direct / net_residual / net_zeroinit | — | — | — | `NO_FEASIBLE_BETA` |
+| vlow | net_residual | 0.5 | 5/6 · **6/6** · 5/6 | 6/6 · 6/6 · 6/6 | **`STRUCT_SAFE_GAIN_CONFIRMED`** |
+| vlow | net_zeroinit | 0.5 | 5/6 · **6/6** · 5/6 | 6/6 · 6/6 · 6/6 | **`STRUCT_SAFE_GAIN_CONFIRMED`** |
+
+未通过的 1 卷是 **e910 的 `var_bg`（2.42e-5 > 2.27e-5）**，如实记录、不做解释性豁免。
+
+### 9.4 边界（请审查方重点看这一节）
+
+1. **low 档不变**：三臂全部 `NO_FEASIBLE_BETA` ⇒ 旧 Gate"网络 0.825 输给盲高斯 0.618"在该档依然成立。
+2. **不是"全局最优"**：β 是 Round4 引入的后处理旋钮；选点规则虽在确认集之前写死，
+   但"网络在匹配噪声下结构偏差更小"这一**假设**是从 e902–e905 看出来的 ⇒ **探索+确认两段式**，
+   强度上限是"在该仿真器、该 6 卷上复现"，**不可推广**。
+3. **不可外推到真实数据**：SA64/HSA64 无 clean GT，本节结论只在仿真器内成立。
+4. **`bg_std_ratio` 不可用于任何比较**。
+
+### 9.5 产物
+
+- 报告：`reports/v3_round4/baseline_pareto.md`；数据：`baseline_pareto.json`、`p0_confirm.json`、
+  `metric_controls.json`(v1) / `metric_controls_v2.json`(v2) / `metric_checks_v3.json`(v3/v3.1)
+- 图：`reports/figures/v3_round4_pareto.png`（两档 `var_bg` vs `|bias_ves|` Pareto 前沿 +
+  确认集 `bias_ves(net)/bias_ves(gauss)` 逐卷比值）
+- 预注册：`V3_PR1_round4_prereg.md` / `_v2_metric` / `_v3_metric` / `_v3_1_metric_control_fix` / `_v4_confirm`；
+  审阅答复：`V3_PR1_round4_review_response.md`
+- 脚本：`scripts/v3_round4_{metrics,metrics_v2,metrics_v3,metric_controls,metric_controls_v2,metric_checks_v3,p0,p0_confirm,figure}.py`
+
+**下一步（未启动）**：Round4-B0 真实数据三域统计 → B1 三臂短 pilot（≤3 训练）。C/I1 与 D 未动，
+`runs/v3_chain_after_T2.sh` 未运行，未改任何阈值，未合并本 PR。
