@@ -269,6 +269,10 @@ def main():
                     help="Round3 B1：把输出层（net.out）的权重与偏置置零。"
                          "只对 residual 有意义（起点精确等于输入）；对 direct 会是退化的全零起点，"
                          "脚本会拒绝这种组合。")
+    ap.add_argument("--resume", default=None,
+                    help="Round4：从已有 checkpoint 续训（只加载 model 权重，**不**恢复优化器/调度器状态）。"
+                         "起始 epoch 取 checkpoint 里的 epoch，poly/cosine 的学习率按**全局** epoch 继续衰减。"
+                         "用于预注册允许的『最优臂 15→40 epoch』续训。")
     ap.add_argument("--groups", type=int, default=4)
     ap.add_argument("--seed", type=int, default=3407)
     ap.add_argument("--device", default="cuda")
@@ -347,15 +351,28 @@ def main():
     model = build_model(args, device)
     if args.arch_head != "direct" or args.zero_init_final:
         print(f"[B1] arch_head={args.arch_head} zero_init_final={args.zero_init_final}")
+
+    start_epoch = 0
+    if args.resume:
+        # Round4：只加载权重（checkpoint 里没存优化器状态），起始 epoch 取 checkpoint 的 epoch，
+        # 学习率按**全局** epoch 继续衰减（而不是从头 1e-4 重来）。
+        rck = torch.load(args.resume, map_location=device)
+        model.load_state_dict(rck["model"])
+        start_epoch = int(rck.get("epoch", 0))
+        assert start_epoch < args.epochs, (
+            f"--resume 的 epoch={start_epoch} 不小于 --epochs={args.epochs}，没有可续训的步数")
+        print(f"[resume] {args.resume}：已有 {start_epoch} epoch，"
+              f"本轮续 {args.epochs - start_epoch} epoch（只加载权重，不恢复优化器状态）")
+
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999))
     if args.lr_schedule == "poly":
         # 上游 VALID v1.0：lr·(1 − epoch/max_epoch)^0.9，无 warmup
-        lr_func = lambda epoch: max(1.0 - epoch / max(args.epochs, 1), 0.0) ** 0.9
+        lr_func = lambda epoch: max(1.0 - (start_epoch + epoch) / max(args.epochs, 1), 0.0) ** 0.9
     else:
         # 本仓库此前一直用的（与上游**不同**，保留以复现旧 run）
         lr_func = lambda epoch: min(
-            (epoch + 1) / (args.epochs * 0.1 + 1e-8),
-            0.5 * (math.cos(epoch / args.epochs * math.pi) + 1),
+            (start_epoch + epoch + 1) / (args.epochs * 0.1 + 1e-8),
+            0.5 * (math.cos((start_epoch + epoch) / args.epochs * math.pi) + 1),
         )
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_func)
     mse = torch.nn.MSELoss()
@@ -437,7 +454,7 @@ def main():
                   f"  weighted={rec['weighted_grad_norm'][k]:.6e}")
         return 0
 
-    for epoch in trange(args.epochs, desc="epochs"):
+    for epoch in trange(start_epoch, args.epochs, desc="epochs"):
         model.train()
         running = 0.0
 
