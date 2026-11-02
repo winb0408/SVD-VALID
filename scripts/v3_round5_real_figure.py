@@ -20,15 +20,25 @@
    （那样整体会亮 5 倍以上，网络看到的输入和训练时不是同一个分布）。
    三条臂走同一套变换，因此**臂间对比是公平的**；绝对质量未标定。
 
-BD-2 的 25% 覆盖
-----------------
-`reconstruct_full` 只学了 `1→6`、`4→3` 两条角色映射，m=2 下 8 个相位只有 {3,6} 有输出，
-所以单卷部署只恢复 25% 体素（这是固定角色采样的**部署代价**，不是实现缺陷）。
-未恢复体素渲染成灰色，与 `v3_round5_sampling_direct.png` 同一口径。
+BD-2 的覆盖与「8 倍推理」
+------------------------
+`--slots 1 4 6 3` 只显式训练了 `1→6`、`4→3` 两条角色映射。两条映射在几何上是同一条规则：
+**目标相位 = 输入相位 ⊕ 7**，也就是体对角平移 `(±2, ±2, ±2)`（逐对核算见
+`tests` 风格的 `FULL_SCATTER` 注释：1⊕7=6、4⊕7=3，且 8 个相位的位移向量都是 (±2,±2,±2)）。
+因为 ⊕7 是对合，8 个相位两两配对，用全 8 个相位当输入、各写到自身 ⊕7，恰好把
+`(2m)³ = 64` 个格点类各覆盖一次——不多不少、无需平均。
+
+代价：一次前向只看到 1/64 的体素（三轴步距 2m=4），所以要 `8 相位 × m³=8 平移 = 64` 次前向
+才能铺满；D1（m=1）是 `8 相位 × 1 平移 = 8` 次 → **BD-2 铺满 = D1 的 8 倍推理**。
+只跑训练过的两条映射（`--fill partial`）则是 16 次 = 2 倍代价、但只覆盖 25%。
+
+⚠️ 诚实标注：其中 6 对相位是训练时**没出现过**的（固定角色模式只喂了 2 对），
+补全用的是同一条几何规则的零样本外推。`--fill full` 的图上会写明这一点。
 
 用法
 ----
-    python -u scripts/v3_round5_real_figure.py --gpu 2
+    python -u scripts/v3_round5_real_figure.py --gpu 2            # 默认铺满（8× 推理）
+    python -u scripts/v3_round5_real_figure.py --gpu 2 --fill partial   # 只跑训练过的 2 对（25%）
 产物
 ----
     reports/figures/v3_round5_real_sa64_hsa64.png
@@ -52,6 +62,12 @@ from v3_round4_b1_prep import fwd, inv                                         #
 ROOT = Path(__file__).resolve().parents[1]
 DATASETS = ["SA64", "HSA64"]
 GAUSS_SIGMA = 0.6          # 与 A5 冻结的 σ*（low 档）一致
+
+# 全 8 相位回填：目标相位 = 输入相位 XOR 7（体对角）。
+# 已训练的两条映射 `1→6`、`4→3` 正好都是这条规则（1^7=6，4^7=3），且 8 个相位的
+# 位移向量都是 (±2,±2,±2)（m=2 时每轴 2 体素）——所以这不是"另编一条规则"，
+# 而是把同一条几何规则补到它天然的 8 个相位对上。⊕7 是对合 ⇒ 每个输出相位只被写一次。
+FULL_SCATTER = {i: i ^ 7 for i in range(8)}
 
 SERIES = [
     ("input", "input（未去噪）", "#7a7a7a"),
@@ -77,7 +93,7 @@ def sim_bg_u_median() -> float:
     return float(np.median(u[v]))
 
 
-def run_dataset(ds: str, norm: dict, gpu: int, device) -> dict:
+def run_dataset(ds: str, norm: dict, gpu: int, device, fill: str = "full") -> dict:
     import torch
     from models.network import NetworkCNR
 
@@ -103,8 +119,9 @@ def run_dataset(ds: str, norm: dict, gpu: int, device) -> dict:
     out["arms"]["gauss"] = {"pd": np.maximum(np.expm1(masked_gauss(lg_in, v_c, GAUSS_SIGMA)), 0.0) * s,
                             "filled": np.ones(shape, bool)}
 
-    for arm, key, scat in (("S_log", "D1", None), ("O_lin", "BDlin", SCATTER["O_lin"]),
-                           ("O_log", "BDlog", SCATTER["O_log"])):
+    for arm, key in (("S_log", "D1"), ("O_lin", "BDlin"), ("O_log", "BDlog")):
+        scat = None if arm == "S_log" else (FULL_SCATTER if fill == "full"
+                                           else SCATTER[arm])
         spec = ARMS[arm]
         dom, m = spec["domain"], spec["stride"]
         ck = ROOT / f"runs/v3_round5/{arm}_s3407/latest.pt"
@@ -124,6 +141,8 @@ def run_dataset(ds: str, norm: dict, gpu: int, device) -> dict:
         pd_hat = np.maximum(inv(dom, xh, s), 0.0)
         out["arms"][key] = {"pd": pd_hat, "filled": filled}
         out["arms"][key]["coverage"] = float(filled.mean())
+        out["arms"][key]["n_phases"] = 8 if scat is None else len(scat)
+        out["arms"][key]["n_passes"] = out["arms"][key]["n_phases"] * (m ** 3)
 
     out["valid"] = v_c
     return out
@@ -142,8 +161,12 @@ def to_db(pd: np.ndarray, ref: float, valid: np.ndarray, filled: np.ndarray) -> 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gpu", type=int, default=2)
-    ap.add_argument("--window", type=float, nargs=2, default=[-30.0, -3.0],
-                    help="显示动态范围（dB，相对 input 的 99.9 分位）")
+    ap.add_argument("--fill", choices=["full", "partial"], default="full",
+                    help="full=按「相位 ⊕ 7」补全全图（64 次前向/臂）；"
+                         "partial=只跑训练过的 2 对（16 次，25% 覆盖）")
+    ap.add_argument("--window", type=float, nargs=2, default=None,
+                    help="显示动态范围（dB，相对本行 input 的 99.9 分位）。"
+                         "缺省 = 每个数据集各自取 input MIP 的 2%…99.9% 分位")
     ap.add_argument("--out-png", default="reports/figures/v3_round5_real_sa64_hsa64.png")
     ap.add_argument("--out-json", default="reports/v3_round5/real_zeroshot.json")
     args = ap.parse_args()
@@ -167,78 +190,124 @@ def main() -> None:
     res = {}
     for ds in DATASETS:
         print(f"[real] {ds} …", flush=True)
-        res[ds] = run_dataset(ds, norm, args.gpu, device)
+        res[ds] = run_dataset(ds, norm, args.gpu, device, fill=args.fill)
         print(f"  s={res[ds]['s']:.3e}  u_median={res[ds]['u_median']:.3f} "
               f"u_p99={res[ds]['u_p99']:.2f}  "
-              + "  ".join(f"{k}:{v.get('coverage', 1.0):.2f}" for k, v in res[ds]["arms"].items()),
+              + "  ".join(f"{k}:cov{v.get('coverage', 1.0):.2f}/{v.get('n_passes', 8)}f"
+                          for k, v in res[ds]["arms"].items()),
               flush=True)
 
     # ---- 画图 ----
     nrow, ncol = len(DATASETS), len(SERIES)
-    fig = plt.figure(figsize=(4.0 * ncol + 0.9, 4.1 * nrow + 1.5))
-    gs = fig.add_gridspec(nrow, ncol + 1, wspace=0.06, hspace=0.16,
-                          left=0.035, right=0.925, top=0.86, bottom=0.065,
+    fig = plt.figure(figsize=(4.0 * ncol + 1.6, 4.1 * nrow + 1.7))
+    gs = fig.add_gridspec(nrow, ncol + 1, wspace=0.06, hspace=0.20,
+                          left=0.035, right=0.925, top=0.85, bottom=0.075,
                           width_ratios=[1] * ncol + [0.05])
 
     cmap = plt.get_cmap("inferno").copy()
     cmap.set_bad("#3d3d3d")
-    lo, hi = args.window
+
+    # 先算好所有 MIP（dB，相对本行 input 的 99.9 分位 = 0 dB），再定窗口、再画
+    mips, wins = {}, {}
+    for ds in DATASETS:
+        R = res[ds]
+        valid = R["valid"]
+        ref = float(np.percentile(R["arms"]["input"]["pd"][valid], 99.9))
+        for key, _l, _c in SERIES:
+            a = R["arms"][key]
+            mips[(ds, key)] = to_db(a["pd"], ref, valid, a["filled"])
+        # 两个数据集是两笔独立采集 → 各自用自己数据的分布定动态范围，
+        # 默认取 input MIP 的 2% … 99.9% 分位（不跨数据集共用，避免窄动态范围那笔被压平）
+        if args.window is None:
+            v = mips[(ds, "input")]
+            v = v[np.isfinite(v)]
+            wins[ds] = (float(np.percentile(v, 2.0)), float(np.percentile(v, 99.9)))
+        else:
+            wins[ds] = tuple(args.window)
 
     for r, ds in enumerate(DATASETS):
         R = res[ds]
-        valid = R["valid"]
-        # 参考电平：input 的 99.9 分位（所有臂共用，保证臂间可比）
-        ref = float(np.percentile(R["arms"]["input"]["pd"][valid], 99.9))
+        lo, hi = wins[ds]
         for c, (key, label, _color) in enumerate(SERIES):
             ax = fig.add_subplot(gs[r, c])
             a = R["arms"][key]
-            db = to_db(a["pd"], ref, valid, a["filled"])
-            # 灰格显示：未恢复体素在 MIP 后若整条 (y,x) 无覆盖，则补灰提示（仅视觉，不改数值）
-            im = ax.imshow(db, vmin=lo, vmax=hi, cmap=cmap, interpolation="nearest")
+            im = ax.imshow(mips[(ds, key)], vmin=lo, vmax=hi, cmap=cmap,
+                           interpolation="nearest")
             ax.set_xticks([]); ax.set_yticks([])
             if r == 0:
                 ax.set_title(label, fontsize=12, pad=8)
             if c == 0:
                 ax.set_ylabel(f"{ds}\n深度 z（MIP）", fontsize=11)
             cov = a.get("coverage", 1.0)
-            ax.text(0.02, 0.03, f"覆盖 {cov*100:.0f}%", transform=ax.transAxes,
-                    fontsize=9, color="w",
+            nps = a.get("n_passes", 8)
+            ax.text(0.02, 0.03, f"覆盖 {cov*100:.0f}% · {nps} 次前向",
+                    transform=ax.transAxes, fontsize=9, color="w",
                     bbox=dict(fc="k", alpha=0.55, ec="none", pad=2))
+        cax = fig.add_subplot(gs[r, -1])
+        cb = fig.colorbar(im, cax=cax)
+        cb.set_label(f"{ds}：线性 PD（dB，相对本行 input 99.9 分位；"
+                     f"窗口 {lo:+.1f}…{hi:+.1f} dB）", fontsize=9.5)
 
     # 存 MIP（dB）供事后核对可读性，不必重跑 GPU
     np.savez_compressed(ROOT / "reports/v3_round5/real_mips_db.npz",
-                        **{f"{ds}_{k}": to_db(R["arms"][k]["pd"],
-                                             float(np.percentile(R["arms"]["input"]["pd"][R["valid"]], 99.9)),
-                                             R["valid"], R["arms"][k]["filled"])
-                           for ds, R in res.items() for k, _l, _c in SERIES})
+                        **{f"{ds}_{k}": v for (ds, k), v in mips.items()})
 
-    cax = fig.add_subplot(gs[:, -1])
-    fig.colorbar(im, cax=cax, label=f"线性 PD（dB，相对 input 的 99.9 分位；窗口 {lo:.0f}…{hi:.0f} dB）")
-
-    fig.text(0.5, 0.955, "Round5 定性对照：两条采样几何在**真实采集**上的零样本表现",
+    fill_txt = ("BD-2 已按「目标相位 = 输入相位 ⊕ 7」补全全图（8/8 相位对，其中 6 对训练时未出现）"
+                if args.fill == "full" else
+                "BD-2 只跑训练过的 2 对相位（1→6、4→3），故只有 25% 覆盖（灰格）")
+    fig.text(0.5, 0.958, "Round5 定性对照：三条采样几何在真实采集上的零样本表现",
              ha="center", fontsize=16)
-    fig.text(0.5, 0.915,
-             "零样本（仿真 low6 训练的权重 → 真实采集），真实数据无真值，**仅定性、不进判据**；"
+    fig.text(0.5, 0.921,
+             "零样本（仿真 low6 训练的权重 → 真实采集），真实数据无真值，仅定性、不进判据；"
              "尺度 s 按「背景 log 中位数」对齐到仿真训练分布",
              ha="center", fontsize=10.5, color="#b00020")
-    fig.text(0.5, 0.888,
-             "MIP 沿 z 投影（axis 0），显示窗口以 input 的 99.9 分位为 0 dB 参考、所有臂共用；"
-             "灰 = 该臂未恢复的体素（BD-2 单卷只覆盖 25%，部署需 8× 推理，见文末脚注）",
+    fig.text(0.5, 0.894,
+             f"MIP 沿 z 投影（axis 0）；{fill_txt}；灰 = 该臂未恢复的体素",
              ha="center", fontsize=10)
-    fig.text(0.5, 0.022,
-             "注：BD-2 的 25% 覆盖来自预注册的角色映射（只学过 1→6、4→3 两条），"
-             "是固定角色采样的部署代价，不是实现缺陷；D1（间距 1）覆盖率 100%。",
+    fig.text(0.5, 0.024,
+             "注：铺满 BD-2 需 8 相位 × m³=8 平移 = 64 次前向，D1（m=1）只要 8 次 → 8 倍推理；"
+             "两个数据集各用各的动态范围（input MIP 的 2%–99.9% 分位），不共用。",
              ha="center", fontsize=9.5, color="#444")
     fig.savefig(ROOT / args.out_png, dpi=150)
     print(f"saved {ROOT / args.out_png}")
+
+    # 每行窗口 + 每臂可读性统计（写进 JSON，便于事后核对，不必重跑 GPU）
+    stats = {}
+    for ds in DATASETS:
+        lo, hi = wins[ds]
+        stats[ds] = {"window_db": [lo, hi], "arms": {}}
+        for key, _l, _c in SERIES:
+            a_img, i_img = mips[(ds, key)], mips[(ds, "input")]
+            img = a_img[np.isfinite(a_img)]
+            both = np.isfinite(a_img) & np.isfinite(i_img)
+            stats[ds]["arms"][key] = {
+                "mip_median_db": float(np.median(img)),
+                "mip_p2_p999_db": [float(np.percentile(img, 2.0)),
+                                   float(np.percentile(img, 99.9))],
+                "mip_spread_db": float(np.percentile(img, 99.9) - np.percentile(img, 2.0)),
+                "clip_black_pct": float((a_img < lo).sum() / a_img.size * 100),
+                "corr_with_input": (1.0 if key == "input" else
+                                    float(np.corrcoef(a_img[both], i_img[both])[0, 1])
+                                    if both.sum() > 2 else None),
+            }
 
     # ---- JSON（去掉大数组） ----
     dump = {}
     for ds, R in res.items():
         dump[ds] = {k: v for k, v in R.items() if k not in ("valid",)}
-        dump[ds]["arms"] = {k: {"coverage": float(v.get("coverage", 1.0))} for k, v in R["arms"].items()}
+        dump[ds]["arms"] = {k: {"coverage": float(v.get("coverage", 1.0)),
+                                "n_phases": int(v.get("n_phases", 8)),
+                                "n_passes": int(v.get("n_passes", 8)),
+                                **stats[ds]["arms"][k]}
+                            for k, v in R["arms"].items()}
+        dump[ds]["window_db"] = stats[ds]["window_db"]
     (ROOT / args.out_json).write_text(json.dumps(
-        {"note": "零样本定性图，无真值，不进判据", "window_db": args.window, "datasets": dump},
+        {"note": "零样本定性图，无真值，不进判据",
+         "fill": args.fill,
+         "pairing": ("目标相位 = 输入相位 XOR 7（体对角 ±2/轴）；"
+                     if args.fill == "full" else "仅训练过的 1→6、4→3"),
+         "n_passes_note": "D1(m=1)=8 次；BD-2(m=2) 铺满=64 次=8×；partial=16 次=2×",
+         "datasets": dump},
         ensure_ascii=False, indent=2))
     print(f"saved {ROOT / args.out_json}")
 
