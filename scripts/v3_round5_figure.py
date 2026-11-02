@@ -1,10 +1,31 @@
-"""Round5 图：采样创新的**直接**定性 + 定量对比。
+"""Round5 图：采样几何的**直接**定性 + 定量对比。
 
-五条臂（`input` / `gauss(σ*)` / `S_log` 标准采样 / `O_log` 我们的采样 / `O_lin` 我们的采样-线性域），
-上排 = held 四场景 `rmse_img` 柱状；下排 = e904 的同一切片（带血管的最弱区）。
+五条臂
+------
+    input            原始输入（不清洗）
+    gauss σ*=0.6     对数域高斯平滑基线
+    D1               **对角配对，间距 1**（SN2N 原型做法）= 输入取 tetris 相位 T、
+                     目标取补相位 T^c，两帧沿体素有 1 体素的对角位移
+    BD-2 linear      **体对角固定配对，间距 2**（本项目采样方案）· linear 域
+    BD-2 logeps      同上 · logeps 域
 
-数据全部来自 `reports/v3_round5/sampling_direct.json` 与
-`runs/_infer_v2/v3_round5/<arm>_e<s>_pred_log1p.npy`，不重算指标、不改阈值。
+命名说明（2026-11-05 修正）
+--------------------------
+用户指出旧命名不可用：「我们的采样」不是方案名，「标准采样」把 SN2N 的对角配对
+误标成了业界标准。现按**几何**命名，并保证与
+`reviews/V3_PR1_round5_prereg_sampling_direct.md` 的 `S_log / O_log / O_lin`
+一一对应：`S_log → D1`，`O_log → BD-2 logeps`，`O_lin → BD-2 linear`。
+预注册文件是冻结文本，**不改**，只在上表建立映射。
+
+数据来源（用户 2026-11-05 追问「用的是哪个数据」）
+--------------------------------------------------
+定量：`data/processed/v3_round2_s0/low6/eval/s0_low_e{900..905}.npz` 中的 **held = e902–e905**
+      四个体数据（e900/e901 未进判定）。原始 37×64×64，按 `usable(shape, 2)` 裁成 36×64×64。
+      指标 = `overall_rmse`，只在 `own_pairing_mask(shape, 2, (3, 6))` 的 **25% 共享体素**上评分，
+      五条臂用同一掩膜，故可比。
+定性：e904 一张切片，z 取血管（rho≥0.1）体素的中位平面。
+数值：直接读 `reports/v3_round5/sampling_direct_ownpair.json`（`--recon own_pairing`），
+      不重算指标、不改阈值；预测值读 `runs/_infer_v2/v3_round5/<arm>_e<s>_pred_log1p.npy`。
 
 用法
 ----
@@ -34,12 +55,13 @@ CACHE = ROOT / "runs/_infer_v2/v3_round5"
 RECON = "own_pairing"
 OUT = ROOT / "reports/figures/v3_round5_sampling_direct.png"
 
+# (key, 图例全名, 轴内短名, 颜色)
 SERIES = [
-    ("input", "input（不清洗）", "#7a7a7a"),
-    ("gauss", "gauss σ*=0.6", "#1f77b4"),
-    ("S_log", "标准采样 m=1（SN2N）", "#2ca02c"),
-    ("O_log", "我们的采样 m=2 · logeps", "#d62728"),
-    ("O_lin", "我们的采样 m=2 · linear", "#ff9f0a"),
+    ("input", "input（不清洗）", "input", "#7a7a7a"),
+    ("gauss", "gauss 平滑 σ*=0.6", "gauss σ*", "#1f77b4"),
+    ("S_log", "D1 · 对角配对（间距 1，SN2N 原型）", "D1（间距 1）", "#2ca02c"),
+    ("O_lin", "BD-2 · 体对角固定配对（间距 2）· linear", "BD-2 linear", "#ff9f0a"),
+    ("O_log", "BD-2 · 体对角固定配对（间距 2）· logeps", "BD-2 logeps", "#d62728"),
 ]
 SLICE_SCENE = 904
 
@@ -59,75 +81,72 @@ def main() -> None:
     held = d["held"]
     arms = d["arms"]
 
-    fig = plt.figure(figsize=(19, 9.2))
-    gs = fig.add_gridspec(2, 6, height_ratios=[1.0, 1.15], hspace=0.34, wspace=0.28)
+    def val(key: str, s: int) -> float:
+        if key in ("input", "gauss"):
+            return d["baselines"][f"e{s}"][key]["overall_rmse"]
+        return arms[key]["held"][f"e{s}"]["overall_rmse"]
 
-    # ---------- 上排：四场景 rmse 柱状 ----------
-    ax = fig.add_subplot(gs[0, :3])
-    x = np.arange(len(held))
-    w = 0.16
-    for k, (key, label, color) in enumerate(SERIES):
-        vals = []
-        for s in held:
-            if key in ("input", "gauss"):
-                vals.append(d["baselines"][f"e{s}"][key]["overall_rmse"])
-            elif key in arms and "held" in arms[key]:
-                vals.append(arms[key]["held"][f"e{s}"]["overall_rmse"])
-            else:
-                vals.append(np.nan)
-        ax.bar(x + (k - 2) * w, vals, w, label=label, color=color,
-               edgecolor="black", linewidth=0.4)
-        for xi, v in zip(x + (k - 2) * w, vals):
-            if np.isfinite(v):
-                ax.text(xi, v, f"{v:.4f}", rotation=90, va="bottom", ha="center",
-                        fontsize=6.5)
-    ax.set_xticks(x, [f"e{s}" for s in held])
-    ax.set_ylabel("rmse_img（PSF 匹配真值，越低越好）")
-    ax.set_title("held 四场景：五条臂的定量对比（Round5 预注册 C1/C2/C3）", fontsize=11)
-    ax.legend(fontsize=8, ncol=2)
-    ax.grid(axis="y", alpha=0.3)
+    fig = plt.figure(figsize=(20.0, 12.8))
+    gs = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.32], hspace=0.40,
+                          left=0.055, right=0.985, top=0.845, bottom=0.055)
 
-    # ---------- 上排右：相对标准采样的变化 ----------
-    ax2 = fig.add_subplot(gs[0, 3:])
-    comp = d.get("criteria", {}).get("comparisons", {}).get("O_log_vs_S_log")
-    if comp:
-        rel = [100 * comp["rel_change"][f"e{s}"] for s in held]
-        cols = ["#2ca02c" if v < 0 else "#d62728" for v in rel]
-        ax2.bar([f"e{s}" for s in held], rel, 0.55, color=cols,
-                edgecolor="black", linewidth=0.5)
-        for i, v in enumerate(rel):
-            ax2.text(i, v, f"{v:+.1f}%", ha="center",
-                     va="bottom" if v >= 0 else "top", fontsize=9)
-        ax2.axhline(0, color="black", lw=0.8)
-        ax2.axhline(-5, color="#2ca02c", ls="--", lw=1, label="C1 阈值 −5%")
-        ax2.axhline(5, color="#d62728", ls="--", lw=1, label="C1 阈值 +5%")
-        ax2.set_ylabel("我们的采样 − 标准采样（相对 %，负=更好）")
-        ax2.set_title(f"预注册判据：{comp['verdict']} / {comp['direction']}", fontsize=11)
-        ax2.legend(fontsize=8)
-        ax2.grid(axis="y", alpha=0.3)
+    # ---------- 上排：逐场景横向条形（对数轴，5 臂不重叠） ----------
+    top = gs[0].subgridspec(1, len(held), wspace=0.16)
+    handles = []
+    for i, s in enumerate(held):
+        ax = fig.add_subplot(top[0, i])
+        ys = np.arange(len(SERIES))[::-1]              # 第 0 项画在最上面
+        vals = [val(k, s) for k, _l, _sl, _c in SERIES]
+        cols = [c for _k, _l, _sl, c in SERIES]
+        bars = ax.barh(ys, vals, 0.70, color=cols, edgecolor="black", linewidth=0.5)
+        for y, v in zip(ys, vals):
+            ax.text(v * 1.10, y, f"{v:.4f}", va="center", ha="left", fontsize=9)
+        ax.set_xscale("log")
+        ax.set_xlim(0.0075, 0.75)
+        ax.set_xticks([0.01, 0.02, 0.05, 0.1, 0.2, 0.5])
+        ax.set_xticklabels(["0.01", "0.02", "0.05", "0.1", "0.2", "0.5"], fontsize=9)
+        ax.grid(axis="x", alpha=0.30, which="major")
+        ax.set_ylim(-0.6, len(SERIES) - 0.4)
+        ax.set_yticks(ys)
+        if i == 0:
+            ax.set_yticklabels([sl for _k, _l, sl, _c in SERIES], fontsize=10)
+            ax.set_xlabel("rmse_img（PSF 匹配真值；对数轴，越低越好）", fontsize=10)
+        else:
+            ax.set_yticklabels([])
+        ratio = val("O_log", s) / val("S_log", s)
+        ax.set_title(f"e{s}    BD-2 logeps / D1 = {ratio:.1f}×", fontsize=11.5, pad=7)
+        handles = bars
+
+    fig.legend([plt.Rectangle((0, 0), 1, 1, fc=c, ec="black", lw=0.5)
+                for _k, _l, _sl, c in SERIES],
+               [lb for _k, lb, _sl, _c in SERIES],
+               loc="upper center", bbox_to_anchor=(0.5, 0.902), ncol=5,
+               frameon=False, fontsize=11.5, handlelength=1.4, columnspacing=1.6)
+    fig.text(0.5, 0.862,
+             "预注册判据 C1（逐场景相对差 ≥5% 且方向一致 ≥3/4）= 成立；方向：BD-2 更差（4/4 场景）",
+             ha="center", va="center", fontsize=10.5, color="#b22222")
 
     # ---------- 下排：e904 同切片 ----------
     E = load(ROOT / f"data/processed/v3_round2_s0/low6/eval/s0_low_e{SLICE_SCENE}.npz")
     ves = E["valid"] & (E["rho"] >= 0.1)
-    zs, ys, xs = np.nonzero(ves)
+    zs, ys_, xs_ = np.nonzero(ves)
     zc = int(np.median(zs)) if len(zs) else E["vol"].shape[0] // 2
 
-    panels = [("truth", "真值 img（PSF 匹配）", E["truth_img"], "gray"),
-              ("input", "input（不清洗）", E["vol"], "gray")]
-    for key, label, _c in SERIES[1:]:
+    panels = [("truth", "真值 img", E["truth_img"]),
+              ("input", "input", E["vol"])]
+    for key, _lb, short, _c in SERIES[1:]:
         p = CACHE / f"{key}_{RECON}_e{SLICE_SCENE}_pred_log1p.npy"
         if p.exists():
-            panels.append((key, label, np.load(p), "gray"))
+            panels.append((key, short, np.load(p)))
         elif key == "gauss":
-            panels.append((key, label, None, "gauss"))
-
-    if panels[-1][2] is None:                     # gauss 现算，不落缓存
+            panels.append((key, short, None))
+    if any(p[2] is None for p in panels):
         from v3_round4_metrics import masked_gauss
-        panels[-1] = ("gauss", panels[-1][1],
-                      masked_gauss(E["vol"], E["valid"], 0.6), "gray")
+        panels = [(k, t, masked_gauss(E["vol"], E["valid"], 0.6) if a is None else a)
+                  for k, t, a in panels]
 
-    # 我们的臂只有 25% 体素被填（固定角色对 + m³ 平移的几何上限），
-    # 所以定性图也统一只显示这批体素，其余涂灰——否则会让人以为未填区域也是预测。
+    # BD-2 固定角色对 + m³ 平移的几何上限只覆盖 25% 体素，定性图统一只显示这批体素，
+    # 其余涂灰——否则会让人以为未填区域也是预测。
     from v3_round5_eval import own_pairing_mask, usable
     shape = usable(E["vol"].shape, 2)
     mask = own_pairing_mask(shape, 2, (3, 6))
@@ -141,18 +160,32 @@ def main() -> None:
 
     vmin, vmax = np.percentile(E["truth_img"][E["valid"]], [1, 99])
     vmax = max(vmax, float(np.percentile(E["vol"][E["valid"]], 99)))
-    for i, (key, label, arr, cmap) in enumerate(panels[:6]):
-        a = fig.add_subplot(gs[1, i])
-        sl = show(arr[zc]) if arr is not None else np.zeros(E["vol"].shape[1:])
-        im = a.imshow(sl, cmap=cmap_obj, vmin=vmin, vmax=vmax, aspect="equal")
-        a.set_title(label, fontsize=9)
+    bot = gs[1].subgridspec(1, len(panels) + 1, wspace=0.07,
+                            width_ratios=[1] * len(panels) + [0.07])
+    im = None
+    for i, (key, ttl, arr) in enumerate(panels[:7]):
+        a = fig.add_subplot(bot[0, i])
+        im = a.imshow(show(arr[zc]), cmap=cmap_obj, vmin=vmin, vmax=vmax, aspect="equal")
+        a.set_title(ttl, fontsize=11)
         a.set_xticks([]); a.set_yticks([])
-        if key not in ("truth",) and arr is not None:
-            m = arms.get(key, {}).get("held", {}).get(f"e{SLICE_SCENE}")
-            if m:
-                a.set_xlabel(f"rmse={m['overall_rmse']:.4f}", fontsize=8)
-    fig.colorbar(im, ax=fig.axes[-6:], fraction=0.012, pad=0.01)
-    fig.suptitle(f"e{SLICE_SCENE} 切片 z={zc}（同一片、同一灰度窗；灰=该臂无回填的体素，我们的臂固定角色对只能填 25%）", fontsize=11, y=0.005)
+        if key == "truth":
+            a.set_xlabel("（参考）", fontsize=9)
+        else:
+            v = val(key, SLICE_SCENE)
+            a.set_xlabel(f"rmse={v:.4f}", fontsize=9.5)
+    cax = fig.add_subplot(bot[0, len(panels)])
+    fig.colorbar(im, cax=cax)
+
+    fig.suptitle("Round5：采样几何的直接对比——D1（对角配对，间距 1）vs BD-2（体对角固定配对，间距 2）",
+                 fontsize=15, y=0.985)
+    fig.text(0.5, 0.951,
+             "定量 = held e902–e905（data/processed/v3_round2_s0/low6/eval，36×64×64），"
+             f"只在五臂共享的 25% 体素掩膜上评分；定性 = e904 一张切片（z={zc}）",
+             ha="center", va="center", fontsize=10.5)
+    fig.text(0.5, 0.012,
+             "灰 = 该臂不覆盖的体素（BD-2 固定角色对的几何只能填 25%，部署代价 = 8 倍推理次数）；"
+             "D1 / gauss / input / 真值本身覆盖全图，此处同样只显示那 25% 以便逐像素对照",
+             ha="center", va="center", fontsize=9.5, color="#444444")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, dpi=140, bbox_inches="tight")

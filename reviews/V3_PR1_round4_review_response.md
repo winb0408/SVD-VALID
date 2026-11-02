@@ -149,13 +149,14 @@ argmin 跨场景跳动 ⇒ 按任务书"相关估计无法复现"条款同样不
 **不等于**"采样创新没被检验"。复核代码后确认此前存在一处过度外推：
 
 - Round4-B1 四臂是 `--mode dense` + `--train-clean-volumes`（`dense_views` 四视图全返回全分辨率同块，
-  目标被同位置干净块替换，`xa is xb`）⇒ **监督上界臂，不是 SN2N**，不能代表"我们 vs 标准 SN2N 的采样"。
+  目标被同位置干净块替换，`xa is xb`）⇒ **监督上界臂，不是 SN2N**，不能代表"BD-2 vs D1 的采样"。
 - §4 的 C 前置筛只排除"8 种 tetris 模式选哪一种"（几何恒等式，极差 6e-18），
   **不覆盖** `--stride` 与 `--role-order/--slots`，而后者才是我方采样的实际变量。
 
 故另开 Round5 直接对照（预注册 `reviews/V3_PR1_round5_prereg_sampling_direct.md`，判据写死在跑之前）：
-三臂全自监督、同网络/损失/15 ep×500 步/seed，唯一变量是采样 ——
-`S_log`（logeps / m=1 随机 tetris / cross）、`O_log`（logeps / m=2 / `--slots 1 4 6 3`）、`O_lin`（线性域，同采样）。
+三臂全自监督、同网络/损失/15 ep×500 步/seed，唯一变量是采样几何 ——
+`S_log` = **D1**（logeps / 间距 1 / 随机 tetris / cross）、`O_log` = **BD-2 logeps**（logeps / 间距 2 / `--slots 1 4 6 3`）、`O_lin` = **BD-2 linear**（线性域，同几何）。
+（2026-11-05 命名修订，**改动原因**：旧写法"标准 SN2N 采样 / 我们的采样"不准确也不可作图例；臂名与全部数字、判据未变。）
 
 **结果**（held e902–e905，`rmse_img`，主口径 `own_pairing`，同一 25% 掩膜）：
 `S_log` 0.0166 / 0.0190 / 0.0193 / 0.0173；
