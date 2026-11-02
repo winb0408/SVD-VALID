@@ -1,0 +1,19 @@
+{
+ "u_med_sim": 0.9999998807907104,
+ "norm_source": "reports/v3_round4/b1_norm.json",
+ "split": "odd/even frames of the SAME band-pass filtered IQ; pd_odd + pd_even == pd_full exactly",
+ "seqs": {
+  "SA64": {
+   "s": 744536.1200056219,
+   "median_pd_odd": 742886.75,
+   "median_pd_even": 746185.3125,
+   "n_valid": 124328
+  },
+  "HSA64": {
+   "s": 116883449.93359302,
+   "median_pd_odd": 116527856.0,
+   "median_pd_even": 117239016.0,
+   "n_valid": 124328
+  }
+ }
+}
