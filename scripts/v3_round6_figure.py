@@ -111,8 +111,8 @@ def main() -> int:
     series = ("input",) + ARMS
 
     # ---------- 图 1：MIP 对照（方向 2 权重 + 增益校准 = 每臂最好的样子）----------
-    fig, axes = plt.subplots(2, 7, figsize=(30.0, 9.8),
-                             gridspec_kw={"width_ratios": [1, 1, 1, 1, 1, 1, 0.05]})
+    fig, axes = plt.subplots(2, 6, figsize=(30.0, 9.8),
+                             gridspec_kw={"width_ratios": [1, 1, 1, 1, 1, 0.05]})
     for r, seq in enumerate(("SA64", "HSA64")):
         th, eh = "even", "odd"                      # 方向 2
         pd_ref, valid, s = load_half(seq, th)
@@ -162,7 +162,7 @@ def main() -> int:
                                 transform=axes[r, c].transAxes, fontsize=10, color="w",
                                 bbox=dict(fc="k", alpha=0.55, ec="none", pad=2))
 
-        cb = fig.colorbar(im, cax=axes[r, 6])
+        cb = fig.colorbar(im, cax=axes[r, 5])
         cb.set_label(f"{seq}：相对本行参照半 99.9 分位的 dB\n窗口 {lo:+.1f}…{hi:+.1f} dB",
                      fontsize=10)
 
@@ -171,6 +171,8 @@ def main() -> int:
     fig.text(0.5, 0.035,
              "全部模型在真实半（37×64×64，200 帧）上从头自监督训练，不使用任何仿真权重。"
              "BD-2 只显示其训练过的角色对直接覆盖的 1/4 体素（16 次前向），其余臂裁到同一批体素以便同面比较；"
+             "BD-2 图上的横条纹来自覆盖几何：所选角色对 1→6、4→3 的目标相位在 y 方向只落在 2/4 行，"
+             "z-MIP 后每 4 行有 2 行整列无数据（换成 4 对则每列都有数据、条纹消失）；"
              "两个数据集各用各的动态范围。\n"
              "注意：亮结构在所有臂上都被压暗（§4.4 带内 slope 0.79–0.93），本图只用于看纹理，不构成判优依据。",
              ha="center", fontsize=10.5, color="0.25")
