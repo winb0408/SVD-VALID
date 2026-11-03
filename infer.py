@@ -58,8 +58,12 @@ def main():
     )
     ckpt = torch.load(args.checkpoint, map_location=device)
     targs = ckpt.get("args", {})
+    # Round3 B1：residual 臂的旁路加在**网络里**（不是推理脚本里），但必须按 checkpoint
+    # 里记录的 arch_head 重建，否则同一个权重会被当成 direct 输出读错一切。
+    # 旧 checkpoint 没有这个键 ⇒ 默认 direct，逐位复现旧行为。
     model = NetworkCNR(
-        features=targs.get("features", 16), groups=targs.get("groups", 4)
+        features=targs.get("features", 16), groups=targs.get("groups", 4),
+        residual=(targs.get("arch_head", "direct") == "residual"),
     ).to(device)
     model.load_state_dict(ckpt["model"])
     model.eval()

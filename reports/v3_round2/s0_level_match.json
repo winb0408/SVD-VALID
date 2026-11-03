@@ -1,0 +1,115 @@
+{
+ "test": "S0 噪声阶梯与真实数据的 log1p 域对齐",
+ "why": "标称 σ 是 PD 域乘性噪声，模型输入是 log1p(pd/s)；log1p 压缩使 σ_eff ≠ σ",
+ "real": {
+  "SA64": {
+   "s_median_pd": 3729.96484375,
+   "n_valid": 124328,
+   "sigma_eff_block100": 0.054489716416347325,
+   "sigma_eff_half200": 0.03966644325575515,
+   "sigma_eff_full400_note": "全长单次观测的噪声是块级的 1/2（正态独立平均），block100 读数 /2 即全长级",
+   "sigma_eff_full400_from_block": 0.027244858208173663,
+   "ratio_pd_over_s_median_bg": 0.6625699400901794
+  },
+  "HSA64": {
+   "s_median_pd": 583485.0625,
+   "n_valid": 124328,
+   "sigma_eff_block100": 0.07970318081999292,
+   "sigma_eff_half200": 0.06306594681216234,
+   "sigma_eff_full400_note": "全长单次观测的噪声是块级的 1/2（正态独立平均），block100 读数 /2 即全长级",
+   "sigma_eff_full400_from_block": 0.03985159040999646,
+   "ratio_pd_over_s_median_bg": 0.5650855302810669
+  }
+ },
+ "s0": {
+  "low": {
+   "sigma_nominal": 0.0385,
+   "per_volume": [
+    {
+     "seed": 200,
+     "sigma_eff": 0.0204261913895607
+    },
+    {
+     "seed": 201,
+     "sigma_eff": 0.019634578377008438
+    },
+    {
+     "seed": 202,
+     "sigma_eff": 0.019816797226667404
+    }
+   ],
+   "sigma_eff": 0.019816797226667404,
+   "compression_factor": 0.5147220058874651
+  },
+  "mid": {
+   "sigma_nominal": 0.077,
+   "per_volume": [
+    {
+     "seed": 200,
+     "sigma_eff": 0.0408419631421566
+    },
+    {
+     "seed": 201,
+     "sigma_eff": 0.03928756341338158
+    },
+    {
+     "seed": 202,
+     "sigma_eff": 0.039662666618824005
+    }
+   ],
+   "sigma_eff": 0.039662666618824005,
+   "compression_factor": 0.5150995664782339
+  },
+  "high": {
+   "sigma_nominal": 0.154,
+   "per_volume": [
+    {
+     "seed": 200,
+     "sigma_eff": 0.08166500926017761
+    },
+    {
+     "seed": 201,
+     "sigma_eff": 0.07868068665266037
+    },
+    {
+     "seed": 202,
+     "sigma_eff": 0.07949431985616684
+    }
+   ],
+   "sigma_eff": 0.07949431985616684,
+   "compression_factor": 0.5161968821829016
+  }
+ },
+ "alignment": {
+  "low": {
+   "SA64": {
+    "ratio_vs_full400_imagery": 0.7273591616902677
+   },
+   "HSA64": {
+    "ratio_vs_full400_imagery": 0.49726490267491347
+   }
+  },
+  "mid": {
+   "SA64": {
+    "ratio_vs_full400_imagery": 1.4557853931838378
+   },
+   "HSA64": {
+    "ratio_vs_full400_imagery": 0.9952593161470147
+   }
+  },
+  "high": {
+   "SA64": {
+    "ratio_vs_full400_imagery": 2.917773300516497
+   },
+   "HSA64": {
+    "ratio_vs_full400_imagery": 1.9947590306515424
+   }
+  }
+ },
+ "closest_to_real": {
+  "low": 0.5084836411837519,
+  "mid": 0.1901487503275516,
+  "high": 0.8806720067332536
+ },
+ "closest_level": "mid"
+}

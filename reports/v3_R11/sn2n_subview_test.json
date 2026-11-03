@@ -1,0 +1,242 @@
+{
+ "test": "R11 前置：SN2N 对角子视图的噪声独立性",
+ "premise_threshold": 0.1,
+ "threshold_written_before_running": true,
+ "formula": "corr(A,B) = (rho_a + rho_b) / (1 + rho_a*rho_b)（可分离近似）",
+ "sources": {
+  "SA64": "data/processed/v3_correlation_length.json",
+  "HSA64": "data/processed/v3_correlation_length.json",
+  "sim": "reports/v3_r06/v2_endpoint_audit.json"
+ },
+ "results": {
+  "real_analytic": {
+   "SA64/plane_yx": {
+    "raw_plateau_included": {
+     "rho_a": 0.9137299046135682,
+     "rho_b": 0.7359175637702098,
+     "rho_diag_assumed": 0.6724298853472033,
+     "corr_A_B": 0.9863776549540098
+    },
+    "fast_deplataeu": {
+     "rho_a": 0.44570531550002834,
+     "rho_b": 0.7493904017030676,
+     "rho_diag_assumed": 0.33400728542375874,
+     "corr_A_B": 0.8958689583344093
+    },
+    "premise_fails_raw": true,
+    "premise_fails_fast": true
+   },
+   "SA64/plane_zy": {
+    "raw_plateau_included": {
+     "rho_a": 0.7938777452833531,
+     "rho_b": 0.9137299046135682,
+     "rho_diag_assumed": 0.7253898364725928,
+     "corr_A_B": 0.989693815160042
+    },
+    "fast_deplataeu": {
+     "rho_a": 0.6039876153328898,
+     "rho_b": 0.44570531550002834,
+     "rho_diag_assumed": 0.2692004906500554,
+     "corr_A_B": 0.8270505239840314
+    },
+    "premise_fails_raw": true,
+    "premise_fails_fast": true
+   },
+   "SA64/plane_zx": {
+    "raw_plateau_included": {
+     "rho_a": 0.7938777452833531,
+     "rho_b": 0.7359175637702098,
+     "rho_diag_assumed": 0.5842285762403123,
+     "corr_A_B": 0.9656405218267616
+    },
+    "fast_deplataeu": {
+     "rho_a": 0.6039876153328898,
+     "rho_b": 0.7493904017030676,
+     "rho_diag_assumed": 0.45262252167799216,
+     "corr_A_B": 0.9316790816877926
+    },
+    "premise_fails_raw": true,
+    "premise_fails_fast": true
+   },
+   "HSA64/plane_yx": {
+    "raw_plateau_included": {
+     "rho_a": 0.8886022746154286,
+     "rho_b": 0.791984889171106,
+     "rho_diag_assumed": 0.703759573978493,
+     "corr_A_B": 0.9863992487285939
+    },
+    "fast_deplataeu": {
+     "rho_a": 0.6276237633542495,
+     "rho_b": 0.7240397760699567,
+     "rho_diag_assumed": 0.45442456907519435,
+     "corr_A_B": 0.9293459201419229
+    },
+    "premise_fails_raw": true,
+    "premise_fails_fast": true
+   },
+   "HSA64/plane_zy": {
+    "raw_plateau_included": {
+     "rho_a": 0.8647723103537861,
+     "rho_b": 0.8886022746154286,
+     "rho_diag_assumed": 0.7684386420048137,
+     "corr_A_B": 0.9914817191403817
+    },
+    "fast_deplataeu": {
+     "rho_a": 0.5678673398442018,
+     "rho_b": 0.6276237633542495,
+     "rho_diag_assumed": 0.3564070369189845,
+     "corr_A_B": 0.8813660432741146
+    },
+    "premise_fails_raw": true,
+    "premise_fails_fast": true
+   },
+   "HSA64/plane_zx": {
+    "raw_plateau_included": {
+     "rho_a": 0.8647723103537861,
+     "rho_b": 0.791984889171106,
+     "rho_diag_assumed": 0.6848866023737845,
+     "corr_A_B": 0.9833048688206898
+    },
+    "fast_deplataeu": {
+     "rho_a": 0.5678673398442018,
+     "rho_b": 0.7240397760699567,
+     "rho_diag_assumed": 0.4111585415782379,
+     "corr_A_B": 0.9154939561002771
+    },
+    "premise_fails_raw": true,
+    "premise_fails_fast": true
+   }
+  },
+  "sim_analytic": {
+   "sim_seed0/plane_yx": {
+    "rho_a": 0.6455731085345872,
+    "rho_b": 0.670887492535414,
+    "rho_diag_assumed": 0.4331069240330619,
+    "corr_A_B": 0.918605987448031,
+    "premise_fails": true
+   },
+   "sim_seed0/plane_zy": {
+    "rho_a": 0.5948628786389917,
+    "rho_b": 0.6455731085345872,
+    "rho_diag_assumed": 0.3840274777148067,
+    "corr_A_B": 0.8962509828357494,
+    "premise_fails": true
+   },
+   "sim_seed0/plane_zx": {
+    "rho_a": 0.5948628786389917,
+    "rho_b": 0.670887492535414,
+    "rho_diag_assumed": 0.39908606505251143,
+    "corr_A_B": 0.9046980044983142,
+    "premise_fails": true
+   },
+   "v2_eval_s30/plane_yx": {
+    "rho_a": 0.6656669988395191,
+    "rho_b": 0.6997145767396343,
+    "rho_diag_assumed": 0.46577690234253677,
+    "corr_A_B": 0.9315070891054866,
+    "premise_fails": true
+   },
+   "v2_eval_s30/plane_zy": {
+    "rho_a": 0.6405624907700399,
+    "rho_b": 0.6656669988395191,
+    "rho_diag_assumed": 0.4264013108000596,
+    "corr_A_B": 0.9157517451220673,
+    "premise_fails": true
+   },
+   "v2_eval_s30/plane_zx": {
+    "rho_a": 0.6405624907700399,
+    "rho_b": 0.6997145767396343,
+    "rho_diag_assumed": 0.4482109121044444,
+    "corr_A_B": 0.9254709077989698,
+    "premise_fails": true
+   },
+   "v2_eval_s31/plane_yx": {
+    "rho_a": 0.667066901590215,
+    "rho_b": 0.6876356422244752,
+    "rho_diag_assumed": 0.45869897728167824,
+    "corr_A_B": 0.9287060352501323,
+    "premise_fails": true
+   },
+   "v2_eval_s31/plane_zy": {
+    "rho_a": 0.6633810707003305,
+    "rho_b": 0.667066901590215,
+    "rho_diag_assumed": 0.4425195554056688,
+    "corr_A_B": 0.922308447954727,
+    "premise_fails": true
+   },
+   "v2_eval_s31/plane_zx": {
+    "rho_a": 0.6633810707003305,
+    "rho_b": 0.6876356422244752,
+    "rho_diag_assumed": 0.4561644685905817,
+    "corr_A_B": 0.9277912914826522,
+    "premise_fails": true
+   }
+  },
+  "empirical": {
+   "SA64/plane_yx": {
+    "n": 4289,
+    "corr_A_B": 0.9446361296223539,
+    "std_A": 0.05982474244377137,
+    "std_B": 0.05993649099014494,
+    "premise_fails": true
+   },
+   "SA64/plane_zy": {
+    "n": 3833,
+    "corr_A_B": 0.9364032522108995,
+    "std_A": 0.060265954983322434,
+    "std_B": 0.060108614658244144,
+    "premise_fails": true
+   },
+   "SA64/plane_zx": {
+    "n": 3587,
+    "corr_A_B": 0.9067430958645484,
+    "std_A": 0.05942277042415032,
+    "std_B": 0.05941435715201875,
+    "premise_fails": true
+   },
+   "note": "percentile 归一化是逐帧单调变换，不改变块内的相关结构；这里用原始 PD 计算，等价。",
+   "v2_eval_s30/plane_yx": {
+    "n": 3859,
+    "corr_A_B": 0.9267743503555248,
+    "std_A": 1421664.560966331,
+    "std_B": 1417178.8945741104,
+    "premise_fails": true
+   },
+   "v2_eval_s30/plane_zy": {
+    "n": 3477,
+    "corr_A_B": 0.9100803940266484,
+    "std_A": 1405948.7630773368,
+    "std_B": 1411176.0208194111,
+    "premise_fails": true
+   },
+   "v2_eval_s30/plane_zx": {
+    "n": 3559,
+    "corr_A_B": 0.910805859694739,
+    "std_A": 1413130.7918198165,
+    "std_B": 1411666.6922596032,
+    "premise_fails": true
+   },
+   "v2_eval_s31/plane_yx": {
+    "n": 3708,
+    "corr_A_B": 0.9226261331764503,
+    "std_A": 1418990.8178007537,
+    "std_B": 1427184.2785008848,
+    "premise_fails": true
+   },
+   "v2_eval_s31/plane_zy": {
+    "n": 3482,
+    "corr_A_B": 0.9059459010007818,
+    "std_A": 1425391.4141264984,
+    "std_B": 1432942.265661025,
+    "premise_fails": true
+   },
+   "v2_eval_s31/plane_zx": {
+    "n": 3543,
+    "corr_A_B": 0.914888267375226,
+    "std_A": 1438823.660220927,
+    "std_B": 1446965.1035989264,
+    "premise_fails": true
+   }
+  }
+ }
+}

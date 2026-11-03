@@ -1,0 +1,108 @@
+{
+ "dataset": "SA64",
+ "source": "/ssd1/wjb/Data/Dyrad/data/SA64/Data_SA64.mat",
+ "G_R0_a": {
+  "temporal": {
+   "noise_var": 0.011889480985701084,
+   "rel_energy": 0.55125893393667,
+   "mse_pairs": [
+    0.023295322433114052,
+    0.024302680045366287,
+    0.023427477106451988,
+    0.022791186347603798,
+    0.024320285767316818,
+    0.02413044683635235
+   ],
+   "note": "4 个 100 帧块的块间差，mse/2；块间不共享帧，静态散斑被块均值带走"
+  },
+  "spatial_on_noise_field": {
+   "within_var_median_per_block": [
+    0.0076734223403036594,
+    0.007491008844226599,
+    0.007764732930809259,
+    0.007696891203522682
+   ],
+   "within_var_demean_corrected": 0.010246875695884228,
+   "patch": 4,
+   "note": "块间涨落场 F_b 上的 4×4×4 块内方差，乘 K/(K-1) 修正去均值偏差；与时间代理估计同一个量"
+  },
+  "spatial_on_full_log_pd": {
+   "n_blocks": 53,
+   "patch": 4,
+   "within_var_median": 0.007571883499622345,
+   "within_var_mean": 0.008999933927970112,
+   "rel_energy_median": 0.3510723833037313,
+   "rel_energy_mean": 0.41728431952580475,
+   "note": "直接对 400 帧 log PD 做块内方差：含静态散斑空间涟漪，只能当上界，不参与判定"
+  },
+  "var_log_pd_bg": 0.021567869931459427,
+  "ratio_controlled_noise_field": 0.8618438187678386,
+  "ratio_naive_full_log_pd": 0.6368556801368109,
+  "ratio_range": [
+   0.5,
+   2.0
+  ],
+  "pass": true,
+  "why_controlled_is_the_test": "两条代理只有在同一个场上才可比；全图 log PD 上的空间代理被静态散斑抬高（本例 rel 由噪声的 1/4 不到抬到 0.35），拿它去比会得出『空间噪声比时间噪声大 2.5 倍』的假结论"
+ },
+ "G_R0_b": {
+  "linear_slope": 2.1468651127072538,
+  "log_slope": 0.033054170961276094,
+  "slope_min_abs": 0.1,
+  "pass": false,
+  "status": "historical — 只当『斜率可测性检查』，不再当同方差化判据",
+  "note": "线性域斜率≈2 ⇒ 噪声方差随信号成正比（乘性）；log 域斜率≈0 ⇒ 信号无关。两条都要测得出，才能说 log 变换改变了噪声-信号依赖。**Round3 审查 R3-P02 更正**：本判据只看『斜率是否不为零』，它奖励的是『有斜率』，与『同方差化』的科学目标相反；真正的判据见 G-R0-b2。"
+ },
+ "G_R0_b2": {
+  "log_slope_same_x": 0.033054170961276094,
+  "log_slope_deprecated_double_log": -0.9273986249959588,
+  "slope_tol": 0.2,
+  "log_var_ratio_max_over_bins": 1.0490234900597193,
+  "linear_var_ratio_max_over_bins": 2.520250490290407,
+  "bin_ratio_max": 2.0,
+  "slope_within_tol": true,
+  "bins_within_ratio": true,
+  "pass": true,
+  "criteria": "①|log 域斜率| ≤ 0.20（同一 x）；②log 域方差跨 8 箱 max/min ≤ 2.0",
+  "note": "**判据是『log 域方差与信号无关』，不是『测得出斜率』。** 旧 G-R0-b 的 abs(slope)≥0.10 恰好在奖励非零斜率，且它的 log 分支用的是 log(log PD)，已被 R3-P02 判定口径不一致；旧数原样保留在 JSON 里，不改不删。"
+ },
+ "G_R0_c": {
+  "bg_noise_frac_odd_even": 0.233427662282929,
+  "bg_noise_frac_contiguous": 0.2743359837846614,
+  "vessel_noise_frac_odd_even": 0.07274045421539839,
+  "vessel_noise_frac_contiguous": 0.2908597811712836,
+  "abs_diff_bg": 0.0409083215017324,
+  "abs_diff_vessel": 0.2181193269558852,
+  "residual_corr_bg": 0.35685623038215486,
+  "residual_corr_vessel": 0.5087478495293912,
+  "pass": true,
+  "note": "只要两种拆分的读数不同（背景差 2 个百分点以上或血管差 2 个百分点以上），就说明配对方式本身是主导因素之一，不存在唯一可用的伪配对"
+ },
+ "G_R0_d": {
+  "corr_shared_reference_bg": 0.35685623038215486,
+  "corr_disjoint_reference_bg": 0.01728642628578481,
+  "independence_null_shared": 0.3333333333333333,
+  "independence_null_disjoint": 0.0,
+  "excess_over_null_shared": 0.023522897048821545,
+  "perm_corr_range": [
+   0.01728642628578481,
+   0.026260034536785135
+  ],
+  "bands": {
+   "artifact_dominated_upper": 0.15,
+   "data_dominated_lower": 0.3
+  },
+  "verdict": "artifact_dominated",
+  "pass": null,
+  "note": "本项**不设过门**：它是旧结论的更正项，只要求①两种口径都报；②旧的 0.357/0.374 加注『含共用参考伪像』；③不得再把 0.36 读成『噪声相关 36%』。"
+ },
+ "version": "v2 (2026-10-28, Round3 审查 R3-P01/P02 修订；旧判据原样保留在 G_R0_b)",
+ "verdict": {
+  "a": "pass",
+  "b": "fail",
+  "b2": "pass",
+  "c": "pass",
+  "d": "artifact_dominated"
+ },
+ "interpretation": "三条全过 = 真实数据有可测、非伪影、且配对可分辨的残余噪声 ⇒ 『真实数据优先』这条路可行；任何一条不过则在报告里写清适用边界，不外推"
+}

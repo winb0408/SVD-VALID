@@ -1,0 +1,31 @@
+{
+  "purpose": "电平偏移干预探针：区分『checkpoint 学到压暗』与『输入电平超训练分布导致收缩』；偏移后输入非真实数据，不得据此报性能",
+  "s0_nonzero_mean": 0.7314,
+  "new_training_jobs": 0,
+  "seqs": {
+    "SA64": {
+      "shift_c": 0.36667871475219727,
+      "arms": {
+        "A": {
+          "slope_vs_shifted_input": 0.9179997095960379,
+          "intercept_vs_shifted_input": 0.09200315107538337,
+          "slope_vs_original_input": 0.9179997095960379,
+          "out_mean_log1p": 0.7634281516075134,
+          "core_mean_ratio_log1p": 0.9869508147239685
+        }
+      }
+    },
+    "HSA64": {
+      "shift_c": 0.5594257116317749,
+      "arms": {
+        "A": {
+          "slope_vs_shifted_input": 0.8465389600946264,
+          "intercept_vs_shifted_input": 0.14761315381653972,
+          "slope_vs_original_input": 0.8465389560080463,
+          "out_mean_log1p": 0.7667716145515442,
+          "core_mean_ratio_log1p": 0.901273787021637
+        }
+      }
+    }
+  }
+}

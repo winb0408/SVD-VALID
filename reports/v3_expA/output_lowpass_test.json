@@ -1,0 +1,12 @@
+{
+ "r_pred_smooth0": 0.7934668659924143,
+ "r_pred_smooth1": 0.8517904856797579,
+ "r_pred_smooth2": 0.6449566581555661,
+ "r_pred_smooth3": 0.48828781209592437,
+ "r_pred_smooth4": 0.3825007512288838,
+ "r_ves_pred_tsmooth0": 0.767984996085434,
+ "r_ves_pred_tsmooth1": 0.8514089754617569,
+ "r_ves_pred_tsmooth2": 0.3695980845463094,
+ "r_ves_pred_truth": 0.767984996085434,
+ "bg_std_ratio_of_pred_vs_smooth2": 1.2822990886625596
+}

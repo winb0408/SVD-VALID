@@ -1,0 +1,484 @@
+{
+ "meta": {
+  "level": "mid",
+  "manifest": "data/processed/v3_round2_s0/mid/manifest.json",
+  "prereg": "CHECKS 写在本脚本里，运行前确定（审查 §3 S0f）"
+ },
+ "per_volume": {
+  "s0_mid_e900": {
+   "clean": {
+    "n2n_ratio": 0.5010420823041299,
+    "n2n_ratio_roi": 0.497088074565526,
+    "r_roi": 0.9999999999999998,
+    "r_core": 1.0,
+    "r_all": 1.0,
+    "rmse": 0.0,
+    "rmse_roi": 0.0,
+    "bg_std_ratio": 0.9942757182640857,
+    "bg_mean": 0.7058921456336975,
+    "roi_mean": 1.3077681064605713,
+    "n_valid": 143360,
+    "n_roi": 4308,
+    "n_core": 1314,
+    "r_flow": 0.8662744709482396,
+    "rmse_vs_imaging": 0.0
+   },
+   "input": {
+    "n2n_ratio": 1.0,
+    "n2n_ratio_roi": 1.0,
+    "r_roi": 0.9793722331053223,
+    "r_core": 0.975756462928257,
+    "r_all": 0.9945542173395464,
+    "rmse": 0.039666173813093245,
+    "rmse_roi": 0.05541835900342255,
+    "bg_std_ratio": 1.0,
+    "bg_mean": 0.7065833806991577,
+    "roi_mean": 1.3090555667877197,
+    "n_valid": 143360,
+    "n_roi": 4308,
+    "n_core": 1314,
+    "r_flow": 0.8469699911231328,
+    "rmse_vs_imaging": 0.03966617211699486
+   },
+   "zero": {
+    "n2n_ratio": 212.6432096534275,
+    "n2n_ratio_roi": 288.22200070249954,
+    "r_roi": NaN,
+    "r_core": NaN,
+    "r_all": NaN,
+    "rmse": 0.8169050746130161,
+    "rmse_roi": 1.3350505896423164,
+    "bg_std_ratio": 0.0,
+    "bg_mean": 0.0,
+    "roi_mean": 0.0,
+    "n_valid": 143360,
+    "n_roi": 4308,
+    "n_core": 1314,
+    "r_flow": NaN,
+    "rmse_vs_imaging": 0.8169050812721252
+   },
+   "blur": {
+    "n2n_ratio": 9.949558853673231,
+    "n2n_ratio_roi": 18.86468301626755,
+    "r_roi": 0.8507140004900171,
+    "r_core": 0.8424699201473504,
+    "r_all": 0.9254193628386788,
+    "rmse": 0.17251721605483317,
+    "rmse_roi": 0.3379778666684176,
+    "bg_std_ratio": 0.692779159022064,
+    "bg_mean": 0.6815984845161438,
+    "roi_mean": 1.0013538599014282,
+    "n_valid": 143360,
+    "n_roi": 4308,
+    "n_core": 1314,
+    "r_flow": 0.6910432896956844,
+    "rmse_vs_imaging": 0.17251721024513245
+   },
+   "sharp": {
+    "n2n_ratio": 24.980602812723777,
+    "n2n_ratio_roi": 45.83315529952814,
+    "r_roi": 0.8834953413872235,
+    "r_core": 0.8687981996226235,
+    "r_all": 0.9566928331054363,
+    "rmse": 0.2776072284870787,
+    "rmse_roi": 0.5286089096579206,
+    "bg_std_ratio": 1.5982578546979846,
+    "bg_mean": 0.744060754776001,
+    "roi_mean": 1.770607829093933,
+    "n_valid": 143360,
+    "n_roi": 4308,
+    "n_core": 1314,
+    "r_flow": 0.794379355370992,
+    "rmse_vs_imaging": 0.2776072323322296
+   },
+   "broken": {
+    "n2n_ratio": 1.2674237935951629,
+    "n2n_ratio_roi": 5.529809784617488,
+    "r_roi": 0.841293808128492,
+    "r_core": 0.7010063130554024,
+    "r_all": 0.9916025422807744,
+    "rmse": 0.04913271791100553,
+    "rmse_roi": 0.17619585838228236,
+    "bg_std_ratio": 1.0,
+    "bg_mean": 0.7065833806991577,
+    "roi_mean": 1.2653363943099976,
+    "n_valid": 143360,
+    "n_roi": 4308,
+    "n_core": 1314,
+    "r_flow": 0.724221708021977,
+    "rmse_vs_imaging": 0.04913271963596344
+   },
+   "fake": {
+    "n2n_ratio": 1.02938076833318,
+    "n2n_ratio_roi": 1.0,
+    "r_roi": 0.9793722331053223,
+    "r_core": 0.975756462928257,
+    "r_all": 0.9942353774453487,
+    "rmse": 0.040813092170405574,
+    "rmse_roi": 0.05541835900342255,
+    "bg_std_ratio": 1.000135332494568,
+    "bg_mean": 0.7066529393196106,
+    "roi_mean": 1.3090555667877197,
+    "n_valid": 143360,
+    "n_roi": 4308,
+    "n_core": 1314,
+    "r_flow": 0.8469699911231328,
+    "rmse_vs_imaging": 0.04081309214234352
+   }
+  },
+  "s0_mid_e901": {
+   "clean": {
+    "n2n_ratio": 0.5028861375665301,
+    "n2n_ratio_roi": 0.4881888267580723,
+    "r_roi": 0.9999999999999999,
+    "r_core": 1.0,
+    "r_all": 1.0,
+    "rmse": 0.0,
+    "rmse_roi": 0.0,
+    "bg_std_ratio": 0.9945996585406981,
+    "bg_mean": 0.7278019189834595,
+    "roi_mean": 1.366892695426941,
+    "n_valid": 143360,
+    "n_roi": 5354,
+    "n_core": 1557,
+    "r_flow": 0.935934932994679,
+    "rmse_vs_imaging": 0.0
+   },
+   "input": {
+    "n2n_ratio": 1.0,
+    "n2n_ratio_roi": 1.0,
+    "r_roi": 0.9911507324053055,
+    "r_core": 0.9880113020833037,
+    "r_all": 0.9952438426481486,
+    "rmse": 0.04047122194774907,
+    "rmse_roi": 0.057122429863721284,
+    "bg_std_ratio": 1.0,
+    "bg_mean": 0.7285686135292053,
+    "roi_mean": 1.3687896728515625,
+    "n_valid": 143360,
+    "n_roi": 5354,
+    "n_core": 1557,
+    "r_flow": 0.9278062997695388,
+    "rmse_vs_imaging": 0.04047122225165367
+   },
+   "zero": {
+    "n2n_ratio": 226.1134888137338,
+    "n2n_ratio_roi": 314.0216013315725,
+    "r_roi": NaN,
+    "r_core": NaN,
+    "r_all": NaN,
+    "rmse": 0.8577371421746396,
+    "rmse_roi": 1.431616144114104,
+    "bg_std_ratio": 0.0,
+    "bg_mean": 0.0,
+    "roi_mean": 0.0,
+    "n_valid": 143360,
+    "n_roi": 5354,
+    "n_core": 1557,
+    "r_flow": NaN,
+    "rmse_vs_imaging": 0.857737123966217
+   },
+   "blur": {
+    "n2n_ratio": 11.280904550642736,
+    "n2n_ratio_roi": 15.315093005970384,
+    "r_roi": 0.9375511990951139,
+    "r_core": 0.9286718579026663,
+    "r_all": 0.9111936435360747,
+    "rmse": 0.18737378442012434,
+    "rmse_roi": 0.31062413100383945,
+    "bg_std_ratio": 0.7423456206489534,
+    "bg_mean": 0.7046942114830017,
+    "roi_mean": 1.1005923748016357,
+    "n_valid": 143360,
+    "n_roi": 5354,
+    "n_core": 1557,
+    "r_flow": 0.8929741339977445,
+    "rmse_vs_imaging": 0.1873737871646881
+   },
+   "sharp": {
+    "n2n_ratio": 27.88603670774677,
+    "n2n_ratio_roi": 37.1783597255667,
+    "r_roi": 0.9345279030144201,
+    "r_core": 0.917367004359441,
+    "r_all": 0.9448655925429682,
+    "rmse": 0.299217132982312,
+    "rmse_roi": 0.49055769695623663,
+    "bg_std_ratio": 1.575327608219112,
+    "bg_mean": 0.7643803358078003,
+    "roi_mean": 1.7710856199264526,
+    "n_valid": 143360,
+    "n_roi": 5354,
+    "n_core": 1557,
+    "r_flow": 0.8624515683847377,
+    "rmse_vs_imaging": 0.2992171347141266
+   },
+   "broken": {
+    "n2n_ratio": 1.6325939923258876,
+    "n2n_ratio_roi": 9.450108018044665,
+    "r_roi": 0.852767749900637,
+    "r_core": 0.5572283622243172,
+    "r_all": 0.9891782836205754,
+    "rmse": 0.06079496615951729,
+    "rmse_roi": 0.2416016815357948,
+    "bg_std_ratio": 1.0,
+    "bg_mean": 0.7285686135292053,
+    "roi_mean": 1.3177767992019653,
+    "n_valid": 143360,
+    "n_roi": 5354,
+    "n_core": 1557,
+    "r_flow": 0.7986801737405961,
+    "rmse_vs_imaging": 0.06079496443271637
+   },
+   "fake": {
+    "n2n_ratio": 1.024935301301706,
+    "n2n_ratio_roi": 1.0871624062474825,
+    "r_roi": 0.989486396371042,
+    "r_core": 0.9880113020833037,
+    "r_all": 0.9950042447233198,
+    "rmse": 0.04148441305715536,
+    "rmse_roi": 0.062230129160680915,
+    "bg_std_ratio": 1.0001658366054007,
+    "bg_mean": 0.7286155819892883,
+    "roi_mean": 1.3692723512649536,
+    "n_valid": 143360,
+    "n_roi": 5354,
+    "n_core": 1557,
+    "r_flow": 0.9264992028986916,
+    "rmse_vs_imaging": 0.04148441180586815
+   }
+  }
+ },
+ "checks": [
+  {
+   "endpoint": "n2n_ratio",
+   "better": "clean",
+   "worse": "input",
+   "why": "完美答案必须严格优于不做处理",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 0.5010420823041299,
+     "worse": 1.0,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 0.5028861375665301,
+     "worse": 1.0,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "n2n_ratio",
+   "better": "input",
+   "worse": "zero",
+   "why": "全零这种平凡解必须被重罚",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 1.0,
+     "worse": 212.6432096534275,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 1.0,
+     "worse": 226.1134888137338,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "n2n_ratio",
+   "better": "input",
+   "worse": "blur",
+   "why": "过度模糊必须被扣分（否则判据奖励抹平）",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 1.0,
+     "worse": 9.949558853673231,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 1.0,
+     "worse": 11.280904550642736,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "n2n_ratio",
+   "better": "input",
+   "worse": "sharp",
+   "why": "过锐化放大噪声必须被扣分",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 1.0,
+     "worse": 24.980602812723777,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 1.0,
+     "worse": 27.88603670774677,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "n2n_ratio",
+   "better": "input",
+   "worse": "broken",
+   "why": "断掉一段血管必须被扣分",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 1.0,
+     "worse": 1.2674237935951629,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 1.0,
+     "worse": 1.6325939923258876,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "n2n_ratio",
+   "better": "input",
+   "worse": "fake",
+   "why": "凭空注入一条血管必须被扣分",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 1.0,
+     "worse": 1.02938076833318,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 1.0,
+     "worse": 1.024935301301706,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "r_roi",
+   "better": "clean",
+   "worse": "input",
+   "why": "完美答案的结构相关必须高于不做处理",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 0.9999999999999998,
+     "worse": 0.9793722331053223,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 0.9999999999999999,
+     "worse": 0.9911507324053055,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "r_roi",
+   "better": "input",
+   "worse": "blur",
+   "why": "模糊会降低结构相关",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 0.9793722331053223,
+     "worse": 0.8507140004900171,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 0.9911507324053055,
+     "worse": 0.9375511990951139,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "r_roi",
+   "better": "input",
+   "worse": "broken",
+   "why": "断血管会降低结构相关",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 0.9793722331053223,
+     "worse": 0.841293808128492,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 0.9911507324053055,
+     "worse": 0.852767749900637,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "r_roi",
+   "better": "input",
+   "worse": "fake",
+   "why": "假血管会降低结构相关",
+   "all_ok": false,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 0.9793722331053223,
+     "worse": 0.9793722331053223,
+     "ok": false
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 0.9911507324053055,
+     "worse": 0.989486396371042,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "endpoint": "r_all",
+   "better": "input",
+   "worse": "fake",
+   "why": "假血管在 ROI 之外，只有全域相关才看得见",
+   "all_ok": true,
+   "rows": [
+    {
+     "volume": "s0_mid_e900",
+     "better": 0.9945542173395464,
+     "worse": 0.9942353774453487,
+     "ok": true
+    },
+    {
+     "volume": "s0_mid_e901",
+     "better": 0.9952438426481486,
+     "worse": 0.9950042447233198,
+     "ok": true
+    }
+   ]
+  }
+ ]
+}

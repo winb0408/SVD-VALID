@@ -1,0 +1,228 @@
+{
+ "sim_cfg": {
+  "shape": [
+   37,
+   64,
+   64
+  ],
+  "T": 400,
+  "psf_sigma": [
+   3.0,
+   2.37,
+   3.97
+  ],
+  "thermal_sigma": [
+   1.0,
+   1.2,
+   1.1
+  ],
+  "static_speckle": 1.0,
+  "static_mod": 0.35,
+  "dynamic_speckle": 0.12,
+  "clutter_amp": 2.0,
+  "clutter_sigma": [
+   5.0,
+   8.0,
+   8.0
+  ],
+  "clutter_rank": 6,
+  "flow_amp": 2.5,
+  "vessel_radius": 1.1,
+  "n_tubes": 14,
+  "thermal": 0.25,
+  "seed": 1,
+  "noise_seed": null,
+  "static_seed": null
+ },
+ "model": {
+  "forward_model": [
+   "X(z,y,x,t) = static(z,y,x)*u_static(t)",
+   "           + dynamic_t(z,y,x)                        ~ CN(0, psf_sigma)",
+   "           + sum_r c_r(z,y,x)*g_r(t)                   clutter, r=1..6",
+   "           + flow_t(z,y,x) = G_t(z,y,x) * vessels(z,y,x)   ~ CN(0, psf_sigma)",
+   "           + thermal_t(z,y,x)                          ~ CN(0, thermal_sigma)",
+   "PD_obs  = sum_t | B{ X }_t |^2 / median(PD_obs[valid])",
+   "PD_true = sum_t | B{ flow }_t |^2 / median(PD_obs[valid])",
+   "B = SVD band-pass, official 1-based 60:350 -> 0-based [59,350) = 291 modes"
+  ],
+  "code_lines": {
+   "static": "scripts/v3_simulator.py:150 static = s_spatial[...,None]*u_static[None,None,None,:]",
+   "dynamic": "scripts/v3_simulator.py:153-155",
+   "clutter": "scripts/v3_simulator.py:157-163 (rank 6, low-time g)",
+   "flow": "scripts/v3_simulator.py:171-175 flow = gauss_field(psf)*vessels",
+   "thermal": "scripts/v3_simulator.py:155",
+   "band": "scripts/official_pipeline.py:55 svd_blood_band(x, 60, 350, faithful=True)",
+   "pd": "scripts/v3_simulator.py:200 band_and_pd"
+  },
+  "three_truths": {
+   "T1_geometric": "vessels (binary mask, radius 1.1 vox, 14 tubes)",
+   "T2_noise_free_imaging": "gt_flow_pd = PD of the flow term only, through the same SVD band",
+   "T3_noisy_observation": "pd_linear = PD of the full X, through the same SVD band"
+  },
+  "known_departure_from_a_real_imaging_chain": "flow_t = G_t * vessels uses a HARD binary vessel mask multiplied by a PSF-correlated speckle field; a real chain would convolve a vessel DENSITY (partial volume) with a point-spread function and then apply the beamforming/vessel-geometry kernel. Consequences: (i) the vessel cross-section is the union of a 1-voxel mask and the PSF width, whichever is wider, not a partial-volume-weighted profile; (ii) the flow signal has no intra-voxel velocity distribution, so no spectral broadening; (iii) there is no sidelobe/clutter coupling INSIDE vessels. Numbers measured in this audit record how far these matter here; they are not grounds for claiming the simulator is realistic."
+ },
+ "separation": {
+  "gt_mean_in_vessels": 0.8918225169181824,
+  "gt_mean_outside": 0.0,
+  "gt_p99_outside": 0.0,
+  "frac_outside_above_in_median": 0.0,
+  "obs_mean_in_vessels": 2.196784257888794,
+  "obs_mean_outside": 0.6928028464317322
+ },
+ "monotonicity": {
+  "pearson_log_obs_vs_log_truth_all_valid": 0.950806329307668,
+  "pearson_log_obs_vs_log_truth_in_vessels": 0.5684428292400365,
+  "spearman_pooled": 0.19761054422119112,
+  "note": "r 明显小于 1 且背景散斑占主导 ⇒ 观测不是真值的单调函数，去噪任务真实存在"
+ },
+ "acf_vs_measured_target": {
+  "z": {
+   "sim": [
+    0.6067770175344428,
+    0.21590033717002646,
+    0.0814276670700726,
+    0.041073053257210765,
+    0.009410998149353098,
+    -0.009410998149353098
+   ],
+   "target": [
+    0.6039876153328898,
+    0.4658265309890501,
+    0.3161943394231416,
+    0.18321213622211022,
+    0.04537548323929127,
+    -0.04537548323929127
+   ],
+   "rmse": 0.15295788137638347
+  },
+  "y": {
+   "sim": [
+    0.6481074041218461,
+    0.2477658895211113,
+    0.06343592512615889,
+    -1.708602694360781e-05,
+    0.0003603037371944934,
+    -0.0003603037371944934
+   ],
+   "target": [
+    0.44570531550002834,
+    0.2100632970523038,
+    0.14322993357444397,
+    0.08635716629636411,
+    0.030156743363842445,
+    -0.030156743363841734
+   ],
+   "rmse": 0.09831186926887946
+  },
+  "x": {
+   "sim": [
+    0.6589221137411286,
+    0.27824835188311353,
+    0.08708273891624665,
+    0.01926824923117366,
+    -0.00015217236010573156,
+    0.0001521723601057298
+   ],
+   "target": [
+    0.7493904017030676,
+    0.554633364160372,
+    0.3670603987400775,
+    0.1810749734039795,
+    0.04075061149185589,
+    -0.04075061149185589
+   ],
+   "rmse": 0.17911270547707683
+  },
+  "overall_rmse": 0.14735749995347042
+ },
+ "vessel_profile": {
+  "vessel_radius_cfg": 1.1,
+  "psf_sigma_cfg": [
+   3.0,
+   2.37,
+   3.97
+  ],
+  "mean_in_radius_of_1voxel_mask": 0.0,
+  "gt_profile_by_distance": {
+   "0": {
+    "mean": 70440744.0,
+    "median": 61351464.0,
+    "n": 1891
+   },
+   "1": {
+    "mean": 0.0,
+    "median": 0.0,
+    "n": 5855
+   },
+   "2": {
+    "mean": 0.0,
+    "median": 0.0,
+    "n": 7762
+   },
+   "3": {
+    "mean": 0.0,
+    "median": 0.0,
+    "n": 8308
+   },
+   "4": {
+    "mean": 0.0,
+    "median": 0.0,
+    "n": 12191
+   },
+   "5": {
+    "mean": 0.0,
+    "median": 0.0,
+    "n": 12330
+   }
+  },
+  "obs_profile_by_distance": {
+   "0": {
+    "mean": 377804736.0,
+    "median": 374676512.0,
+    "n": 1891
+   },
+   "1": {
+    "mean": 44939472.0,
+    "median": 44904100.0,
+    "n": 5855
+   },
+   "2": {
+    "mean": 44963368.0,
+    "median": 45011152.0,
+    "n": 7762
+   },
+   "3": {
+    "mean": 44962368.0,
+    "median": 44944488.0,
+    "n": 8308
+   },
+   "4": {
+    "mean": 44973768.0,
+    "median": 44901576.0,
+    "n": 12191
+   },
+   "5": {
+    "mean": 44829652.0,
+    "median": 44754960.0,
+    "n": 12330
+   }
+  },
+  "gt_hwhm_voxels": 0.0,
+  "obs_hwhm_voxels": 0.0
+ },
+ "scale_and_fractions": {
+  "vessel_voxels": 1891,
+  "valid_voxels": 143360,
+  "vessel_fraction": 0.013190569196428572,
+  "bg_std_input": 0.029184121638536453,
+  "bg_std_truth": 0.0,
+  "bg_mean_truth": 0.0,
+  "gt_max_outside_vessels": 0.0
+ },
+ "degenerate_controls": {
+  "rmse_if_output_all_zeros": 0.10819544643163681,
+  "rmse_if_output_all_zeros_vessels_only": 0.9420571327209473,
+  "rmse_of_input": 0.7056988477706909,
+  "note": "全零输出在 valid 上就能拿到上表的 RMSE；凡是据此宣称'去噪有效'的结论无效。实验 A 必须同时报血管内的保真度与背景压制，不能用全局 RMSE 单独下结论。"
+ }
+}

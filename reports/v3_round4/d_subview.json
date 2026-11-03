@@ -1,0 +1,484 @@
+{
+ "prereg": "reviews/V3_PR1_round4_prereg.md §4",
+ "paper": {
+  "doi": "10.64898/2026.09.10.750668",
+  "title": "SVD-SN2N: Self-Inspired Noise2Noise Learning for Denoising Log-Compressed SVD-Filtered Ultrasound Imaging",
+  "text_claim": "2×2 块的三种二分割里只有对角分割两伴图共享质心 ⇒ 不引入半像素位移",
+  "their_measured": {
+   "x1_x2_signal_corr": 0.96,
+   "residual_corr_between_copies": 0.39,
+   "residual_neighbour_corr": {
+    "axial": 0.09,
+    "lateral": 0.31
+   }
+  }
+ },
+ "constructions": {
+  "tetris3d": {
+   "A_corners": [
+    0,
+    1,
+    2,
+    4
+   ],
+   "B_corners": [
+    3,
+    5,
+    6,
+    7
+   ],
+   "centroid_A": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "centroid_B": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "shift_vox": [
+    0.5,
+    0.5,
+    0.5
+   ]
+  },
+  "paper2d_diagonal": {
+   "centroid_shift_vox": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "tetris3d_parity": {
+   "A_corners": [
+    0,
+    3,
+    5,
+    6
+   ],
+   "B_corners": [
+    1,
+    2,
+    4,
+    7
+   ],
+   "centroid_A": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "centroid_B": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "shift_vox": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "valid_patterns_centroid_shared": {
+   "per_pattern": [
+    {
+     "pattern": [
+      0,
+      1,
+      2,
+      4
+     ],
+     "centroid_A": [
+      0.25,
+      0.25,
+      0.25
+     ],
+     "centroid_B": [
+      0.75,
+      0.75,
+      0.75
+     ],
+     "shared": false
+    },
+    {
+     "pattern": [
+      0,
+      1,
+      3,
+      5
+     ],
+     "centroid_A": [
+      0.25,
+      0.25,
+      0.75
+     ],
+     "centroid_B": [
+      0.75,
+      0.75,
+      0.25
+     ],
+     "shared": false
+    },
+    {
+     "pattern": [
+      1,
+      2,
+      3,
+      7
+     ],
+     "centroid_A": [
+      0.25,
+      0.75,
+      0.75
+     ],
+     "centroid_B": [
+      0.75,
+      0.25,
+      0.25
+     ],
+     "shared": false
+    },
+    {
+     "pattern": [
+      0,
+      2,
+      3,
+      6
+     ],
+     "centroid_A": [
+      0.25,
+      0.75,
+      0.25
+     ],
+     "centroid_B": [
+      0.75,
+      0.25,
+      0.75
+     ],
+     "shared": false
+    },
+    {
+     "pattern": [
+      0,
+      4,
+      5,
+      6
+     ],
+     "centroid_A": [
+      0.75,
+      0.25,
+      0.25
+     ],
+     "centroid_B": [
+      0.25,
+      0.75,
+      0.75
+     ],
+     "shared": false
+    },
+    {
+     "pattern": [
+      1,
+      4,
+      5,
+      7
+     ],
+     "centroid_A": [
+      0.75,
+      0.25,
+      0.75
+     ],
+     "centroid_B": [
+      0.25,
+      0.75,
+      0.25
+     ],
+     "shared": false
+    },
+    {
+     "pattern": [
+      2,
+      4,
+      6,
+      7
+     ],
+     "centroid_A": [
+      0.75,
+      0.75,
+      0.25
+     ],
+     "centroid_B": [
+      0.25,
+      0.25,
+      0.75
+     ],
+     "shared": false
+    },
+    {
+     "pattern": [
+      3,
+      5,
+      6,
+      7
+     ],
+     "centroid_A": [
+      0.75,
+      0.75,
+      0.75
+     ],
+     "centroid_B": [
+      0.25,
+      0.25,
+      0.25
+     ],
+     "shared": false
+    }
+   ],
+   "any_shared": false
+  }
+ },
+ "scenes": {
+  "e902": {
+   "tetris3d_raw": {
+    "signal_mismatch_rel": 0.11474261509507516,
+    "noise_corr_ves": -0.030935868621672705,
+    "noise_corr_bg": 0.01497575249945198,
+    "noise_var_ves": 0.00020339624133110666,
+    "n_ves": 146,
+    "signal_distortion_rel": 0.0576485371351206
+   },
+   "tetris3d_fourier": {
+    "signal_mismatch_rel": 0.10206242469364508,
+    "noise_corr_ves": 0.005943254184762806,
+    "noise_corr_bg": 0.011158766749166195,
+    "noise_var_ves": 0.00019155154151844056,
+    "n_ves": 930,
+    "signal_distortion_rel": 0.05119636945788031
+   },
+   "tetris3d_parity_raw": {
+    "signal_mismatch_rel": 0.0004983347977983421,
+    "noise_corr_ves": -0.01094948503461159,
+    "noise_corr_bg": 0.0048095330794778995,
+    "noise_var_ves": 0.00020546575406253412,
+    "n_ves": 146,
+    "signal_distortion_rel": 0.0002491709917738886
+   },
+   "tetris3d_parity_fourier": {
+    "signal_mismatch_rel": 0.00045245897008417665,
+    "noise_corr_ves": -0.00963199234589736,
+    "noise_corr_bg": 0.003717807211632006,
+    "noise_var_ves": 0.00017928596454531577,
+    "n_ves": 930,
+    "signal_distortion_rel": 0.00022622531493570188
+   },
+   "paper2d_raw": {
+    "signal_mismatch_rel": 0.004962680540916672,
+    "noise_corr_ves": -0.07862343299970122,
+    "noise_corr_bg": 0.008868277270517685,
+    "noise_var_ves": 0.00038516503658469944,
+    "n_ves": 273
+   },
+   "paper2d_fourier": {
+    "signal_mismatch_rel": 0.004428936710430956,
+    "noise_corr_ves": -0.09581286196548952,
+    "noise_corr_bg": 0.009829739106788821,
+    "noise_var_ves": 0.0003696616848367059,
+    "n_ves": 930
+   },
+   "reference": {
+    "noise_var_ves_full_res": 0.0009539000457152724
+   }
+  },
+  "e903": {
+   "tetris3d_raw": {
+    "signal_mismatch_rel": 0.12519089040385242,
+    "noise_corr_ves": 0.06370505966490123,
+    "noise_corr_bg": -0.0160203850490351,
+    "noise_var_ves": 0.00020536446039437798,
+    "n_ves": 72,
+    "signal_distortion_rel": 0.06271781101812435
+   },
+   "tetris3d_fourier": {
+    "signal_mismatch_rel": 0.08276709356886576,
+    "noise_corr_ves": 0.10225277643251883,
+    "noise_corr_bg": -0.01813676017028396,
+    "noise_var_ves": 0.00013834019945798865,
+    "n_ves": 450,
+    "signal_distortion_rel": 0.04104001863091929
+   },
+   "tetris3d_parity_raw": {
+    "signal_mismatch_rel": 0.0003668735656671373,
+    "noise_corr_ves": 0.11887303672324441,
+    "noise_corr_bg": -0.003392495355464575,
+    "noise_var_ves": 0.0001920401916157551,
+    "n_ves": 72,
+    "signal_distortion_rel": 0.00018343634664038858
+   },
+   "tetris3d_parity_fourier": {
+    "signal_mismatch_rel": 0.0002757900649070029,
+    "noise_corr_ves": 0.08662277024524809,
+    "noise_corr_bg": -0.0002711045038795889,
+    "noise_var_ves": 0.0001546952858234246,
+    "n_ves": 450,
+    "signal_distortion_rel": 0.00013789486146937745
+   },
+   "paper2d_raw": {
+    "signal_mismatch_rel": 0.006531860139644164,
+    "noise_corr_ves": 0.06904593616866794,
+    "noise_corr_bg": -0.005072118362760756,
+    "noise_var_ves": 0.00042274948228672167,
+    "n_ves": 139
+   },
+   "paper2d_fourier": {
+    "signal_mismatch_rel": 0.00548919268843615,
+    "noise_corr_ves": -0.010132386352295079,
+    "noise_corr_bg": -0.004176823248421915,
+    "noise_var_ves": 0.00035185358803878336,
+    "n_ves": 450
+   },
+   "reference": {
+    "noise_var_ves_full_res": 0.0007619094685651362
+   }
+  },
+  "e904": {
+   "tetris3d_raw": {
+    "signal_mismatch_rel": 0.11834502609962322,
+    "noise_corr_ves": 0.0487489423557248,
+    "noise_corr_bg": 0.0005713095915218434,
+    "noise_var_ves": 0.00014351791881687018,
+    "n_ves": 142,
+    "signal_distortion_rel": 0.05899769777164622
+   },
+   "tetris3d_fourier": {
+    "signal_mismatch_rel": 0.11872746427312816,
+    "noise_corr_ves": -0.03824801984019533,
+    "noise_corr_bg": 0.0003508059869404888,
+    "noise_var_ves": 0.00017665243504009782,
+    "n_ves": 831,
+    "signal_distortion_rel": 0.05913683229728531
+   },
+   "tetris3d_parity_raw": {
+    "signal_mismatch_rel": 0.000619930719685965,
+    "noise_corr_ves": 0.14614034510478396,
+    "noise_corr_bg": 0.015188597883137608,
+    "noise_var_ves": 0.0002035175744855338,
+    "n_ves": 142,
+    "signal_distortion_rel": 0.0003099715336017287
+   },
+   "tetris3d_parity_fourier": {
+    "signal_mismatch_rel": 0.0005974309080727132,
+    "noise_corr_ves": 0.04171294319037422,
+    "noise_corr_bg": 0.012824691115820696,
+    "noise_var_ves": 0.000174622244531962,
+    "n_ves": 831,
+    "signal_distortion_rel": 0.00029872734916935666
+   },
+   "paper2d_raw": {
+    "signal_mismatch_rel": 0.006371425865142761,
+    "noise_corr_ves": 0.0734726326300941,
+    "noise_corr_bg": 0.0076182863684851245,
+    "noise_var_ves": 0.0004232832332304997,
+    "n_ves": 269
+   },
+   "paper2d_fourier": {
+    "signal_mismatch_rel": 0.006111182363572764,
+    "noise_corr_ves": 0.06479352769859666,
+    "noise_corr_bg": 0.0085585191952065,
+    "noise_var_ves": 0.0003814118399721479,
+    "n_ves": 831
+   },
+   "reference": {
+    "noise_var_ves_full_res": 0.0008480026735924184
+   }
+  },
+  "e905": {
+   "tetris3d_raw": {
+    "signal_mismatch_rel": 0.16538156922259345,
+    "noise_corr_ves": 0.08489283730039626,
+    "noise_corr_bg": -0.015290664527951378,
+    "noise_var_ves": 0.00014607720227966057,
+    "n_ves": 111,
+    "signal_distortion_rel": 0.0829265841575933
+   },
+   "tetris3d_fourier": {
+    "signal_mismatch_rel": 0.13034331265035504,
+    "noise_corr_ves": 0.12172974753156053,
+    "noise_corr_bg": -0.019563844166505265,
+    "noise_var_ves": 0.00015085821890384386,
+    "n_ves": 619,
+    "signal_distortion_rel": 0.06509941854469162
+   },
+   "tetris3d_parity_raw": {
+    "signal_mismatch_rel": 0.0011373073271194615,
+    "noise_corr_ves": 0.10999119005343846,
+    "noise_corr_bg": 0.006275939192627634,
+    "noise_var_ves": 0.00018263265085356758,
+    "n_ves": 111,
+    "signal_distortion_rel": 0.0005685131169283204
+   },
+   "tetris3d_parity_fourier": {
+    "signal_mismatch_rel": 0.0009071364408657784,
+    "noise_corr_ves": 0.13934598420939578,
+    "noise_corr_bg": 0.0019654953301948943,
+    "noise_var_ves": 0.00014233709984453553,
+    "n_ves": 619,
+    "signal_distortion_rel": 0.0004535035713899318
+   },
+   "paper2d_raw": {
+    "signal_mismatch_rel": 0.01739752666756386,
+    "noise_corr_ves": -0.015016941140328754,
+    "noise_corr_bg": 0.022189649860685653,
+    "noise_var_ves": 0.0003604872317942177,
+    "n_ves": 201
+   },
+   "paper2d_fourier": {
+    "signal_mismatch_rel": 0.01538677745139065,
+    "noise_corr_ves": -0.026875545197893785,
+    "noise_corr_bg": 0.019885190563881553,
+    "noise_var_ves": 0.00030294847851675523,
+    "n_ves": 619
+   },
+   "reference": {
+    "noise_var_ves_full_res": 0.000652443733997643
+   }
+  }
+ },
+ "summary_median": {
+  "tetris3d_raw": {
+   "signal_mismatch_rel": 0.12176795825173782,
+   "noise_corr_ves": 0.05622700101031301,
+   "noise_corr_bg": -0.0073596774682147675,
+   "noise_var_ves": 0.00017473672180538363
+  },
+  "tetris3d_fourier": {
+   "signal_mismatch_rel": 0.11039494448338663,
+   "noise_corr_ves": 0.05409801530864082,
+   "noise_corr_bg": -0.008892977091671734,
+   "noise_var_ves": 0.00016375532697197084
+  },
+  "tetris3d_parity_raw": {
+   "signal_mismatch_rel": 0.0005591327587421535,
+   "noise_corr_ves": 0.11443211338834144,
+   "noise_corr_bg": 0.005542736136052767,
+   "noise_var_ves": 0.00019777888305064445
+  },
+  "tetris3d_parity_fourier": {
+   "signal_mismatch_rel": 0.000524944939078445,
+   "noise_corr_ves": 0.06416785671781115,
+   "noise_corr_bg": 0.0028416512709134503,
+   "noise_var_ves": 0.0001646587651776933
+  },
+  "paper2d_raw": {
+   "signal_mismatch_rel": 0.006451643002393462,
+   "noise_corr_ves": 0.027014497514169594,
+   "noise_corr_bg": 0.008243281819501406,
+   "noise_var_ves": 0.0004039572594357106
+  },
+  "paper2d_fourier": {
+   "signal_mismatch_rel": 0.005800187526004457,
+   "noise_corr_ves": -0.01850396577509443,
+   "noise_corr_bg": 0.009194129150997661,
+   "noise_var_ves": 0.00036075763643774464
+  }
+ }
+}

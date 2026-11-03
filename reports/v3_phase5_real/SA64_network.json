@@ -1,0 +1,128 @@
+{
+ "dataset": "SA64",
+ "grid": [
+  32,
+  64,
+  64
+ ],
+ "T": 400,
+ "band_full": [
+  0,
+  400
+ ],
+ "band_blood": [
+  60,
+  350
+ ],
+ "band_blood_half": [
+  30,
+  175
+ ],
+ "norm_const": {
+  "full": 2643058.0,
+  "svd": 3753.4091796875
+ },
+ "checkpoints": [
+  "runs/v3_n2n_multi/res_s3411/latest.pt",
+  "runs/v3_n2n_multi/res_s3412/latest.pt",
+  "runs/v3_n2n_multi/res_s3413/latest.pt",
+  "runs/v3_n2n_multi/res_s3414/latest.pt"
+ ],
+ "protocol": "零样本：checkpoint 只在仿真场景 seed2-4 训练、seed5 早停，未在真实数据上训练",
+ "prereg": {
+  "rule": "n2n <= n2n(①Wiener) 且 core>=0.95；4 个 seed 全满足才可称有效",
+  "core_thr": 0.95,
+  "prediction": "④ 很可能输：预估 n2n 0.3–1.0、core < 0.95。依据：仿真上 ② 均值 0.831 差于 ① 0.754，血管区 n2n 1.31–1.81，再叠零样本域偏移。",
+  "written_before_run": true
+ },
+ "n2n_svd_chain": {
+  "不处理（SVD 输出）": 1.0,
+  "①Wiener w=7": 0.2730934727580341,
+  "④SVD+②网络 res_s3411": 0.9614568462156716,
+  "④SVD+②网络 res_s3412": 0.9438121836912202,
+  "④SVD+②网络 res_s3413": 0.954338032388818,
+  "④SVD+②网络 res_s3414": 0.9548068591774712
+ },
+ "corr_odd_even": {
+  "不处理（SVD 输出）": 0.9217174544384809,
+  "①Wiener w=7": 0.9755875484250792,
+  "④SVD+②网络 res_s3411": 0.9386187645556907,
+  "④SVD+②网络 res_s3412": 0.9226695646373695,
+  "④SVD+②网络 res_s3413": 0.9290098729319302,
+  "④SVD+②网络 res_s3414": 0.9136318797581438
+ },
+ "structure_keep_odd": {
+  "不处理（SVD 输出）": {
+   "core": 1.0,
+   "body": 1.0,
+   "dark": 1.0,
+   "isolated": 1.0
+  },
+  "①Wiener w=7": {
+   "core": 0.9765870571136475,
+   "body": 0.9849567413330078,
+   "dark": 1.047353744506836,
+   "isolated": 0.9431386590003967
+  },
+  "④SVD+②网络 res_s3411": {
+   "core": 0.8837943077087402,
+   "body": 0.7677300572395325,
+   "dark": 5.761001110076904,
+   "isolated": 0.8807681202888489
+  },
+  "④SVD+②网络 res_s3412": {
+   "core": 0.8327215909957886,
+   "body": 0.6859484314918518,
+   "dark": 4.861823558807373,
+   "isolated": 0.7573378086090088
+  },
+  "④SVD+②网络 res_s3413": {
+   "core": 0.9394919872283936,
+   "body": 0.9094893336296082,
+   "dark": 7.318047046661377,
+   "isolated": 0.8724393844604492
+  },
+  "④SVD+②网络 res_s3414": {
+   "core": 0.992371141910553,
+   "body": 0.9623368978500366,
+   "dark": 0.22193355858325958,
+   "isolated": 0.970447838306427
+  }
+ },
+ "mask_voxels": {
+  "core": 664,
+  "body": 35031,
+  "dark": 40220,
+  "isolated": 257
+ },
+ "valid_voxels": {
+  "full": 75791,
+  "svd": 75791
+ },
+ "verdict": {
+  "④SVD+②网络 res_s3411": {
+   "n2n_ok": false,
+   "core_ok": false,
+   "pass": false
+  },
+  "④SVD+②网络 res_s3412": {
+   "n2n_ok": false,
+   "core_ok": false,
+   "pass": false
+  },
+  "④SVD+②网络 res_s3413": {
+   "n2n_ok": false,
+   "core_ok": false,
+   "pass": false
+  },
+  "④SVD+②网络 res_s3414": {
+   "n2n_ok": false,
+   "core_ok": true,
+   "pass": false
+  }
+ },
+ "seeds_passed": 0,
+ "stable": false,
+ "best_net": "④SVD+②网络 res_s3412",
+ "note": "真实数据 n2n 不做绝对通过/不通过判定（天花板未校准）；上表的通过线是**相对 ①** 的预注册门槛，只用于回答'④ 能不能赢 ①'。"
+}

@@ -1,0 +1,46 @@
+
+===== SA64 =====
+/ssd1/wjb/SVD-VALID/scripts/v3_correlation_length.py:171: RuntimeWarning: Mean of empty slice
+  "plateau": float(np.nanmean([c[0] for c in curve[-2:]])),
+-- P1  n_bg=24866
+    ax   rho(1)  plateau rho_fast(1)  ell_raw  ell_fast  lam_exp
+     z   0.7939   0.4795      0.6040    1.472     0.996    8.815
+     y   0.9137   0.8444      0.4457    2.354     0.787   66.006
+     x   0.7359  -0.0538      0.7494    1.277     1.316    1.815
+-- P2  n_bg=24866
+    ax   rho(1)  plateau rho_fast(1)  ell_raw  ell_fast  lam_exp
+     z   0.0153  -0.0020      0.0172    0.346     0.351   32.388
+     y   0.4125   0.0158      0.4031    0.751     0.742    1.674
+     x   0.1640  -0.0043      0.1675    0.526     0.529    0.912
+-- Gate 1 泄漏上界（各向异性，按两种读法）
+   raw   ell=(1.47,2.35,1.28) m=1.0  min=0.810 mean=0.901 max=0.999
+   raw   ell=(1.47,2.35,1.28) m=1.5  min=0.302 mean=0.572 max=0.958
+   raw   ell=(1.47,2.35,1.28) m=2.0  min=0.053 mean=0.287 max=0.807
+   raw   ell=(1.47,2.35,1.28) m=3.0  min=0.000 mean=0.072 max=0.380
+   fast  ell=(1.00,0.79,1.32) m=1.0  min=0.249 mean=0.513 max=0.883
+   fast  ell=(1.00,0.79,1.32) m=1.5  min=0.011 mean=0.152 max=0.510
+   fast  ell=(1.00,0.79,1.32) m=2.0  min=0.000 mean=0.041 max=0.197
+   fast  ell=(1.00,0.79,1.32) m=3.0  min=0.000 mean=0.002 max=0.011
+
+===== HSA64 =====
+-- P1  n_bg=24866
+    ax   rho(1)  plateau rho_fast(1)  ell_raw  ell_fast  lam_exp
+     z   0.8648   0.6871      0.5679    1.855     0.940   19.393
+     y   0.8886   0.7008      0.6276    2.058     1.036   20.695
+     x   0.7920   0.2462      0.7240    1.464     1.244    3.677
+-- P2  n_bg=24866
+    ax   rho(1)  plateau rho_fast(1)  ell_raw  ell_fast  lam_exp
+     z   0.0243  -0.0110      0.0349    0.367     0.386    1.759
+     y   0.4984   0.0068      0.4950    0.847     0.843    1.185
+     x   0.2538   0.0225      0.2367    0.604     0.589    2.584
+-- Gate 1 泄漏上界（各向异性，按两种读法）
+   raw   ell=(1.86,2.06,1.46) m=1.0  min=0.923 mean=0.959 max=0.995
+   raw   ell=(1.86,2.06,1.46) m=1.5  min=0.531 mean=0.707 max=0.905
+   raw   ell=(1.86,2.06,1.46) m=2.0  min=0.174 mean=0.389 max=0.685
+   raw   ell=(1.86,2.06,1.46) m=3.0  min=0.004 mean=0.076 max=0.235
+   fast  ell=(0.94,1.04,1.24) m=1.0  min=0.408 mean=0.604 max=0.847
+   fast  ell=(0.94,1.04,1.24) m=1.5  min=0.038 mean=0.176 max=0.445
+   fast  ell=(0.94,1.04,1.24) m=2.0  min=0.001 mean=0.039 max=0.150
+   fast  ell=(0.94,1.04,1.24) m=3.0  min=0.000 mean=0.001 max=0.006
+
+wrote data/processed/v3_correlation_length.json

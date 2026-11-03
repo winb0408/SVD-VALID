@@ -1,0 +1,280 @@
+{
+ "meta": {
+  "prereg": "reports/v3_expA_v2/prereg.md §1.3（T1）/ §3.3（T2），写入于 2026-10-27 00:16",
+  "thresholds_literal": {
+   "T1_input_r_ves": 0.9456,
+   "T1_n2n_lt": 1.0,
+   "T2_n2n_lt": 1.0,
+   "T2_r_roi_gt_input": true,
+   "zero_margin": 0.0
+  },
+  "aggregation_note": "预注册只写'两条臂都满足'，未写跨种子/跨体的聚合方式。本脚本在结果产生之前固定：主判据 `strict` = 每条臂的**每一个** (seed × 评估体) 格子都满足门槛；同时并列报告 `arm_mean` = 每条臂先对体求均值、再对种子求均值后是否满足。两者不一致时，报告以 strict 为结论、把 arm_mean 标为'口径敏感性'。",
+  "gate_script": "scripts/v3_expA_v2_gate.py",
+  "gate_script_sha1": "9573b9f79af4f97c4d482cfbc493c1866016f400",
+  "gate_script_mtime": 1793038358.1886203,
+  "predates": {
+   "stage1": true,
+   "stage2": true
+  }
+ },
+ "T1": {
+  "status": "已判定",
+  "verdict": "T1-未通过",
+  "verdict_text": "T1-未通过（预算不是解释）：两条臂的 r_ves 都 < 输入且 n2n_ratio > 1.0 → 预算不是解释；实验 A 的结论在 50 倍预算下保持，仍需要阶段 2。",
+  "baseline_input_r_ves": 0.9455921763610047,
+  "threshold_literal_check": {
+   "input_r_ves_matches_prereg": true,
+   "note": "预注册写 0.9456；此处核对 JSON 里的输入值与之是否一致（不一致要报出来，不改门槛）"
+  },
+  "per_arm": {
+   "A_fixed4": {
+    "strict_pass": false,
+    "strict_fail": true,
+    "r_ves_mean": 0.5479143384389369,
+    "n2n_mean": 11.92905935640875,
+    "cells": {
+     "3407|eval": {
+      "r_ves": 0.5603630575185827,
+      "n2n_ratio": 11.76859623515691,
+      "bg_std_ratio": 1.1383223357782994
+     },
+     "3408|eval": {
+      "r_ves": 0.5354656193592912,
+      "n2n_ratio": 12.08952247766059,
+      "bg_std_ratio": 1.1865490888102908
+     }
+    }
+   },
+   "A_rand": {
+    "strict_pass": false,
+    "strict_fail": true,
+    "r_ves_mean": -0.08392364467358358,
+    "n2n_mean": 18.153067165786204,
+    "cells": {
+     "3407|eval": {
+      "r_ves": -0.14017266623879027,
+      "n2n_ratio": 19.2416112557128,
+      "bg_std_ratio": 0.578483996936466
+     },
+     "3408|eval": {
+      "r_ves": -0.027674623108376893,
+      "n2n_ratio": 17.06452307585961,
+      "bg_std_ratio": 0.5672206066462979
+     }
+    }
+   }
+  },
+  "aggregation": "预注册只写'两条臂都满足'，未写跨种子/跨体的聚合方式。本脚本在结果产生之前固定：主判据 `strict` = 每条臂的**每一个** (seed × 评估体) 格子都满足门槛；同时并列报告 `arm_mean` = 每条臂先对体求均值、再对种子求均值后是否满足。两者不一致时，报告以 strict 为结论、把 arm_mean 标为'口径敏感性'。"
+ },
+ "T2": {
+  "status": "已判定",
+  "verdict": "T2-未通过",
+  "verdict_text": "T2-未通过：两条臂 n2n_ratio 都 > 1.0 或 r_roi 都 < 输入 → faithful VALID 在该仿真上不成立，实验 B/C/D 继续冻结；结论适用范围写成'Kong 等 2024 的自监督去噪教义 + 本项目仿真协议'。",
+  "input_ref": {
+   "v2_eval_s30": {
+    "n2n_ratio": 1.0,
+    "r_roi": 0.7988801310922663
+   },
+   "v2_eval_s31": {
+    "n2n_ratio": 1.0,
+    "r_roi": 0.8212744876558371
+   }
+  },
+  "per_arm": {
+   "A_rand": {
+    "strict_pass": false,
+    "strict_fail": true,
+    "arm_mean_pass": false,
+    "n2n_mean": 9.623537466148454,
+    "r_roi_mean": 0.19371920074531712,
+    "cells": {
+     "3407|v2_eval_s30": {
+      "n2n_ratio": 6.9932337545878065,
+      "r_roi": 0.1812641240629284,
+      "r_core": 0.207653419151336,
+      "bg_std_ratio": 0.9246751691666738
+     },
+     "3407|v2_eval_s31": {
+      "n2n_ratio": 12.426708344296959,
+      "r_roi": 0.1889539729035494,
+      "r_core": 0.24647649047378012,
+      "bg_std_ratio": 0.8066213185280028
+     },
+     "3408|v2_eval_s30": {
+      "n2n_ratio": 7.47948425515068,
+      "r_roi": 0.2203552799710764,
+      "r_core": 0.2823420408886907,
+      "bg_std_ratio": 0.8742907074913313
+     },
+     "3408|v2_eval_s31": {
+      "n2n_ratio": 11.594723510558369,
+      "r_roi": 0.18430342604371425,
+      "r_core": 0.18230035826090218,
+      "bg_std_ratio": 0.8055742901039941
+     }
+    }
+   },
+   "A_fixed4": {
+    "strict_pass": false,
+    "strict_fail": true,
+    "arm_mean_pass": false,
+    "n2n_mean": 2.392259556182159,
+    "r_roi_mean": 0.7615881218375269,
+    "cells": {
+     "3407|v2_eval_s30": {
+      "n2n_ratio": 2.0499369208430696,
+      "r_roi": 0.7777154316881725,
+      "r_core": 0.7900815426257465,
+      "bg_std_ratio": 1.0053425664090452
+     },
+     "3407|v2_eval_s31": {
+      "n2n_ratio": 3.2977976584864805,
+      "r_roi": 0.737141710208261,
+      "r_core": 0.793167879606913,
+      "bg_std_ratio": 1.0052227327814909
+     },
+     "3408|v2_eval_s30": {
+      "n2n_ratio": 1.7440463800814485,
+      "r_roi": 0.7821675739656085,
+      "r_core": 0.792428068829066,
+      "bg_std_ratio": 0.977310807754342
+     },
+     "3408|v2_eval_s31": {
+      "n2n_ratio": 2.477257265317639,
+      "r_roi": 0.7493277714880654,
+      "r_core": 0.7966151602820084,
+      "bg_std_ratio": 0.9724948152946087
+     }
+    }
+   }
+  },
+  "aggregation": "预注册只写'两条臂都满足'，未写跨种子/跨体的聚合方式。本脚本在结果产生之前固定：主判据 `strict` = 每条臂的**每一个** (seed × 评估体) 格子都满足门槛；同时并列报告 `arm_mean` = 每条臂先对体求均值、再对种子求均值后是否满足。两者不一致时，报告以 strict 为结论、把 arm_mean 标为'口径敏感性'。",
+  "zero_control": {
+   "status": "已检查",
+   "zero_still_degenerate": false,
+   "offending": [],
+   "rows": {
+    "v2_eval_s30": {
+     "zero": {
+      "n2n_ratio": 314.5219076743249,
+      "r_roi": NaN
+     },
+     "input": {
+      "n2n_ratio": 1.0,
+      "r_roi": 0.7988801310922663
+     },
+     "zero_beats_or_ties_input": {
+      "n2n_ratio": false,
+      "r_roi": false
+     },
+     "nan_keys": [
+      "r_roi"
+     ],
+     "nan_treated_as": "not_beating（nan 来自常数输出的 0/0 相关，不构成「赢过输入」）"
+    },
+    "v2_eval_s31": {
+     "zero": {
+      "n2n_ratio": 326.8258320995952,
+      "r_roi": NaN
+     },
+     "input": {
+      "n2n_ratio": 1.0,
+      "r_roi": 0.8212744876558371
+     },
+     "zero_beats_or_ties_input": {
+      "n2n_ratio": false,
+      "r_roi": false
+     },
+     "nan_keys": [
+      "r_roi"
+     ],
+     "nan_treated_as": "not_beating（nan 来自常数输出的 0/0 相关，不构成「赢过输入」）"
+    }
+   },
+   "rule": "任一评估体上 zero 的 n2n_ratio<=输入 或 r_roi>=输入 ⇒ 判据仍退化 ⇒ 失败不可归因于方法"
+  },
+  "attribution": "zero 对照不退化 ⇒ 本次失败可以归因于方法（在预注册的预算与判据下）。"
+ },
+ "monotonicity": {
+  "role": "机制判读，不改门槛（预注册 §1.3 附加检查）",
+  "rows": [
+   {
+    "label": "4k",
+    "status": "已读",
+    "path": "reports/v3_expA/expA_metrics.json",
+    "arms": {
+     "A_rand": 0.7597492405909496,
+     "A_fixed4": 0.6865155327745165
+    },
+    "loss": {
+     "epoch": 40,
+     "loss": 0.024177
+    }
+   },
+   {
+    "label": "24k",
+    "status": "已读",
+    "path": "reports/v3_expA_long/expA_metrics.json",
+    "arms": {
+     "A_rand": 0.2176886775847502,
+     "A_fixed4": 0.4110122021615313
+    },
+    "loss": {
+     "epoch": 120,
+     "loss": 0.017816
+    }
+   },
+   {
+    "label": "200k",
+    "status": "已读",
+    "path": "reports/v3_expA_v2/stage1_eval/expA_metrics.json",
+    "arms": {
+     "A_rand": -0.08392364467358358,
+     "A_fixed4": 0.5479143384389369
+    },
+    "loss": {
+     "epoch": 200,
+     "loss": 0.01496
+    }
+   }
+  ],
+  "trend": {
+   "A_rand": {
+    "sequence": [
+     [
+      "4k",
+      0.7597492405909496
+     ],
+     [
+      "24k",
+      0.2176886775847502
+     ],
+     [
+      "200k",
+      -0.08392364467358358
+     ]
+    ],
+    "decreasing": true,
+    "note": "r_ves 随预算是否下降（下降=网络在正确优化错误的目标）"
+   },
+   "A_fixed4": {
+    "sequence": [
+     [
+      "4k",
+      0.6865155327745165
+     ],
+     [
+      "24k",
+      0.4110122021615313
+     ],
+     [
+      "200k",
+      0.5479143384389369
+     ]
+    ],
+    "decreasing": true,
+    "note": "r_ves 随预算是否下降（下降=网络在正确优化错误的目标）"
+   }
+  }
+ }
+}

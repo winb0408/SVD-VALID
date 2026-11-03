@@ -1,0 +1,655 @@
+{
+ "prereg": "Chatgpt/V3_PR1_round4_last_chance_stop_loss_protocol_2026-10-29.md §4（C 前置筛）",
+ "question": "I1 的相关性感知先验能否选出一个与 fixed-4 实质不同、且随场景变化的采样？",
+ "candidates": {
+  "valid_partitions": [
+   {
+    "name": "F0",
+    "role_pattern_index": 0,
+    "A": [
+     0,
+     1,
+     2,
+     4
+    ],
+    "B": [
+     3,
+     5,
+     6,
+     7
+    ],
+    "partner_pattern_index": 7
+   },
+   {
+    "name": "F1",
+    "role_pattern_index": 1,
+    "A": [
+     0,
+     1,
+     3,
+     5
+    ],
+    "B": [
+     2,
+     4,
+     6,
+     7
+    ],
+    "partner_pattern_index": 6
+   },
+   {
+    "name": "F2",
+    "role_pattern_index": 2,
+    "A": [
+     1,
+     2,
+     3,
+     7
+    ],
+    "B": [
+     0,
+     4,
+     5,
+     6
+    ],
+    "partner_pattern_index": 4
+   },
+   {
+    "name": "F3",
+    "role_pattern_index": 3,
+    "A": [
+     0,
+     2,
+     3,
+     6
+    ],
+    "B": [
+     1,
+     4,
+     5,
+     7
+    ],
+    "partner_pattern_index": 5
+   }
+  ],
+  "parity_split": {
+   "A": [
+    0,
+    3,
+    5,
+    6
+   ],
+   "B": [
+    1,
+    2,
+    4,
+    7
+   ],
+   "note": "共享质心；不在 VALID 8 模式家族内（见 d_subview.json）"
+  }
+ },
+ "scenes": {
+  "e902": {
+   "acf": {
+    "0": [
+     1.0,
+     -0.03900882103218273,
+     -0.02409901450411161,
+     -0.028310845907464768,
+     -0.03002052559743691
+    ],
+    "1": [
+     1.0,
+     -0.025311644623607545,
+     -0.03791123235267813,
+     -0.02217323878178239,
+     -0.02238673897783816
+    ],
+    "2": [
+     1.0,
+     -0.027065165001352372,
+     -0.036855597712011544,
+     -0.0164653897352488,
+     -0.026849512438147427
+    ]
+   },
+   "partitions": {
+    "F0": {
+     "signal_mismatch_rel": 0.11474261509507516,
+     "noise_corr_ves": -0.030935868621672705,
+     "noise_corr_bg": 0.01497575249945198,
+     "noise_var_ves": 0.00020339624133110666,
+     "n_ves": 146,
+     "signal_distortion_rel": 0.0576485371351206,
+     "pred_corr_noise": -0.04641284964797998,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F1": {
+     "signal_mismatch_rel": 0.14128383264299768,
+     "noise_corr_ves": -0.04644339444091081,
+     "noise_corr_bg": -0.004643126303272953,
+     "noise_var_ves": 0.00020841089822396777,
+     "n_ves": 146,
+     "signal_distortion_rel": 0.071264756574133,
+     "pred_corr_noise": -0.04641284964797999,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F2": {
+     "signal_mismatch_rel": 0.13192289144993932,
+     "noise_corr_ves": 0.021434539759186248,
+     "noise_corr_bg": 0.009779824369283997,
+     "noise_var_ves": 0.00023970313056681562,
+     "n_ves": 146,
+     "signal_distortion_rel": 0.0657571121094123,
+     "pred_corr_noise": -0.04641284964797998,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F3": {
+     "signal_mismatch_rel": 0.12325658358004142,
+     "noise_corr_ves": -0.027083425426806553,
+     "noise_corr_bg": -0.022530449609835693,
+     "noise_var_ves": 0.00021679563561384412,
+     "n_ves": 146,
+     "signal_distortion_rel": 0.061227265192705466,
+     "pred_corr_noise": -0.04641284964797999,
+     "centroid_shift_vox": 0.8660254037844386
+    }
+   },
+   "parity": {
+    "signal_mismatch_rel": 0.0004983347977983421,
+    "noise_corr_ves": -0.01094948503461159,
+    "noise_corr_bg": 0.0048095330794778995,
+    "noise_var_ves": 0.00020546575406253412,
+    "n_ves": 146,
+    "signal_distortion_rel": 0.0002491709917738886,
+    "pred_corr_noise": -0.09116363959452438,
+    "centroid_shift_vox": 0.0
+   },
+   "prior_choice_in_valid_family": {
+    "by_prediction": "F1",
+    "by_measurement": "F1"
+   },
+   "spread_in_family": {
+    "pred_corr_noise": [
+     -0.04641284964797998,
+     -0.04641284964797999,
+     -0.04641284964797998,
+     -0.04641284964797999
+    ],
+    "signal_mismatch_rel": [
+     0.11474261509507516,
+     0.14128383264299768,
+     0.13192289144993932,
+     0.12325658358004142
+    ],
+    "noise_corr_ves": [
+     -0.030935868621672705,
+     -0.04644339444091081,
+     0.021434539759186248,
+     -0.027083425426806553
+    ]
+   },
+   "family_vs_parity": {
+    "signal_mismatch_rel_family_median": 0.12758973751499036,
+    "signal_mismatch_rel_parity": 0.0004983347977983421,
+    "ratio": 256.0321656819584
+   },
+   "shuffled_prior": {
+    "distribution_mean_signal_mismatch_rel": 0.1276781059221862,
+    "best_achievable": 0.11474261509507516,
+    "worst_achievable": 0.14128383264299768,
+    "p_shuffle_matches_best_within_10pct": 0.497
+   }
+  },
+  "e903": {
+   "acf": {
+    "0": [
+     1.0,
+     -0.02493108176836798,
+     -0.02331989774719503,
+     -0.026728757463462854,
+     -0.019389094146130416
+    ],
+    "1": [
+     1.0,
+     -0.02695739491297867,
+     -0.027601278153069862,
+     -0.02919842773810681,
+     -0.02718983384713997
+    ],
+    "2": [
+     1.0,
+     -0.032227848511773974,
+     -0.0289193633964544,
+     -0.03106948497013391,
+     -0.03387349511032629
+    ]
+   },
+   "partitions": {
+    "F0": {
+     "signal_mismatch_rel": 0.12519089040385242,
+     "noise_corr_ves": 0.06370505966490123,
+     "noise_corr_bg": -0.0160203850490351,
+     "noise_var_ves": 0.00020536446039437798,
+     "n_ves": 72,
+     "signal_distortion_rel": 0.06271781101812435,
+     "pred_corr_noise": -0.04265150605450641,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F1": {
+     "signal_mismatch_rel": 0.13162513308365129,
+     "noise_corr_ves": 0.09166613902583567,
+     "noise_corr_bg": 0.01649274074399849,
+     "noise_var_ves": 0.0001869653137701907,
+     "n_ves": 72,
+     "signal_distortion_rel": 0.06615534167524542,
+     "pred_corr_noise": -0.04265150605450641,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F2": {
+     "signal_mismatch_rel": 0.08892430966737007,
+     "noise_corr_ves": 0.06293463479001735,
+     "noise_corr_bg": 0.00865762415968903,
+     "noise_var_ves": 0.00020662211354246715,
+     "n_ves": 72,
+     "signal_distortion_rel": 0.04443884680946296,
+     "pred_corr_noise": -0.04265150605450641,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F3": {
+     "signal_mismatch_rel": 0.09264001673443549,
+     "noise_corr_ves": 0.23065563270828673,
+     "noise_corr_bg": 0.01594409783388266,
+     "noise_var_ves": 0.00017936049936053723,
+     "n_ves": 72,
+     "signal_distortion_rel": 0.04615785270135881,
+     "pred_corr_noise": -0.04265150605450641,
+     "centroid_shift_vox": 0.8660254037844386
+    }
+   },
+   "parity": {
+    "signal_mismatch_rel": 0.0003668735656671373,
+    "noise_corr_ves": 0.11887303672324441,
+    "noise_corr_bg": -0.003392495355464575,
+    "noise_var_ves": 0.0001920401916157551,
+    "n_ves": 72,
+    "signal_distortion_rel": 0.00018343634664038858,
+    "pred_corr_noise": -0.08394119883623975,
+    "centroid_shift_vox": 0.0
+   },
+   "prior_choice_in_valid_family": {
+    "by_prediction": "F0",
+    "by_measurement": "F2"
+   },
+   "spread_in_family": {
+    "pred_corr_noise": [
+     -0.04265150605450641,
+     -0.04265150605450641,
+     -0.04265150605450641,
+     -0.04265150605450641
+    ],
+    "signal_mismatch_rel": [
+     0.12519089040385242,
+     0.13162513308365129,
+     0.08892430966737007,
+     0.09264001673443549
+    ],
+    "noise_corr_ves": [
+     0.06370505966490123,
+     0.09166613902583567,
+     0.06293463479001735,
+     0.23065563270828673
+    ]
+   },
+   "family_vs_parity": {
+    "signal_mismatch_rel_family_median": 0.10891545356914395,
+    "signal_mismatch_rel_parity": 0.0003668735656671373,
+    "ratio": 296.87462865057563
+   },
+   "shuffled_prior": {
+    "distribution_mean_signal_mismatch_rel": 0.10933088694727164,
+    "best_achievable": 0.08892430966737007,
+    "worst_achievable": 0.13162513308365129,
+    "p_shuffle_matches_best_within_10pct": 0.5045
+   }
+  },
+  "e904": {
+   "acf": {
+    "0": [
+     1.0,
+     -0.030041880092043786,
+     -0.032539335883419174,
+     -0.02422272355664976,
+     -0.027693152316731636
+    ],
+    "1": [
+     1.0,
+     -0.02413479544567695,
+     -0.01891232115601013,
+     -0.029012786275816844,
+     -0.029578929368515847
+    ],
+    "2": [
+     1.0,
+     -0.03424918749682527,
+     -0.019574071873204202,
+     -0.026978802828681536,
+     -0.021674048203422336
+    ]
+   },
+   "partitions": {
+    "F0": {
+     "signal_mismatch_rel": 0.11834502609962322,
+     "noise_corr_ves": 0.0487489423557248,
+     "noise_corr_bg": 0.0005713095915218434,
+     "noise_var_ves": 0.00014351791881687018,
+     "n_ves": 142,
+     "signal_distortion_rel": 0.05899769777164622,
+     "pred_corr_noise": -0.044873576000384365,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F1": {
+     "signal_mismatch_rel": 0.09226292922734113,
+     "noise_corr_ves": -0.010586313707746788,
+     "noise_corr_bg": -0.005729541521446131,
+     "noise_var_ves": 0.0002012893759459602,
+     "n_ves": 142,
+     "signal_distortion_rel": 0.04616121075854569,
+     "pred_corr_noise": -0.044873576000384365,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F2": {
+     "signal_mismatch_rel": 0.12513341779795945,
+     "noise_corr_ves": 0.05052955806769866,
+     "noise_corr_bg": 0.027527654439732263,
+     "noise_var_ves": 0.00019146623744605026,
+     "n_ves": 142,
+     "signal_distortion_rel": 0.0627877563443503,
+     "pred_corr_noise": -0.044873576000384365,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F3": {
+     "signal_mismatch_rel": 0.13382437483431292,
+     "noise_corr_ves": 0.14881330626026468,
+     "noise_corr_bg": 0.025153873007942456,
+     "noise_var_ves": 0.00018362228658404028,
+     "n_ves": 142,
+     "signal_distortion_rel": 0.06688371751970099,
+     "pred_corr_noise": -0.044873576000384365,
+     "centroid_shift_vox": 0.8660254037844386
+    }
+   },
+   "parity": {
+    "signal_mismatch_rel": 0.000619930719685965,
+    "noise_corr_ves": 0.14614034510478396,
+    "noise_corr_bg": 0.015188597883137608,
+    "noise_var_ves": 0.0002035175744855338,
+    "n_ves": 142,
+    "signal_distortion_rel": 0.0003099715336017287,
+    "pred_corr_noise": -0.08822303058840136,
+    "centroid_shift_vox": 0.0
+   },
+   "prior_choice_in_valid_family": {
+    "by_prediction": "F0",
+    "by_measurement": "F1"
+   },
+   "spread_in_family": {
+    "pred_corr_noise": [
+     -0.044873576000384365,
+     -0.044873576000384365,
+     -0.044873576000384365,
+     -0.044873576000384365
+    ],
+    "signal_mismatch_rel": [
+     0.11834502609962322,
+     0.09226292922734113,
+     0.12513341779795945,
+     0.13382437483431292
+    ],
+    "noise_corr_ves": [
+     0.0487489423557248,
+     -0.010586313707746788,
+     0.05052955806769866,
+     0.14881330626026468
+    ]
+   },
+   "family_vs_parity": {
+    "signal_mismatch_rel_family_median": 0.12173922194879133,
+    "signal_mismatch_rel_parity": 0.000619930719685965,
+    "ratio": 196.37552726933765
+   },
+   "shuffled_prior": {
+    "distribution_mean_signal_mismatch_rel": 0.11761762815628347,
+    "best_achievable": 0.09226292922734113,
+    "worst_achievable": 0.13382437483431292,
+    "p_shuffle_matches_best_within_10pct": 0.2395
+   }
+  },
+  "e905": {
+   "acf": {
+    "0": [
+     1.0,
+     -0.03985901843516696,
+     -0.0367723399155627,
+     -0.019316376064171806,
+     -0.023849821208388987
+    ],
+    "1": [
+     1.0,
+     -0.029293017970400993,
+     -0.02727733984581526,
+     -0.027958057102933857,
+     -0.030901111266951508
+    ],
+    "2": [
+     1.0,
+     -0.02475605378431415,
+     -0.02797065853014513,
+     -0.023322420583022675,
+     -0.020692493225967914
+    ]
+   },
+   "partitions": {
+    "F0": {
+     "signal_mismatch_rel": 0.16538156922259345,
+     "noise_corr_ves": 0.08489283730039626,
+     "noise_corr_bg": -0.015290664527951378,
+     "noise_var_ves": 0.00014607720227966057,
+     "n_ves": 111,
+     "signal_distortion_rel": 0.0829265841575933,
+     "pred_corr_noise": -0.0477148982231406,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F1": {
+     "signal_mismatch_rel": 0.176395770147191,
+     "noise_corr_ves": 0.016679167635196303,
+     "noise_corr_bg": 0.008279748710828205,
+     "noise_var_ves": 0.00016856524067458697,
+     "n_ves": 111,
+     "signal_distortion_rel": 0.08863821514943697,
+     "pred_corr_noise": -0.0477148982231406,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F2": {
+     "signal_mismatch_rel": 0.16487116474995336,
+     "noise_corr_ves": 0.10791779241471955,
+     "noise_corr_bg": 0.0018376577629792565,
+     "noise_var_ves": 0.00013924534384707996,
+     "n_ves": 111,
+     "signal_distortion_rel": 0.0847838912565415,
+     "pred_corr_noise": -0.0477148982231406,
+     "centroid_shift_vox": 0.8660254037844386
+    },
+    "F3": {
+     "signal_mismatch_rel": 0.16637949233959473,
+     "noise_corr_ves": 0.12140849871157917,
+     "noise_corr_bg": 0.01639363270799479,
+     "noise_var_ves": 0.00016890551731102665,
+     "n_ves": 111,
+     "signal_distortion_rel": 0.08538931181544367,
+     "pred_corr_noise": -0.0477148982231406,
+     "centroid_shift_vox": 0.8660254037844386
+    }
+   },
+   "parity": {
+    "signal_mismatch_rel": 0.0011373073271194615,
+    "noise_corr_ves": 0.10999119005343846,
+    "noise_corr_bg": 0.006275939192627634,
+    "noise_var_ves": 0.00018263265085356758,
+    "n_ves": 111,
+    "signal_distortion_rel": 0.0005685131169283204,
+    "pred_corr_noise": -0.09366727810152711,
+    "centroid_shift_vox": 0.0
+   },
+   "prior_choice_in_valid_family": {
+    "by_prediction": "F0",
+    "by_measurement": "F1"
+   },
+   "spread_in_family": {
+    "pred_corr_noise": [
+     -0.0477148982231406,
+     -0.0477148982231406,
+     -0.0477148982231406,
+     -0.0477148982231406
+    ],
+    "signal_mismatch_rel": [
+     0.16538156922259345,
+     0.176395770147191,
+     0.16487116474995336,
+     0.16637949233959473
+    ],
+    "noise_corr_ves": [
+     0.08489283730039626,
+     0.016679167635196303,
+     0.10791779241471955,
+     0.12140849871157917
+    ]
+   },
+   "family_vs_parity": {
+    "signal_mismatch_rel_family_median": 0.1658805307810941,
+    "signal_mismatch_rel_parity": 0.0011373073271194615,
+    "ratio": 145.85374315773683
+   },
+   "shuffled_prior": {
+    "distribution_mean_signal_mismatch_rel": 0.16812547823669122,
+    "best_achievable": 0.16487116474995336,
+    "worst_achievable": 0.176395770147191,
+    "p_shuffle_matches_best_within_10pct": 1.0
+   }
+  }
+ },
+ "degeneracy_proof": {
+  "within_set_distances": {
+   "F0": {
+    "A": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ],
+    "B": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ]
+   },
+   "F1": {
+    "A": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ],
+    "B": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ]
+   },
+   "F2": {
+    "A": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ],
+    "B": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ]
+   },
+   "F3": {
+    "A": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ],
+    "B": [
+     1.0,
+     1.0,
+     1.0,
+     1.414214,
+     1.414214,
+     1.414214
+    ]
+   },
+   "parity": {
+    "A": [
+     1.414214,
+     1.414214,
+     1.414214,
+     1.414214,
+     1.414214,
+     1.414214
+    ],
+    "B": [
+     1.414214,
+     1.414214,
+     1.414214,
+     1.414214,
+     1.414214,
+     1.414214
+    ]
+   }
+  },
+  "family_all_equal": true,
+  "parity_differs": true,
+  "why": "4+4 分割的预测跨伴图噪声相关 = (总协方差和 − A 内和 − B 内和)/2；族内所有分割的 A 内/B 内距离多重集相同 ⇒ 任何可分离自相关模型下预测值**精确并列**，相关性先验在族内没有区分力（这不是样本量问题，是几何恒等式）。"
+ },
+ "summary": {
+  "pred_corr_within_family_max_spread": 6.938893903907228e-18,
+  "prior_discriminative_power": "NONE — 族内预测值精确并列（见 degeneracy_proof）",
+  "measured_argmin_per_scene": [
+   "F1",
+   "F2",
+   "F1",
+   "F1"
+  ],
+  "measured_argmin_is_constant": false,
+  "measured_vs_predicted_agreement": "预测并列 ⇒ 无可比排序；实测 argmin 在 F1/F2 之间跳动，说明实测差异不来自相关性模型，无法据此建立可复现的选择规则",
+  "family_mismatch_median": 0.12466447973189085,
+  "parity_mismatch_median": 0.0005591327587421535,
+  "family_over_parity": 222.9604289549066,
+  "verdict": "I1_NO_DISTINCT_INTERVENTION",
+  "reason": "族内 4 个分割的预测跨伴图噪声相关在任何可分离自相关模型下**精确并列**（spread ≤ 1e-17，几何恒等式，见 degeneracy_proof）⇒ 相关性感知先验在 VALID 家族内没有任何区分力，不存在“随数据变化的干预”，C-pilot 无从对照，故不消耗训练预算。实测跨伴图相关的族内差异（0.07–0.17）无法由相关性模型解释、argmin 在场景间跳动，按任务书 §4 的“相关估计无法复现”条款同样不支持进入 C。另一方面族内信号失配中位数 0.125 对 parity 分割 0.00056（约 223×）：真正的结构安全增益来自**离开 VALID 采样家族**（固定采样重设计），不能归功于相关性自适应。"
+ }
+}
