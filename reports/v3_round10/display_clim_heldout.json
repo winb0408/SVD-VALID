@@ -1,0 +1,34 @@
+{
+  "rule": "四列共用同一 dB 参考 = 输入 PD 在 valid mask 内的最大值；下界 = 各列 XY MIP 在锥内像素上第 2.0 百分位向下取整，上界 0 dB",
+  "note": "本图展示的半卷就是 §4 里被评分的那一半（方向 2 = even），训练只用这一半，参照半 odd 未参与训练。与 final_5col_*（全 400 帧训练、逐列独立色标）不是一回事。",
+  "cols": {
+    "SA64": {
+      "clim_db": [
+        -10.0,
+        0.0
+      ],
+      "ref_pd": 4892416.0,
+      "sigma": 0.6,
+      "arm": "A",
+      "domain": "log1p",
+      "epochs": 6,
+      "run": "SA64_A_log1p_e6_even2odd",
+      "scored_half": "even",
+      "reference_half": "odd"
+    },
+    "HSA64": {
+      "clim_db": [
+        -18.0,
+        0.0
+      ],
+      "ref_pd": 12654469120.0,
+      "sigma": 0.4,
+      "arm": "A",
+      "domain": "log1p",
+      "epochs": 2,
+      "run": "HSA64_A_log1p_e2_even2odd",
+      "scored_half": "even",
+      "reference_half": "odd"
+    }
+  }
+}

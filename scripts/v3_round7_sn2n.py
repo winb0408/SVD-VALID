@@ -229,10 +229,24 @@ def main():
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--tta", type=int, default=8, choices=[1, 4, 8])
     ap.add_argument("--out", default=None)
+    # Round10 追加（改动原因）：要在**半卷**上训练同一套 SN2N，就必须能指定输入/输出路径。
+    # 不给这两个参数时行为与原版逐位相同（读 Round7 的全卷 dB，写回原目录）。
+    ap.add_argument("--pd-npy", default=None,
+                    help="线性 PD 的 .npy；给定时按 Round7 同一规则换算成 dB 当输入。")
+    ap.add_argument("--pred-npy", default=None,
+                    help="线性 PD 输出的 .npy 路径（由预测 dB 反变换得到）。")
     args = ap.parse_args()
 
     src = DATA / args.seq
-    db = np.load(src / "pd_svd_db.npy").astype(np.float64)
+    pd_linear = None
+    if args.pd_npy:
+        pd_linear = np.load(args.pd_npy).astype(np.float64)
+        # 与 scripts/v3_round7_prep.py::to_db 逐字同口径：10log10(PD/max)，零压到地板
+        floor = -60.0
+        db = 10.0 * np.log10(np.maximum(pd_linear, 1e-12) / pd_linear.max())
+        db = np.maximum(np.nan_to_num(db, nan=floor, neginf=floor), floor)
+    else:
+        db = np.load(src / "pd_svd_db.npy").astype(np.float64)
     run = Path(args.out) if args.out else ROOT / f"runs/v3_round7/sn2n_{args.seq}"
     run.mkdir(parents=True, exist_ok=True)
 
@@ -242,7 +256,13 @@ def main():
     torch.save({"model": model.state_dict()}, run / "model.pt")
 
     pred = predict_volume(model, db, args.device, tta=args.tta)
-    np.save(src / "pd_sn2n_db.npy", pred.astype(np.float32))
+    if args.pred_npy:
+        # dB → 线性 PD，与 to_db 严格互逆（except 被地板截断的部分）
+        pd_pred = pd_linear.max() * 10.0 ** (pred / 10.0)
+        Path(args.pred_npy).parent.mkdir(parents=True, exist_ok=True)
+        np.save(args.pred_npy, np.maximum(pd_pred, 0.0).astype(np.float32))
+    else:
+        np.save(src / "pd_sn2n_db.npy", pred.astype(np.float32))
     meta = {
         "seq": args.seq, "epochs": args.epochs, "bs": args.bs, "lr": args.lr,
         "seed": args.seed, "tta": args.tta, "pmin": PMIN, "pmax": PMAX,
