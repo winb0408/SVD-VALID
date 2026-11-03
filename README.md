@@ -1,5 +1,7 @@
 # SVD-VALID
 
+> **Current active experiment (2026-11-03)**: [Round9 shared-CRN VALID restoration and stop-loss plan](reviews/V3_PR1_round9_shared_valid_restoration_plan_2026-11-03.md). Skip the proposed Round8 artifact-diagnostic Stage 0; start with faithful within-Tetris single-network training and full-volume inference. Earlier negative results remain historical evidence, not a validated I1 falsification.
+
 **Current research direction (V3.0, planned): PSF- and Speckle-Correlation-Aware Orthogonal Self-Supervised Denoising for 3D Ultrasound Microvascular Imaging.**
 
 **中文简介**：项目以最终三维微血管图像恢复质量为首要目标；拟用独立测量的 PSF、散斑/残余噪声空间相关性指导 VALID 三维正交采样，并在不同时修改 CRN 网络和主要损失函数的条件下，对照 faithful random Tetris、fixed-4 与最强固定方向，检验背景抑制与微血管结构保真能否得到真实改善。
