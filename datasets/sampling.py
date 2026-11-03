@@ -5,10 +5,12 @@ Only the pattern selection policy is new in this repository.
 
 Two samplers are provided:
 
-* :func:`valid_random_tetris` -- a faithful port of the original VALID
-  sampler: every 2x2x2 block independently draws one of the eight Tetris
-  patterns and randomly assigns its four sampled positions to the four
-  subvolume roles. Use this for the baseline arm.
+* :func:`valid_random_tetris` -- the VALID random Tetris sampler. Every
+  2x2x2 block independently draws one of the eight Tetris patterns. NOTE
+  (corrected 2026-11-03): the role assignment is **not** identical to the
+  upstream sampler -- see the function docstring. Pass
+  ``role_perm="global"`` for the upstream behaviour; the default is the
+  historical per-block variant this repo's earlier arms were trained with.
 * :func:`guided_tetris_subvolumes` -- our method: one pattern per patch,
   selected from SVD-derived signal/noise statistics.
 """
@@ -114,17 +116,25 @@ def check_cross_slots(slots):
     return p
 
 
-def valid_random_tetris_strided(volume, stride=1, generator=None):
-    """与原版随机 Tetris 同样的抽样规则，但支持采样步距 m，且四种角色取自同一 tet。
+def valid_random_tetris_strided(volume, stride=1, generator=None,
+                                role_perm="per_block"):
+    """随机 Tetris 抽样，支持采样步距 m，四种角色取自同一 tet。
 
-    stride=1 时与 :func:`valid_random_tetris` **逐体素相同**（同样的 RNG 消耗顺序），
-    这一点由 tests/test_smoke.py 的回归检查保证。
+    stride=1 时与 :func:`valid_random_tetris` **逐体素相同**（同样的 RNG 消耗顺序，
+    前提是两者 `role_perm` 相同），这一点由 tests/test_smoke.py 的回归检查保证。
     注意这是"同 tet 配对"，**用不了体对角角色对**；cross 配对见
     :func:`valid_random_tetris_cross`。
+
+    角色置换的作用域**不是忠实移植**：默认 `role_perm="per_block"` 是逐块独立置换，
+    而上游 VALID 用 `RandomSampler_0123` 每次调用只 shuffle 一次、整个 patch 共用一次
+    全局置换。`role_perm="global"` 才是上游口径。详见
+    :func:`valid_random_tetris` 的说明（2026-11-03 审查第 2 条）。
     """
     x = torch.as_tensor(volume).float()
     if x.ndim != 3:
         raise ValueError("volume must have shape [D,H,W].")
+    if role_perm not in ("per_block", "global"):
+        raise ValueError(f"role_perm must be 'per_block' or 'global', got {role_perm!r}")
     step = 2 * stride
     if any(n % step for n in x.shape):
         raise ValueError(f"每个轴都必须能被 2*stride={step} 整除")
@@ -136,7 +146,10 @@ def valid_random_tetris_strided(volume, stride=1, generator=None):
 
     k = torch.randint(0, len(TETRIS_PATTERNS), (nb,), generator=generator)
     chosen = TETRIS_PATTERNS[k]                  # (nb, 4)
-    perm = torch.rand(nb, 4, generator=generator).argsort(dim=1)
+    if role_perm == "global":
+        perm = torch.rand(1, 4, generator=generator).argsort(dim=1).expand(nb, 4)
+    else:
+        perm = torch.rand(nb, 4, generator=generator).argsort(dim=1)
 
     zz, yy, xx = torch.meshgrid(
         *[torch.arange(n) for n in view_shape], indexing="ij"
@@ -150,10 +163,16 @@ def valid_random_tetris_strided(volume, stride=1, generator=None):
 
 
 def valid_random_tetris_cross(volume, stride=1, generator=None):
-    """VALID 的互补配对 + 随机角色：输入取随机 tet 的两个角，目标取其互补 tet 的两个角。
+    """跨 tet 配对 + 随机角色：输入取随机 tet 的两个角，目标取其**互补 tet** 的两个角。
 
-    与 :func:`valid_random_tetris_strided` 的区别**只在目标从哪来**：这里目标来自与
-    输入互补的那半个块，所以体对角角色对是可达的（它是 V3 预注册的首选）。
+    这不是上游 VALID 的配对方式（2026-11-03 更正）：上游 ``train_pipeline.py`` 里
+    ``mask1/mask2`` 是输入、``mask3/mask4`` 是目标，四者都取自**同一个** tet 的
+    ``rd_pair_idx``，即输入与目标在同一个 tet 内互补、合起来正好是这个 tet 的 4 个角。
+    本函数让目标来自互补 tet，输入与目标合起来覆盖整块 8 个角 —— 这是**本仓库的设计**，
+    目的是让体对角角色对可达（tet 内部恒缺体对角对，见上面的说明），
+    属于 V3 创新点的一部分，不应被描述为"忠实复现上游"。
+
+    与 :func:`valid_random_tetris_strided` 的区别**只在目标从哪来**。
     覆盖率和 within 配对一样是 4/8（每块 2 个输入角 + 2 个目标角），
     两者采到的体素总数相同，区别是"目标的 2 个体素落在哪半个块里"。
     """
@@ -195,19 +214,41 @@ def _space_to_depth(x, block_size=2):
     return x.view(d // block_size, h // block_size, w // block_size, block_size ** 3)
 
 
-def valid_random_tetris(volume, generator=None):
-    """Faithful port of VALID v1.0 random Tetris sampling.
+def valid_random_tetris(volume, generator=None, role_perm="per_block"):
+    """VALID random Tetris sampling -- **with one documented deviation**.
 
-    Each 2x2x2 block draws one of the eight patterns uniformly at random,
-    and the four sampled positions are assigned to the four subvolume
-    roles through a random permutation, exactly as the upstream
-    generate_mask_pair / RandomSampler_0123 combination does.
+    Matching upstream: each 2x2x2 block draws one of the eight patterns
+    uniformly at random (upstream ``generate_mask_pair``: ``rd_idx`` is drawn
+    per block over ``idx_pair``, and ``idx_pair`` here is the same eight-row
+    table).
+
+    Not matching upstream: the role assignment. Upstream constructs
+    ``RandomSampler_0123`` once per call -- ``__init__`` shuffles ``[0,1,2,3]``
+    a single time -- and then pops four numbers that are applied to **every
+    block** in the patch (``datasets/sampling.py:264-268`` of VALID v1.0).
+    So upstream uses **one global permutation per patch**. This function
+    historically drew an **independent permutation per block**, which is a
+    strictly more randomised (and therefore not faithful) variant. The
+    2026-11-03 review (PR #1 round 8, point 2) flagged this; the earlier
+    docstring claim "exactly as the upstream ... combination does" was wrong
+    and has been removed.
+
+    Parameters
+    ----------
+    role_perm : {"per_block", "global"}
+        ``"per_block"`` (default) keeps the historical behaviour so that arms
+        already trained with this function remain reproducible.
+        ``"global"`` reproduces upstream: one permutation shared by all blocks.
+        Use ``"global"`` for any arm that is described as a faithful VALID
+        baseline.
 
     Returns four tensors of shape (D/2, H/2, W/2).
     """
     x = torch.as_tensor(volume).float()
     if x.ndim != 3:
         raise ValueError("volume must have shape [D,H,W].")
+    if role_perm not in ("per_block", "global"):
+        raise ValueError(f"role_perm must be 'per_block' or 'global', got {role_perm!r}")
     d, h, w = x.shape
     if d % 2 or h % 2 or w % 2:
         raise ValueError("All spatial dimensions must be even.")
@@ -220,8 +261,10 @@ def valid_random_tetris(volume, generator=None):
     offsets = torch.arange(nb).unsqueeze(1) * 8
     flat = blocks.reshape(-1)                    # (nb*8,)
 
-    # Random permutation per block: sub i receives pattern slot perm[i].
-    perm = torch.rand(nb, 4, generator=generator).argsort(dim=1)
+    if role_perm == "global":                    # upstream: one shuffle per patch
+        perm = torch.rand(1, 4, generator=generator).argsort(dim=1).expand(nb, 4)
+    else:                                        # historical: one shuffle per block
+        perm = torch.rand(nb, 4, generator=generator).argsort(dim=1)
 
     subs = []
     for i in range(4):

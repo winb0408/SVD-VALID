@@ -50,7 +50,9 @@ def test_valid_random_tetris_covers_and_disjoint():
     assert joint.numel() == (4 * 8 * 8) // 2
     assert joint.unique().numel() == joint.numel(), "subvolumes must be disjoint"
     assert torch.isin(joint, torch.as_tensor(v).flatten()).all()
-    print("ok: faithful random Tetris yields 4 disjoint half-coverage subvolumes")
+    # 注意不提 "faithful"：角色置换的作用域与上游不同，见
+    # test_role_permutation_scope_matches_upstream_only_in_global_mode。
+    print("ok: random Tetris yields 4 disjoint half-coverage subvolumes")
 
 
 def test_strided_phase_regresses_to_one_phase():
@@ -84,6 +86,47 @@ def test_valid_random_tetris_strided_regresses_to_original():
     for a, b in zip(ref, new):
         assert torch.equal(a, b)
     print("ok: strided random Tetris regresses to the original at m=1")
+
+
+def test_role_permutation_scope_matches_upstream_only_in_global_mode():
+    """PR #1 round 8 第 2 条：角色置换的作用域。
+
+    上游 VALID 的 ``RandomSampler_0123`` 每次调用只 shuffle 一次，四次 ``draw()``
+    分别弹出 {0,1,2,3}，作用到**所有块**上 —— 即整个 patch 共用一次全局置换。
+    本仓库历史上是逐块独立置换，二者不同，所以"忠实移植"的说法已撤回。
+    这里同时钉住两件事：
+      * ``role_perm="global"``：每块的角色顺序必须完全一致（同一置换）；
+      * 默认 ``role_perm="per_block"``：历史行为不变，避免已训好的臂不可复现。
+    """
+    # 4x4x4 = 8 个块；标签值 = 块号*8 + 块内角点号，取模即角点身份。
+    # 块号按 _space_to_depth 的枚举顺序 = ((zb)*2+yb)*2+xb。
+    g3 = np.indices((4, 4, 4))
+    block_id = (g3[0] // 2) * 4 + (g3[1] // 2) * 2 + (g3[2] // 2)
+    corner = (g3[0] % 2) * 4 + (g3[1] % 2) * 2 + (g3[2] % 2)
+    labels = torch.from_numpy((block_id * 8 + corner).astype(np.float32))
+
+    def block_role_tuples(mode):
+        """每块一条 4 元组 = 视图 i 取到的角点在该块模式内的**排名**。
+
+        为什么要取排名：每块抽到的 tet 不同，所以绝对角点号逐块不同；被共享的是
+        "哪个视图拿第几个角"这个槽位置换。取排名才能把两者分开。
+        """
+        torch.manual_seed(5)
+        subs = valid_random_tetris(labels, role_perm=mode)
+        corners = [[int(v) % 8 for v in s.reshape(-1).tolist()] for s in subs]
+        out = []
+        for blk in zip(*corners):
+            order = sorted(blk)
+            out.append(tuple(order.index(c) for c in blk))
+        return out
+
+    g, b = block_role_tuples("global"), block_role_tuples("per_block")
+    assert len(g) == 8, f"应看到 8 个块，实际 {len(g)}"
+    assert all(len(set(t)) == 4 for t in g + b), "每块必须取到 4 个不同角点"
+    assert len(set(g)) == 1, f"global 应所有块共用同一置换，实际 {set(g)}"
+    assert len(set(b)) > 1, "per_block 应逐块不同，否则历史行为被改动"
+    print("ok: role_perm=global reproduces upstream's one-permutation-per-patch; "
+          "default keeps the historical per-block variant")
 
 
 def test_cross_pairing_is_disjoint_with_targets_in_the_other_tet():
@@ -214,6 +257,7 @@ if __name__ == "__main__":
     test_pattern_semantics_match_upstream()
     test_strided_phase_regresses_to_one_phase()
     test_valid_random_tetris_strided_regresses_to_original()
+    test_role_permutation_scope_matches_upstream_only_in_global_mode()
     test_cross_pairing_is_disjoint_with_targets_in_the_other_tet()
     test_body_diagonal_pair_needs_the_complement_tet()
     test_phases_partition_volume()

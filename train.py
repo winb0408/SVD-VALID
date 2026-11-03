@@ -5,7 +5,10 @@ Loss, optimizer, LR schedule and CRN follow VALID v1.0 (the upstream
 DWT typo -- the second DWT applied again to output 1 -- is fixed here).
 
 Sampling arms share everything else (loss, optimizer, LR schedule, CRN):
-  --mode random       : faithful per-block random Tetris (VALID baseline)
+  --mode random       : per-block random Tetris (VALID baseline; NOTE the role
+                        permutation is per-block, upstream VALID uses one
+                        global permutation per patch — see datasets/sampling.py,
+                        pass role_perm="global" for the exact upstream behaviour)
   --mode patch_random : single random pattern per patch, fixed roles
                         (control for guided: removes the guidance, keeps the
                         "one pattern per patch" geometry)
@@ -197,7 +200,9 @@ def main():
     ap.add_argument("--noise-map")
     ap.add_argument("--mode", choices=["random", "patch_random", "guided", "fixed", "dense"],
                     default="random",
-                    help="random: faithful per-block VALID Tetris; "
+                    help="random: per-block random Tetris (VALID baseline; role "
+                         "permutation is per-block, NOT upstream's one global "
+                         "permutation per patch — see datasets/sampling.py); "
                          "patch_random: single random pattern per patch, fixed "
                          "roles (control for guided); guided: SVD-guided "
                          "pattern per patch; fixed: one fixed pattern "

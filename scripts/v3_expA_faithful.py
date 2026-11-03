@@ -1,5 +1,13 @@
 """实验 A（外部审查 R01/R07 整改后的第一个必跑项）：恢复基础能力。
 
+.. note::
+   2026-11-03（PR #1 round 8 第 2 条）：本文件标题里的 "faithful" 只在
+   "逐块随机 tet + 同 tet 配对" 这个意义上成立。角色置换的作用域**不是**上游口径——
+   上游 `RandomSampler_0123` 每个 patch 只 shuffle 一次、所有块共用一次全局置换，
+   本仓库是逐块独立置换。见 `datasets/sampling.py::valid_random_tetris` 的说明。
+   已跑完的数值不受影响（行为未改），但不应再称这一臂为"忠实复现上游"。
+
+
 ## 这一步要回答的唯一问题
 
 **faithful VALID（逐块随机 Tetris、同 tet 配对）和 fixed-4 这两个真正"原版口径"的臂，
