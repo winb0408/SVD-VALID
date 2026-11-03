@@ -324,8 +324,10 @@ def tetris_from_pattern(volume, pattern_id):
 def random_tetris_subvolumes(volume):
     """Single-pattern-per-patch random sampling (kept for ablation only).
 
-    This is NOT the original VALID sampler; use :func:`valid_random_tetris`
-    for the faithful baseline.
+    This is NOT the original VALID sampler: upstream redraws the Tetris per
+    2x2x2 block, whereas this draws ONE pattern for the whole patch. For an
+    upstream-faithful baseline use :func:`valid_random_tetris` with
+    ``role_perm="global"``.
     """
     pattern_id = int(torch.randint(0, len(TETRIS_PATTERNS), ()).item())
     return pattern_id, tetris_from_pattern(volume, pattern_id)

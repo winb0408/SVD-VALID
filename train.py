@@ -5,10 +5,11 @@ Loss, optimizer, LR schedule and CRN follow VALID v1.0 (the upstream
 DWT typo -- the second DWT applied again to output 1 -- is fixed here).
 
 Sampling arms share everything else (loss, optimizer, LR schedule, CRN):
-  --mode random       : per-block random Tetris (VALID baseline; NOTE the role
-                        permutation is per-block, upstream VALID uses one
-                        global permutation per patch — see datasets/sampling.py,
-                        pass role_perm="global" for the exact upstream behaviour)
+  --mode random       : random Tetris, one legal tet per 2x2x2 block. Role
+                        permutation scope is chosen by --role-perm:
+                        global = upstream VALID v1.0 (one shuffle per patch),
+                        per_block = this repo's historical default.
+                        Upstream-faithful arm must pass --role-perm global.
   --mode patch_random : single random pattern per patch, fixed roles
                         (control for guided: removes the guidance, keeps the
                         "one pattern per patch" geometry)
@@ -154,7 +155,8 @@ def sample_views(args, src, csrc, patch, origin, signal=None, noise=None, gen_se
                 v = strided_views(arr, TETRIS_PATTERNS[args.pattern].tolist(),
                                   args.stride)
                 return [v[i] for i in args.role_order] if args.role_order is not None else v
-            return valid_random_tetris_strided(arr, args.stride, generator=gen)
+            return valid_random_tetris_strided(arr, args.stride, generator=gen,
+                                               role_perm=args.role_perm)
         if args.mode == "guided":
             z0, y0, x0 = origin
             sp = signal[z0:z0 + args.patch[0], y0:y0 + args.patch[1], x0:x0 + args.patch[2]]
@@ -167,7 +169,8 @@ def sample_views(args, src, csrc, patch, origin, signal=None, noise=None, gen_se
         if args.mode == "fixed":
             v = tetris_from_pattern(arr, args.pattern)
             return [v[i] for i in args.role_order] if args.role_order is not None else v
-        return valid_random_tetris(arr, generator=gen)
+        # random 臂：角色置换作用域由 --role-perm 决定（global = 上游行为）
+        return valid_random_tetris(arr, generator=gen, role_perm=args.role_perm)
 
     if csrc is not None:
         # 有监督上界臂：**只改目标**。输入视图与目标视图都按同一套采样几何抽，
@@ -229,15 +232,28 @@ def main():
                     help="cross 配对下的显式相位槽位（0..7）。前两个必须同属一个 tet，"
                          "后两个必须落在它的互补 tet 内。例：体对角 1 4 6 3；"
                          "y 轴向 1 4 3 6（**同一批 4 个体素、同样的输入，只把两个目标对调**）。")
+    ap.add_argument("--role-perm", choices=["per_block", "global"], default="per_block",
+                    help="角色置换的作用域（只对 random 臂有意义）。"
+                         "global = **上游 VALID v1.0 行为**：`RandomSampler_0123.__init__` "
+                         "只 shuffle 一次 [0,1,2,3]，四个 draw 结果套到所有块上，即每个 patch "
+                         "共用一个置换；per_block = 本仓库历史行为，每块独立抽置换。"
+                         "默认保持 per_block 以免改变旧 run 的语义；Round9 的 faithful 臂"
+                         "必须显式写 --role-perm global。"
+                         "**在 fixed / cross / guided / patch_random 下该参数无意义**，"
+                         "给 global 会直接报错而不是静默忽略（静默忽略 = 假 faithful）。")
     ap.add_argument("--patch", nargs=3, type=int, default=[32, 64, 64])
     ap.add_argument("--epochs", type=int, default=50)
     ap.add_argument("--steps-per-epoch", type=int, default=200)
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--lr-schedule", choices=["poly", "cosine"], default="poly",
-                    help="poly = 上游 VALID v1.0 的 `utils/general.py:adjust_learning_rate`："
-                         "lr·(1−epoch/max_epoch)^0.9，**没有 warmup**；"
-                         "cosine = 本仓库此前用的 warmup+余弦（保留以便复现旧 run）。"
-                         "2026-10-26 核出此前一直用 cosine，与上游不同，故默认改为 poly。")
+                    help="**2026-11-03（Round9）逐行核对上游后的更正**：上游 "
+                         "`train_pipeline.py` 里其实有**两套** schedule ——"
+                         "①686 行建了 `LambdaLR(min((e+1)/(0.1E), 0.5(cos+1)))`（warmup+余弦），"
+                         "②741 行在**每个 batch 开头**调用 `utils/general.adjust_learning_rate`，"
+                         "直接赋值 lr = round(init_lr·(1−e/E)^0.9, 8)（= 本参数的 poly）。"
+                         "②每步都执行且晚于 ① 的 epoch 级赋值，因此**实际生效的是 poly**，"
+                         "①只剩每次 `get_last_lr()` 的打印意义。所以默认 poly 就是上游有效行为。"
+                         "cosine 只为复现本仓库早前自造的 warmup+余弦 run 而保留。")
     ap.add_argument("--clip-grad", type=float, default=100.0,
                     help="上游 `clip_gradients` 默认 100.0；本仓库此前写死 20.0。")
     ap.add_argument("--train-clean-volumes", nargs="*", default=None,
@@ -303,6 +319,20 @@ def main():
             check_cross_slots(args.slots)
     elif args.slots is not None:
         raise ValueError("--slots 只在 --pairing cross 下使用。")
+
+    # --role-perm 校验（Round9 / Phase 1A）。只对"随机抽 tet"的臂有意义：
+    # 固定 pattern 与 cross 配对根本没有"角色置换"这一步，静默忽略会让一条命令
+    # 看起来 faithful 实际不是，所以显式报错。
+    if args.role_perm == "global":
+        if args.mode != "random":
+            raise ValueError(
+                f"--role-perm global 只对 --mode random 有意义，当前 mode={args.mode}。"
+                "（fixed 的角色完全由 --pattern/--role-order 决定；cross 的输入与目标"
+                "分属互补 tet，没有上游意义上的角色置换。）")
+        if args.pairing == "cross":
+            raise ValueError(
+                "--role-perm global 不能与 --pairing cross 同用：上游 VALID 的四个视图"
+                "全部取自**同一个** tet，cross 是本仓库自己的设计，与上游不可比。")
     if args.stride > 1 and any(p % (2 * args.stride) for p in args.patch):
         raise ValueError(
             f"--stride {args.stride} 要求每个 --patch 轴能被 {2 * args.stride} 整除。")
@@ -371,10 +401,11 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999))
     if args.lr_schedule == "poly":
-        # 上游 VALID v1.0：lr·(1 − epoch/max_epoch)^0.9，无 warmup
+        # **上游实际生效的 schedule**：lr·(1 − epoch/max_epoch)^0.9，无 warmup
+        # （上游 utils/general.py:adjust_learning_rate，每个 batch 调用一次覆盖掉 LambdaLR）
         lr_func = lambda epoch: max(1.0 - (start_epoch + epoch) / max(args.epochs, 1), 0.0) ** 0.9
     else:
-        # 本仓库此前一直用的（与上游**不同**，保留以复现旧 run）
+        # 上游建了但**被覆盖**的那套 LambdaLR（warmup+余弦），本仓库早前自用过
         lr_func = lambda epoch: min(
             (start_epoch + epoch + 1) / (args.epochs * 0.1 + 1e-8),
             0.5 * (math.cos((start_epoch + epoch) / args.epochs * math.pi) + 1),
