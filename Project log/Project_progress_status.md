@@ -1,6 +1,6 @@
 # SVD-VALID V3.0 项目进度与验收状态
 
-> **最新执行决策（2026-11-03）**：Round8 已确认“八相位回填产生网格；完整 patch 去网格但旧四模型方案没有有效去噪收益”。旧止损结论保留；用户授权一次**有限预算的 Round9 单共享 CRN VALID 主线恢复**，**跳过水波纹阶段 0 诊断**。目前 Round9 仅完成**计划编制，代码修复、A/B 训练、I1 C/D 均未运行**。以 [Round9 执行方案](../reviews/V3_PR1_round9_shared_valid_restoration_plan_2026-11-03.md) 为准，不据此修改前轮 Gate 或已保存数值。
+> **最新执行决策（2026-11-03，Round9 已执行完毕）**：Round8 已确认“八相位回填产生网格；完整 patch 去网格但旧四模型方案没有有效去噪收益”。旧止损结论保留。Round9 的**有限预算单共享 CRN VALID 主线恢复**已按用户授权执行完成：Phase 1A（上游逐项保真核对 + `--role-perm` 修复 + 8 条单测）**通过**；Phase 1B（A=严格照上游随机采样、B=校准选出的最强固定几何，各 1 万步）**Gate 未通过**，判定 **[`STOP_BASELINE`](../reports/v3_round9/DECISION.md)**，Phase 2（物理引导采样 C/D）写为 **`NOT_RUN`**。本轮实际消耗 2 个训练作业 / 0.59 GPU·h。以 [Round9 执行方案](../reviews/V3_PR1_round9_shared_valid_restoration_plan_2026-11-03.md) 与 [预注册](../reviews/V3_PR1_round9_prereg.md) 为准，不据此修改前轮 Gate 或已保存数值。
 
 
 > **更新时间**：2026-11-02（Round6：真实采集上重新自监督训练，BD-2 仍垫底，且暴露度量偏袒低对比度输出）｜ **状态**：Phase 0–5 + Round2/3/4/5/6 已执行，**主主张（I1 相关性感知采样）尚未通过任何一条验收闸门**；Round4 给 I1 的结论是"**未检验即止损**"（结构尺子不可解），同时 `logeps` 表示域拿到探索级正向信号；Round5 给出采样几何的**直接负结果**（BD-2 比 D1 差 9.4–12×，仿真带真值）；Round6 在真实采集上重新自监督训练后同网格对照，结论同向（BD-2 垫底），并测出当前误差类度量**偏袒"低对比度输出"**（分数最好的 gauss 削掉 9.85%/1.66% 图像方差，超可去上限 5.23%/0.52%）。
@@ -561,10 +561,13 @@ Round6 的"BD-2 垫底"与"当前分数偏袒低对比度输出"两条结论**�
 一种）；也不能说"换个说法让指标过了就行"——门槛是看结果之前写死的。
 
 
-## Round9 — 单共享 CRN VALID 主线恢复（2026-11-03；用户授权，待执行）
+## Round9 — 单共享 CRN VALID 主线恢复（2026-11-03；已执行完毕，判定 STOP_BASELINE）
 
 - **用户决定**：不再做 Round8 后的水波纹/低频频谱/增益专项阶段 0 诊断；直接从阶段 1 开始。此调整仅是资源管理，不代表波纹的完整机制已被证明。
-- **已完成的证据**：Round8 的完整分辨率推理消除了相位拼装的周期接缝，但旧 P0–P3 四模型方案未在真实 SA/HSA 的保真代理上展现收益。已发现仓库 random 采样默认的逐块 role permutation 不完全等同上游，而 `train.py` 尚未传入 `role_perm="global"`。这些是**计划修复项**。
-- **本轮新任务**：1A 上游对照、接入 global role perm、within-tet 四视图/共享 CRN/完整 patch 推理单测；1B 两臂 A faithful random、B strongest fixed；仅在 1B 过 Gate 后才允许 C 物理先验、D 打乱先验。**当前状态：1A/1B/C/D 均 NOT_RUN；旧实验不被重新计为本轮通过。**
-- **硬预算/止损**：≤4 新训练 jobs、≤6 GPU·h；阶段 1 ≤2 jobs、≤3 GPU·h，若基础 VALID 无结构安全的真实成像收益则 `STOP_BASELINE`，直接终止这条 CRN/VALID 应用线；正确/错误先验无差异则 `STOP_I1`。不以“接近通过”无限续训。结果状态与命令需提交 [本轮执行方案](../reviews/V3_PR1_round9_shared_valid_restoration_plan_2026-11-03.md) 指定的文件。
-- **与原止损不冲突**：此前判负的对象是固定 cross-tet+四独立网络+八相位拼装，Round9 则是原始 VALID 的单共享网络和训练侧几何选择。任何 I1 科学结论仍须后续直接、同预算、同推理条件的对照实验。
+- **已完成的证据**：Round8 的完整分辨率推理消除了相位拼装的周期接缝，但旧 P0–P3 四模型方案未在真实 SA/HSA 的保真代理上展现收益。已发现仓库 random 采样默认的逐块 role permutation 不完全等同上游，而 `train.py` 尚未传入 `role_perm="global"`。
+- **Phase 1A（已通过）**：`train.py` 新增并透传 `--role-perm {per_block,global}`（非法组合直接报错，不静默忽略）；上游逐项核对落到数字——CRN 权重互传后前向 `max|Δ|=0.0`（112 张量 / 1,543,654 参数）、neighbour 与 identity 与上游差 `0.0`、reg 在修掉上游 `DWT3D(output1)` 写两遍的 typo 后差 `0.0`、上游"一个 patch 一个全局置换"是被**实测**出来的；DWT 有 4 个频带与上游反号但正则项数值不变（已单测）。8 条单测全过。见 [implementation_fidelity.md](../reports/v3_round9/implementation_fidelity.md)。
+- **Phase 1B（Gate 未通过）**：A=严格照上游随机采样、B=仅用 e900/e901 校准选出的固定几何，各 10,000 步、同损失/同预算/同满 patch 推理，合计 **0.59 GPU·h**。主考 e902–e905 上 A 34.55 dB / B 28.56 dB，**恒等 40.77、维纳 42.76**；A 在 0/4 场景优于恒等且弱血管与分支 4/4 场景受损；严格确认集 e906–e911 方向完全一致（0/6）。**三条 Gate 条件一条未满足** → [`STOP_BASELINE`](../reports/v3_round9/DECISION.md)。
+- **机制（已测量，非猜测）**：训练目标在 `f=identity` 处为 0.01714，训练后为 0.00913（**降了 47%，不是没训起来**），但降的方式是 identity 项 0.0083→0.0024、reg 1.21→1.02，即**把两条分支输出拉到一起 + 抹平高频**；代价是 `core_mean_ratio` 0.950/0.909（亮血管被压暗 5%–9%），而主终点在线性 PD 域对亮区压缩极敏感。把高斯调到**同等压暗程度**后高斯仍更好（35.08 vs 34.55），排除"只是更平滑所以吃亏"。
+- **结论的适用边界**：上游 patch 64×256×256（子视图 32×128×128），本轮 32×64×64（子视图 16×32×32），CRN 全局分支被池化到 2×4×4 而非 4×16×16——这是真实协议差异，因此本轮否证的是"**在我们这个数据尺度上原样迁移 VALID**"，不是"VALID 无价值"；但按纪律不得以此就地重跑。
+- **Phase 2 = `NOT_RUN`**：物理引导采样 C（正确先验）/D（打乱先验）**未训练**，[physical_sampler_intervention.md](../reports/v3_round9/physical_sampler_intervention.md) 写明原因；不产出 `STOP_I1`/`STOP_I1_NO_DISTINCT_INTERVENTION` 结论（那两个结论要求 C/D 真跑过）。
+- **预算与纪律**：≤4 新训练 jobs、≤6 GPU·h（实际 2 jobs / 0.59 GPU·h）；旧实验未被重新计为本轮通过；Round8 的 `INFERENCE_ARTIFACT_FIXED_METHOD_NO_GAIN` 与更早负结果原样保留。
